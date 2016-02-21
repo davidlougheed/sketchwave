@@ -7,26 +7,29 @@ block scripts
 				$('#conversations').html('');
 				$.get('/conversations_data/').done(function (data) {
 					for (var c in data['conversations']) {
-
+						var rawDate = data['conversations'][c]['lastMessage'];
+						var formattedDate = moment(rawDate).format("h:mm:ss A; dddd, MMMM D, YYYY");
 						$('#conversations').append('<li class="conversation" data-id="' + data['conversations'][c]['id']
 								+ '" id="conversation-'
-								+ data['conversations'][c]['id'] + '"><a href="/conversation/'
+								+ data['conversations'][c]['id'] + '"><div id="link"><a href="/conversation/'
 								+ data['conversations'][c]['id'] + '/">'
-								+ data['conversations'][c]['name'] + '</a> | Members: <span class="members"></span>'
+								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> <span class="members"></span><div class="date">' + formattedDate + '</div>'
 								+ '<div class="controls"><button class="delete">Delete</button></div>'
 								+ '</li>');
 					}
 
-					for (var i = 0; i < $('.conversation').length; i++) {
+					for(var i = 0; i < data['conversations'].length; i++) {
 						$.get('/conversation_users/' + data['conversations'][i]['id'] + '/', function (userData) {
 							var userList = '';
 							for (var u in userData['users']) {
-								var userList;
-
 								userList += userData['users'][u]['username'];
 								if (userData['users'][u] !== userData['users'][userData['users'].length - 1]) {
 									userList += ', ';
 								}
+							}
+
+							if(userData['users'].length > 1) {
+								$('#conversation-' + userData['conversationID']).children('.controls').first().children('.delete').first().remove();
 							}
 
 							$('#conversation-' + userData['conversationID']).children('.members').first().html(userList);
@@ -90,5 +93,6 @@ block content
 		br
 		br
 		button(type='submit') Create
+		button(type='button', id='cancelConversation') Cancel
 
 	ul#conversations

@@ -1,6 +1,7 @@
 module.exports = function (sequelize, dataTypes) {
     var Conversation = sequelize.define('Conversation', {
-        name: {type: dataTypes.STRING}
+        name: {type: dataTypes.STRING},
+        lastMessage: {type: dataTypes.DATE}
     }, {
         classMethods: {
             associate: function (models) {

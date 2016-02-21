@@ -51,6 +51,12 @@ module.exports.controller = function (objects) {
 			}
 		}).then(function (user) {
 			user.getConversations().then(function (conversations) {
+				conversations.sort(function (a, b) {
+					if(a['lastMessage'] < b['lastMessage']) return 1;
+					if(a['lastMessage'] > b['lastMessage']) return -1;
+
+					return 0;
+				});
 				return res.send({ conversations: conversations });
 			});
 		});

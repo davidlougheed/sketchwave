@@ -4,6 +4,7 @@ html
         title SketchWave
         link(rel='stylesheet', href='/stylesheets/screen.css')
 
+        script(src='/scripts/moment-with-locales.js')
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js')
 
         block scripts
@@ -15,7 +16,7 @@ html
                     if user
                         li
                             a(href='/conversations') Conversations
-                        li
+                        li(style='float: right')
                             a(href='/logout') Log Out (#{user.username})
                     else
                         li

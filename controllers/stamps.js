@@ -19,6 +19,29 @@ module.exports.controller = function (objects) {
 			res.send({ success: true });
 		});
 	});
+	objects.router.delete('/stamp/:id/', function (req, res) {
+		//TODO: Handle errors properly
+		//TODO: DONT LET YOU DELETE UNLESS YOU HAVE PERMISSION!!!!!!
+
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send({ error: 'not authenticated' }); // TODO: Handle non authentication
+		}
+		if (!req.body) {
+			return res.send({ error: 'error no body' });
+		}
+
+		objects.models.Stamp.findOne({
+			where: {
+				id: parseInt(req.params.id)
+			}
+		}).then(function (stamp) {
+			stamp.destroy();
+
+			return res.send({ success: true });
+		});
+	});
 
 	objects.router.post('/stamps/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');

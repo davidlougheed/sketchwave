@@ -259,9 +259,33 @@ block scripts
 
 				$.post('/stamps/', { conversationID: convID }).done(function (data) {
 					for(var s in data['stamps']) {
-						$('#stamps').append('<div class="stamp"><img src="' + data['stamps'][s]['imageData']
-								+ '"></div>');
+						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+						if(data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+							stampHTML += '<button class="stampDelete">Delete</button>';
+						}
+						stampHTML += '</div>';
+						$('#stamps').append(stampHTML);
 					}
+				});
+
+				$('body').on('click', '.stampDelete', function (event) {
+					event.stopPropagation();
+					$.ajax({
+						url: '/stamp/' + $(this).parent().data('id') + '/',
+						method: 'DELETE',
+					}).done(function (data) {
+						$('#stamps').html('<div class="stamp"><img src="/images/sciencerules.png"></div>');
+						$.post('/stamps/', {conversationID: convID}).done(function (data) {
+							for (var s in data['stamps']) {
+								var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+								if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+									stampHTML += '<button class="stampDelete">Delete</button>';
+								}
+								stampHTML += '</div>';
+								$('#stamps').append(stampHTML);
+							}
+						});
+					});
 				});
 
 				$('#cancel').click(function () {
