@@ -3,6 +3,8 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			$('#cursor').hide();
+
 			var drawCanvas = document.getElementById('drawCanvas');
 			var ctx = drawCanvas.getContext('2d');
 			var paint = false;
@@ -99,6 +101,10 @@ block scripts
 					addPoint(mouseX, mouseY, true);
 					redraw();
 				}
+
+				if(hover) {
+					$('#cursor').css({'top': event.pageY.toString() + 'px', 'left': event.pageX.toString() + 'px'});
+				}
 			});
 			$(drawCanvas).on('mouseup', function (event) {
 				paint = false;
@@ -110,8 +116,12 @@ block scripts
 			});
 
 			$(drawCanvas).on('mouseenter', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
 				hover = true;
 				$('#cursor').show();
+				$('#cursor').css({'top': event.pageY.toString() + 'px', 'left': event.pageX.toString() + 'px'});
 			});
 
 			$('.colorTool').click(function () {
@@ -163,7 +173,7 @@ block scripts
 
 
 block content
-	img#cursor(width='100', height='57')
+	img#cursor(width='100', height='57', src='/images/cursor.png')
 
 	div#conversation
 		section#messages
@@ -183,7 +193,7 @@ block content
 				ul
 					li#clear Clear
 				ul
-					li#stamp Stamp
+					li#stamp Stamp It!
 
 			div#tools
 				ul#colors

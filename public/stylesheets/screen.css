@@ -80,6 +80,14 @@ section#main h1 div#controls button {
 	color: #cceeff;
 }
 
+#cursor {
+    position: absolute;
+    z-index: 100;
+    margin-top: -54px;
+    user-select: none;
+    pointer-events: none;
+}
+
 /* conversation stuff */
 
 div#conversation {
@@ -138,6 +146,7 @@ div#conversation section#drawPanel canvas#drawCanvas {
     border: 1px solid #bbb;
     border-radius: 4px;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+    cursor: none;
 }
 div#conversation section#drawPanel div#commands {
     width: 20%;
