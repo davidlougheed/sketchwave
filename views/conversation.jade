@@ -6,10 +6,12 @@ block scripts
 			var drawCanvas = document.getElementById('drawCanvas');
 			var ctx = drawCanvas.getContext('2d');
 			var paint = false;
+			var hover = false;
 
 			var brushColor = '#ff0000';
 			var brushSize = 5;
 			var toolType = 'brush';
+			var stamp = 'dolphin';
 
 			var clickX = [];
 			var clickY = [];
@@ -20,25 +22,47 @@ block scripts
 
 			var stamps = [];
 
+			var clearAllCanvasData = function () {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				clickX = [];
+				clickY = [];
+				clickDrag = [];
+				clickColor = [];
+				clickSize = [];
+				tool = [];
+				stamps = [];
+			};
+
+			var saveMemory = function () {
+
+			};
+
 			var redraw = function () {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 				ctx.lineJoin = 'round';
 
 				for(var i = 0; i < clickX.length; i++) {
-					ctx.lineWidth = clickSize[i];
-					ctx.strokeStyle = clickColor[i];
+					if(tool[i] == 'brush') {
+						ctx.lineWidth = clickSize[i];
+						ctx.strokeStyle = clickColor[i];
 
-					ctx.beginPath();
+						ctx.beginPath();
 
-					if(clickDrag[i] && i != 0) {
-						ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+						if (clickDrag[i] && i != 0) {
+							ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+						} else {
+							ctx.moveTo(clickX[i] - 1, clickY[i]);
+						}
+
+						ctx.lineTo(clickX[i], clickY[i]);
+						ctx.closePath();
+						ctx.stroke();
 					} else {
-						ctx.moveTo(clickX[i] - 1, clickY[i]);
+						if(stamps[i]) {
+							var size = 50 * (clickSize[i] / 5);
+							ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 2), size, size);
+						}
 					}
-
-					ctx.lineTo(clickX[i], clickY[i]);
-					ctx.closePath();
-					ctx.stroke();
 				}
 			};
 
@@ -48,6 +72,14 @@ block scripts
 				clickDrag.push(dragging);
 				clickColor.push(brushColor);
 				clickSize.push(brushSize);
+
+				tool.push(toolType);
+
+				if(toolType == 'brush') {
+					stamps.push(null);
+				} else {
+					stamps.push(stamp);
+				}
 			};
 
 			$(drawCanvas).on('mousedown', function (event) {
@@ -73,17 +105,41 @@ block scripts
 			});
 			$(drawCanvas).on('mouseleave', function (event) {
 				paint = false;
+				hover = false;
+				$('#cursor').hide();
+			});
+
+			$(drawCanvas).on('mouseenter', function (event) {
+				hover = true;
+				$('#cursor').show();
 			});
 
 			$('.colorTool').click(function () {
+				toolType = 'brush';
+
 				brushColor = $(this).css('backgroundColor');
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
 				});
 				$(this).addClass('active');
+
+				$(this).parent().parent().children('#images').children('li').each(function () {
+					$(this).removeClass('active');
+				});
 			});
 			$('.stampTool').click(function () {
 				toolType = 'stamp';
+
+				stamp = $(this).attr('id');
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#colors').children('li').each(function () {
+					$(this).removeClass('active');
+				});
 			});
 			$('.brushTool').click(function () {
 				brushSize = parseInt($(this).data('size'));
@@ -92,10 +148,23 @@ block scripts
 				});
 				$(this).addClass('active');
 			});
+
+			$('#clear').click(function () {
+				clearAllCanvasData();
+			});
+			$('#send').click(function () {
+				console.log(drawCanvas.toDataURL());
+			});
+
+			// -----------------
+
+			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'})
 		});
 
 
 block content
+	img#cursor(width='100', height='57')
+
 	div#conversation
 		section#messages
 			h1
@@ -108,12 +177,20 @@ block content
 
 		section#drawPanel
 			canvas#drawCanvas(height='320', width='480')
+			div#commands
+				ul
+					li#send Send
+				ul
+					li#clear Clear
+				ul
+					li#stamp Stamp
+
 			div#tools
 				ul#colors
 					li#white.colorTool
 					li#grey.colorTool
 					li#black.colorTool
-					li#red.colorTool
+					li#red.colorTool.active
 					li#hotPink.colorTool
 					li#yellow.colorTool
 					li#blue.colorTool
@@ -128,17 +205,21 @@ block content
 						img(src='/images/pizza.png')
 					li#gabe.big.stampTool
 						img(src='/images/gabe.png')
-					li#sciencerules.big.stampTool
+					li#sciencerules.big.stampTool.hotswap
 						img(src='/images/sciencerules.png')
+					li#hotkey.big
+						span ⋮
 
 				ul#brushes
 					li.big.brushTool(data-size='3')
 						div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
-					li.big.brushTool(data-size='5')
+					li.big.brushTool(data-size='5').active
 						div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
 					li.big.brushTool(data-size='7')
 						div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
 					li.big.brushTool(data-size='12')
 						div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
+					li.big.brushTool(data-size='16')
+						div(style='width: 16px; height: 16px; margin: auto; background-color: black; border-radius: 16px; margin-top: 10px;')
 					li.big.brushTool(data-size='20')
 						div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')
