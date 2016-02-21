@@ -231,6 +231,7 @@ block scripts
 			$('#stampIt').click(function () {
 				var messageData = {
 					'imageData': drawCanvas.toDataURL(),
+					'conversationID': convID
 				};
 
 				$.post('/stamp/', messageData).done(function (data) {
@@ -244,7 +245,7 @@ block scripts
 						+ '<button id="cancel">Cancel</button>'
 						+ '</div>');
 
-				$.get('/stamps/').done(function (data) {
+				$.post('/stamps/', { conversationID: convID }).done(function (data) {
 					for(var s in data['stamps']) {
 						$('#stamps').append('<div class="stamp"><img src="' + data['stamps'][s]['imageData']
 								+ '"></div>');
