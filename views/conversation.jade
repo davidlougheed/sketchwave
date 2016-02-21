@@ -103,7 +103,12 @@ block scripts
 					} else {
 						if(stamps[i]) {
 							var size = 50 * (clickSize[i] / 5);
-							ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 2), size, size);
+
+							if(stamps[i] == 'hotswap') {
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
+							} else {
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 2), size, size);
+							}
 						}
 					}
 				}
@@ -223,6 +228,50 @@ block scripts
 				});
 			});
 
+			$('#stampIt').click(function () {
+				var messageData = {
+					'imageData': drawCanvas.toDataURL(),
+				};
+
+				$.post('/stamp/', messageData).done(function (data) {
+				});
+			});
+
+			$('#hotkey').click(function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>User Stamps</h1>'
+						+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
+						+ '<button id="cancel">Cancel</button>'
+						+ '</div>');
+
+				$.get('/stamps/').done(function (data) {
+					for(var s in data['stamps']) {
+						$('#stamps').append('<div class="stamp"><img src="' + data['stamps'][s]['imageData']
+								+ '"></div>');
+					}
+				});
+
+				$('#cancel').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
+			});
+
+			$('body').on('click', '.stamp', function () {
+				$('#hotswap').children('img').first().attr('src', ($(this).children('img').first().attr('src')));
+
+				$('#modal').fadeOut('fast', function () {
+					$(this).remove();
+				});
+				$('#modalBackground').fadeOut('fast', function () {
+					$(this).remove();
+				});
+			});
+
 			$('body').on('click', '.importToCanvas', function (event) {
 				var imageData = $(this).parent().parent().children('div.image').first().children('img').first().attr('src');
 
@@ -282,7 +331,7 @@ block content
 				ul
 					li#clear Clear
 				ul
-					li#stamp StampIt!
+					li#stampIt StampIt!
 
 			div#tools
 				ul#colors
@@ -304,7 +353,7 @@ block content
 						img(src='/images/pizza.png')
 					li#gabe.big.stampTool
 						img(src='/images/gabe.png')
-					li#sciencerules.big.stampTool.hotswap
+					li#hotswap.big.stampTool
 						img(src='/images/sciencerules.png')
 					li#hotkey.big
 						span ⋮

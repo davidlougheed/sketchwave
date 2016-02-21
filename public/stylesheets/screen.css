@@ -331,6 +331,26 @@ div#modal h1 {
     font-size: 1.3rem;
 }
 
+#stamps {
+    margin-bottom: 15px;
+}
+#stamps .stamp {
+    display: inline-block;
+    width: 19%;
+    margin: 5px 0.5%;
+    box-sizing: border-box;
+    border: 1px solid #999;
+    border-radius: 3px;
+}
+#stamps .stamp.active {
+    border: 1px solid orange;
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+#stamps .stamp img {
+    width: 100%;
+    height: auto;
+}
+
 form {
 	clear: both;
 	padding: 15px;

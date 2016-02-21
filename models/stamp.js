@@ -1,6 +1,6 @@
 module.exports = function (sequelize, dataTypes) {
     var Stamp = sequelize.define('Stamp', {
-        imageData: {type: dataTypes.ARRAY(dataTypes.TEXT)},
+        imageData: {type: dataTypes.TEXT},
     }, {
         classMethods: {
             associate: function (models) {
