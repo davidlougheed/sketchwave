@@ -18,10 +18,7 @@ module.exports.controller = function (objects) {
 			return res.send('error no body');
 		}
 
-		var names = req.body.names.split(',');
-		for(var n in names) {
-			names[n] = names[n].trim();
-		}
+		var names = req.body.names;
 		names.push(req.user.username);
 
 		objects.models.Conversation.create({

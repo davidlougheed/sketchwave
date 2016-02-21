@@ -27,11 +27,11 @@ block scripts
 								+ data['conversations'][c]['id'] + '"><div id="link"><a href="/conversation/'
 								+ data['conversations'][c]['id'] + '/">'
 								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> '
-								+ '<span class="members">' + userList + '</span><div class="date">Last message posted ' + formattedDate
-								+ '</div>';
+								+ '<span class="members">' + userList + '</span><div class="date">Last message posted: '
+								+ formattedDate + '</div>';
 
 
-						if(data['users'].length == 1) {
+						if(data['users'][c].length == 1) {
 							conversationHTML += '<div class="controls"><button class="delete">Delete</button></div>';
 						}
 
@@ -46,10 +46,23 @@ block scripts
 				reloadConversations();
 			}, 2000);
 
+			$.get('/users_data/').done(function (data) {
+				$('#names').html('');
+				for(var u in data['users']) {
+					if(data['users'][u]['id'] != #{user.id})
+					$('#names').append('<option value="' + data['users'][u]['username'] + '">' + data['users'][u]['username'] + '</option>');
+				}
+
+				$('#names').select2();
+			});
+
 			$('#formCreateConversation').hide();
 
 			$('#createConversation').click(function () {
 				$('#formCreateConversation').slideDown();
+			});
+			$('#cancelConversation').click(function () {
+				$('#formCreateConversation').slideUp();
 			});
 
 			$('body').on('click', '.delete', function () {
@@ -94,12 +107,12 @@ block content
 
 	form#formCreateConversation(method='post')
 		label(for='names') To:
-		input(type='text', name='names', id='names')
+		select(name='names[]', id='names', class='js-basic-multiple', multiple='multiple', style='width: 400px')
 		label(for='names') Name
 		input(type='text', name='name', id='name')
 		br
 		br
 		button(type='submit') Create
-		button(type='button', id='cancelConversation') Cancel
+		button(type='button', id='cancelConversation' style='margin-left: 0.5em') Cancel
 
 	ul#conversations
