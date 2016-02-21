@@ -277,6 +277,8 @@ block scripts
 			$('body').on('click', '.stamp', function () {
 				$('#hotswap').children('img').first().attr('src', ($(this).children('img').first().attr('src')));
 
+				$('#hotswap').click();
+
 				$('#modal').fadeOut('fast', function () {
 					$(this).remove();
 				});
@@ -310,6 +312,49 @@ block scripts
 					});
 				});
 				$(this).attr('disabled', 'disabled');
+			});
+
+			$('#editMembers').click(function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>Edit Members</h1>'
+						+ '<div id="members"></div>'
+						+ '<input type="text" id="addMemberBox"> <button id="addMember">Add Member</button><br><br>'
+						+ '<button id="close">Close</button>'
+						+ '</div>');
+
+				$.get('/conversation_users/' + convID + '/').done(function (data) {
+					for (var u in data['users']) {
+						$('#members').append('<div class="member">' + data['users'][u]['username'] + '</div>');
+					}
+				});
+
+				$('#addMember').click(function () {
+					var usernameToAdd = $('#addMemberBox').val();
+
+					$.ajax({
+						url: '/conversation_users/' + convID + '/',
+						method: 'PUT',
+						data: {
+							username: usernameToAdd
+						}
+					}).done(function (data) {
+						$('#members').html('');
+						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							for (var u in data['users']) {
+								$('#members').append('<div class="member">' + data['users'][u]['username'] + '</div>');
+							}
+						});
+					});
+				});
+
+				$('#close').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
 			});
 
 			// -----------------

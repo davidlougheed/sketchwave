@@ -354,6 +354,19 @@ div#modal h1 {
     height: auto;
 }
 
+#members {
+    margin: 10px 0;
+}
+#members .member {
+    padding: 10px;
+    background-color: #fefefd;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    margin-bottom: 5px;
+
+    font-family: sans-serif;
+}
+
 form {
 	clear: both;
 	padding: 15px;
