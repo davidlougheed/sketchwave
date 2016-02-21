@@ -152,6 +152,14 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	margin: auto;
 	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.1);
 }
+div#conversation section#messages section#messagesContainer div.message div.controls {
+    margin: auto;
+    margin-top: 5px;
+    max-width: 480px;
+    width: 100%;
+    color: #666;
+    font-family: sans-serif;
+}
 div#conversation section#drawPanel {
 	box-sizing: border-box;
 	position: absolute;

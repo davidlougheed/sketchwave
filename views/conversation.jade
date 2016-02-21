@@ -68,7 +68,8 @@ block scripts
 									+ '<div class="author">' + authors[data['messages'][m]['UserId']]['username'] + '</div>'
 									+ '<div class="image">'
 									+ '<img src="' + data['messages'][m]['imageData'] + '">'
-									+ '</div></div>');
+									+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
+									+ '</div>');
 						}
 
 						$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
@@ -222,6 +223,14 @@ block scripts
 					clearAllCanvasData(true);
 					refreshMessages();
 				});
+			});
+
+			$('body').on('click', '.importToCanvas', function (event) {
+				var imageData = $(this).parent().parent().children('div.image').first().children('img').first().attr('src');
+
+				background = imageData;
+				clearAllCanvasData(false);
+				redraw();
 			});
 
 			// -----------------
