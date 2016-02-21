@@ -12,9 +12,13 @@ html
             img(src='/images/sketchwave.png' height='70')
             nav
                 ul
-                    li
-                        a(href='/conversations') Conversations
-                    li
-                        a(href='/logout') Log Out
+                    if user
+                        li
+                            a(href='/conversations') Conversations
+                        li
+                            a(href='/logout') Log Out (#{user.username})
+                    else
+                        li
+                            a(href='/') Home
         section#main
             block content

@@ -1,6 +1,11 @@
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
-		res.render('conversations');
+		//TODO: Handle errors properly
+		if(!req.isAuthenticated()) {
+			return res.send('not authenticated'); // TODO: Handle non authentication
+		}
+
+		res.render('conversations', { user: req.user });
 	});
 	objects.router.post('/conversations/', function (req, res) {
 		//TODO: Handle errors properly
@@ -26,7 +31,7 @@ module.exports.controller = function (objects) {
 				}
 			}).then(function (users) {
 				conversation.setUsers(users).then(function () {
-					return res.render('conversations');
+					return res.render('conversations', { user: req.user });
 				});
 			});
 		});
@@ -56,7 +61,7 @@ module.exports.controller = function (objects) {
 			return res.send('not authenticated'); // TODO: Handle non authentication
 		}
 
-        res.render('conversation', { conversationID: req.params.id });
+        res.render('conversation', { user: req.user, conversationID: req.params.id });
     });
 	objects.router.get('/conversation_data/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');

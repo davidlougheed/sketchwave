@@ -6,8 +6,15 @@ block scripts
 			$.get('/conversations_data/').done(function (data) {
 				for(var c in data['conversations']) {
 					$('#conversations').append('<li class="conversation"><a href="/conversation/'
-							+ data['conversations'][c]['id'] + '/">' + data['conversations'][c]['name'] + '</a>');
+							+ data['conversations'][c]['id'] + '/">'
+							+ data['conversations'][c]['name'] + '</a> | Members: </li>');
 				}
+			});
+
+			$('#formCreateConversation').hide();
+
+			$('#createConversation').click(function () {
+				$('#formCreateConversation').slideDown();
 			});
 		});
 

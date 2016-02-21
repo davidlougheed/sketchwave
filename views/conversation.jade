@@ -59,11 +59,7 @@ block scripts
 			var refreshMessages = function () {
 				$.get('/conversation_data/' + convID.toString()).then(function (data) {
 					if(data['messages'].length > pastMessages) {
-						$('#messagesContainer').html('');
-
-						pastMessages = data['messages'].length;
-
-						for (var m in data['messages']) {
+						for (var m = pastMessages; m < data['messages'].length; m++) {
 							$('#messagesContainer').append('<div class="message">'
 									+ '<div class="author">' + authors[data['messages'][m]['UserId']]['username'] + '</div>'
 									+ '<div class="image">'
@@ -71,6 +67,8 @@ block scripts
 									+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
 									+ '</div>');
 						}
+
+						pastMessages = data['messages'].length;
 
 						$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 					}
