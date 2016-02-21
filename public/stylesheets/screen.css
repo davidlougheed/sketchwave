@@ -303,6 +303,34 @@ div#conversation section#drawPanel div#tools ul li#yellow { background-color: #F
 div#conversation section#drawPanel div#tools ul li#blue { background-color: #00F; }
 div#conversation section#drawPanel div#tools ul li#green { background-color: #0F0; }
 
+div#modalBackground {
+    z-index: 101;
+    position: fixed;
+    top: 0; bottom: 0;
+    left: 0; right: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+div#modal {
+    z-index: 102;
+    position: fixed;
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 40px;
+    padding: 20px;
+
+    border: 1px solid #999;
+    border-radius: 4px;
+    background-color: #f9f9f5;
+
+    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.2);
+}
+div#modal h1 {
+    margin-top: 0;
+    font-family: sans-serif;
+    color: #666;
+    font-size: 1.3rem;
+}
+
 form {
 	clear: both;
 	padding: 15px;

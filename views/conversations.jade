@@ -3,40 +3,75 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
-			$.get('/conversations_data/').done(function (data) {
-				for(var c in data['conversations']) {
+			var reloadConversations = function () {
+				$('#conversations').html('');
+				$.get('/conversations_data/').done(function (data) {
+					for (var c in data['conversations']) {
 
-					$('#conversations').append('<li class="conversation" id="conversation-'
-							+ data['conversations'][c]['id'] + '"><a href="/conversation/'
-							+ data['conversations'][c]['id'] + '/">'
-							+ data['conversations'][c]['name'] + '</a> | Members: <span class="members"></span>'
-							+ '<div class="controls"><button class="delete">Delete</button></div>'
-							+ '</li>');
-				}
+						$('#conversations').append('<li class="conversation" data-id="' + data['conversations'][c]['id']
+								+ '" id="conversation-'
+								+ data['conversations'][c]['id'] + '"><a href="/conversation/'
+								+ data['conversations'][c]['id'] + '/">'
+								+ data['conversations'][c]['name'] + '</a> | Members: <span class="members"></span>'
+								+ '<div class="controls"><button class="delete">Delete</button></div>'
+								+ '</li>');
+					}
 
-				for (var i = 0; i < $('.conversation').length; i++) {
-					$.get('/conversation_users/' + data['conversations'][i]['id'] + '/', function (userData) {
-						var userList = '';
-						for (var u in userData['users']) {
-							var userList;
+					for (var i = 0; i < $('.conversation').length; i++) {
+						$.get('/conversation_users/' + data['conversations'][i]['id'] + '/', function (userData) {
+							var userList = '';
+							for (var u in userData['users']) {
+								var userList;
 
-							userList += userData['users'][u]['username'];
-							if (userData['users'][u] !== userData['users'][userData['users'].length - 1]) {
-								userList += ', ';
+								userList += userData['users'][u]['username'];
+								if (userData['users'][u] !== userData['users'][userData['users'].length - 1]) {
+									userList += ', ';
+								}
 							}
-						}
 
-						console.log(userData['conversationID']);
-
-						$('#conversation-' + userData['conversationID']).children('.members').first().html(userList);
-					});
-				}
-			});
+							$('#conversation-' + userData['conversationID']).children('.members').first().html(userList);
+						});
+					}
+				});
+			};
+			reloadConversations();
 
 			$('#formCreateConversation').hide();
 
 			$('#createConversation').click(function () {
 				$('#formCreateConversation').slideDown();
+			});
+
+			$('body').on('click', '.delete', function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>Are you sure you want to delete conversation "'
+						+ $(this).parent().parent().children('a').first().text() + '"?</h1>'
+						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') +  '">'
+						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
+						+ '</div>');
+
+				$('#confirmDelete').click(function () {
+					$.ajax({
+						url: '/conversation/' + $(this).parent().children('#toDelete').first().val() + '/',
+						method: 'DELETE',
+					}).done(function (data) {
+						$('#modal').fadeOut('fast', function () {
+							$(this).remove();
+						});
+						$('#modalBackground').fadeOut('fast', function () {
+							$(this).remove();
+							reloadConversations();
+						});
+					});
+				});
+				$('#cancelDelete').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
 			});
 		});
 

@@ -83,6 +83,33 @@ module.exports.controller = function (objects) {
 			return res.send({ success: true });
 		});
 	});
+	objects.router.delete('/conversation/:id/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send('not authenticated'); // TODO: Handle non authentication
+		}
+
+		objects.models.Conversation.findOne({
+			where: {
+				id: req.params.id
+			}
+		}).then(function (conversation) {
+			objects.models.Message.findAll({
+				where: {
+					ConversationId: conversation.id
+				}
+			}).then(function (messages) {
+				for(var m in messages) {
+					messages[m].destroy();
+				}
+			});
+
+			conversation.destroy();
+
+			return res.send({ success: true });
+		});
+	});
 	objects.router.get('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
