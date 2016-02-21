@@ -366,6 +366,11 @@ div#modal h1 {
 
     font-family: sans-serif;
 }
+#members .member button {
+    float: right;
+    position: relative;
+    top: -7px;
+}
 
 form {
 	clear: both;

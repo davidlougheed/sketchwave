@@ -324,7 +324,9 @@ block scripts
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
 					for (var u in data['users']) {
-						$('#members').append('<div class="member">' + data['users'][u]['username'] + '</div>');
+						$('#members').append('<div class="member" data-username="'
+								+ data['users'][u]['username'] + '">' + data['users'][u]['username']
+								+ ' <button class="deleteMember">Delete</button></div>');
 					}
 				});
 
@@ -341,7 +343,31 @@ block scripts
 						$('#members').html('');
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
 							for (var u in data['users']) {
-								$('#members').append('<div class="member">' + data['users'][u]['username'] + '</div>');
+								$('#members').append('<div class="member">' + data['users'][u]['username']
+										+ ' <button class="deleteMember">Delete</button></div>');
+							}
+						});
+					});
+				});
+
+				$('body').on('click', '.deleteMember', function () {
+					$.ajax({
+						url: '/conversation_users/' + convID + '/',
+						method: 'DELETE',
+						data: {
+							username: $(this).parent().data('username')
+						}
+					}).done(function (data) {
+						$('#members').html('');
+						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							for (var u in data['users']) {
+								if(data['users'].length > 1) {
+									$('#members').append('<div class="member">' + data['users'][u]['username']
+											+ ' <button class="deleteMember">Delete</button></div>');
+								} else {
+									$('#members').append('<div class="member">' + data['users'][u]['username']
+											+ '</div>');
+								}
 							}
 						});
 					});

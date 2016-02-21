@@ -112,6 +112,35 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
+	objects.router.delete('/conversation_users/:id/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send('not authenticated'); // TODO: Handle non authentication
+		}
+		if (!req.body) {
+			return res.send('error no body');
+		}
+
+		objects.models.Conversation.findOne({where: {
+			id: req.params.id
+		}
+		}).then(function (conversation) {
+			objects.models.User.findOne({
+				where: {
+					username: req.body.username
+				}
+			}).then(function (user) {
+				if(user) {
+					conversation.removeUser(user);
+
+					return res.send({success: true});
+				} else {
+					return res.send({success: false});
+				}
+			});
+		});
+	});
 	objects.router.delete('/conversation/:id/', function (req, res) {
 		//TODO: CONFIRM DELETE HAS CORRECT OWNER
 
