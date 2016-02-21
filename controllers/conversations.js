@@ -38,8 +38,6 @@ module.exports.controller = function (objects) {
 				});
 			});
 		});
-
-		return res.send('error creating conversation');
 	});
 	objects.router.get('/conversations_data/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
@@ -84,6 +82,8 @@ module.exports.controller = function (objects) {
 		});
 	});
 	objects.router.delete('/conversation/:id/', function (req, res) {
+		//TODO: CONFIRM DELETE HAS CORRECT OWNER
+
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
