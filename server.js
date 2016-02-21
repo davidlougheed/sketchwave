@@ -70,7 +70,7 @@ fs.readdirSync(controllerDir).filter(function (file) {
 });
 
 models.sequelize.sync().then(function () {
-	var server = app.listen(4321, 'localhost', function () {
+	var server = app.listen(4321, '142.157.16.97', function () {
 		console.log('Server running on ' + server.address().port);
 	});
 });

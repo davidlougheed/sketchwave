@@ -3,6 +3,11 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var convID = #{conversationID};
+			$.get('/conversation_data/' + convID.toString() + '/').done(function (data) {
+				$('#convName').text(data['conversation']['name']);
+			});
+
 			$('#cursor').hide();
 
 			var drawCanvas = document.getElementById('drawCanvas');
@@ -37,6 +42,19 @@ block scripts
 
 			var saveMemory = function () {
 
+			};
+
+			var refreshMessages = function () {
+				$.get('/conversation_data/' + convID.toString()).then(function (data) {
+					$('#messagesContainer').html('');
+					for(var m in data['messages']) {
+						$('#messagesContainer').append('<div class="message"><div class="image">'
+								+ '<img src="' + data['messages'][m]['imageData'] + '">'
+								+ '</div></div>');
+					}
+				});
+
+				$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 			};
 
 			var redraw = function () {
@@ -103,7 +121,7 @@ block scripts
 				}
 
 				if(hover) {
-					$('#cursor').css({'top': event.pageY.toString() + 'px', 'left': event.pageX.toString() + 'px'});
+					$('#cursor').css({'top': (event.pageY - 112	).toString() + 'px', 'left': event.pageX.toString() + 'px'});
 				}
 			});
 			$(drawCanvas).on('mouseup', function (event) {
@@ -163,12 +181,26 @@ block scripts
 				clearAllCanvasData();
 			});
 			$('#send').click(function () {
-				console.log(drawCanvas.toDataURL());
+				var messageData = {
+					'imageData': drawCanvas.toDataURL(),
+					'conversationID': convID
+				};
+
+				$.post('/message/', messageData).done(function (data) {
+					// TODO: Handle error/success
+					refreshMessages();
+				});
 			});
 
 			// -----------------
 
-			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'})
+			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
+
+			refreshMessages();
+
+			window.setInterval(function () {
+				refreshMessages();
+			}, 500);
 		});
 
 
@@ -178,12 +210,12 @@ block content
 	div#conversation
 		section#messages
 			h1
-				span Conversation
+				span#convName
 			section#messagesContainer
-				div.message
-					div.image
-				div.message
-					div.image
+				//div.message
+				//	div.image
+				//div.message
+				//	div.image
 
 		section#drawPanel
 			canvas#drawCanvas(height='320', width='480')
@@ -193,7 +225,7 @@ block content
 				ul
 					li#clear Clear
 				ul
-					li#stamp Stamp It!
+					li#stamp StampIt!
 
 			div#tools
 				ul#colors

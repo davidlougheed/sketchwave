@@ -1,14 +1,28 @@
 extends base.jade
 
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			$.get('/conversations_data/').done(function (data) {
+				for(var c in data['conversations']) {
+					$('#conversations').append('<li class="conversation"><a href="/conversation/'
+							+ data['conversations'][c]['id'] + '/">' + data['conversations'][c]['name'] + '</a>');
+				}
+			});
+		});
+
+
 block content
 	h1
 		span Conversations
 		div#controls
 			button#createConversation(type='button') Create
 
-	form#formCreateConversation
+	form#formCreateConversation(method='post')
 		label(for='names') To:
 		input(type='text', name='names', id='names')
+		label(for='names') Name
+		input(type='text', name='name', id='name')
 		br
 		br
 		button(type='submit') Create

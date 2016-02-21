@@ -5,6 +5,7 @@ module.exports = function (sequelize, dataTypes) {
         classMethods: {
             associate: function (models) {
                 Conversation.belongsToMany(models.User, {through: 'UserConversation'});
+                Conversation.hasMany(models.Message);
             }
         }
     });

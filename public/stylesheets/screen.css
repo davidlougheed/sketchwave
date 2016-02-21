@@ -6,18 +6,18 @@ body {
 }
 
 header {
-    background: url(/images/wave.png);
-    background-repeat: repeat-x;
-    background-size: auto 70px;
-    background-position-x: 43px;
-    height: 112px;
-    position: absolute;
-    left: 0; right: 0;
-    z-index: 50;
+	background: url(/images/wave.png);
+	background-repeat: repeat-x;
+	background-size: auto 70px;
+	background-position-x: 43px;
+	height: 112px;
+	position: absolute;
+	left: 0; right: 0;
+	z-index: 50;
 }
 header img {
 	vertical-align: top;
-    background-color: #f9f9f5;
+	background-color: #f9f9f5;
 }
 header nav {
 	background-color: #1e90ff;
@@ -48,6 +48,8 @@ header nav ul li a {
 
 section#main {
 	padding: 30px;
+	position: absolute;
+	left: 0; right: 0; bottom: 0; top: 112px;
 }
 section#main h1 {
 	overflow: hidden;
@@ -81,49 +83,66 @@ section#main h1 div#controls button {
 }
 
 #cursor {
-    position: absolute;
-    z-index: 100;
-    margin-top: -54px;
-    user-select: none;
-    pointer-events: none;
+	position: absolute;
+	z-index: 100;
+	margin-top: -54px;
+	user-select: none;
+	pointer-events: none;
 }
 
 /* conversation stuff */
 
+ul#conversations {
+    list-style: none;
+    padding: 0; margin: 0;
+    margin-top: 20px;
+}
+ul#conversations li.conversation {
+    padding: 10px;
+    border: 1px solid #bbb;
+    background-color: #fefefd;
+
+    font-family: sans-serif;
+}
+ul#conversations li.conversation a {
+    color: #666;
+}
+
 div#conversation {
 	position: absolute;
-    z-index: 49;
-	left: 0; right: 0; bottom: 0; top: 112px;
+	z-index: 49;
+	left: 0; right: 0; bottom: 0; top: 0;
+	box-sizing: border-box;
 }
 div#conversation section#messages {
 	position: absolute;
-    box-sizing: border-box;
+	box-sizing: border-box;
 	top: 0; left: 0; bottom: 0;
 	width: 50%;
-    padding: 20px;
+	padding: 20px;
 }
 div#conversation section#messages section#messagesContainer {
-    overflow-y: auto;
-    position: absolute;
-    bottom: 0;
-    top: 53px;
-    left: 0; right: 0;
-    padding: 40px 0;
+	overflow-y: auto;
+	position: absolute;
+	bottom: 0;
+	top: 53px;
+	left: 0; right: 0;
+	padding: 40px 0;
 }
 div#conversation section#messages section#messagesContainer div.message {
-    margin-top: 40px;
+	margin-top: 40px;
 }
 div#conversation section#messages section#messagesContainer div.message:last-child {
-    margin-bottom: 80px;
+	margin-bottom: 80px;
 }
 div#conversation section#messages section#messagesContainer div.message div.image {
-    background-color: white;
-    width: 480px;
-    height: 320px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    margin: auto;
-    box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.1);
+	background-color: white;
+	width: 480px;
+	height: 320px;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	margin: auto;
+	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.1);
 }
 div#conversation section#drawPanel {
 	box-sizing: border-box;
@@ -134,104 +153,105 @@ div#conversation section#drawPanel {
 
 	padding: 20px;
 
+    border-left: 1px solid #ccc;
+
 	background-color: #f3f3f1;
 
-    text-align: center;
+	text-align: center;
 }
 
 div#conversation section#drawPanel canvas#drawCanvas {
 	background-color: white;
 	width: 480px;
 	height: 320px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
-    cursor: none;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	cursor: none;
 }
 div#conversation section#drawPanel div#commands {
-    width: 20%;
-    display: inline-block;
-    box-sizing: border-box;
-    background-color: #e9e9e7;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    margin: auto;
-    margin-right: 2%;
-    margin-top: 20px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
-    vertical-align: top;
-    padding: 10px;
+	width: 20%;
+	display: inline-block;
+	box-sizing: border-box;
+	background-color: #e9e9e7;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	margin: auto;
+	margin-right: 2%;
+	margin-top: 20px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	vertical-align: top;
+	padding: 10px;
 }
 div#conversation section#drawPanel div#commands ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 div#conversation section#drawPanel div#commands ul li {
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    background-color: #f9f9f5;
-    height: 40px;
-    margin-bottom: 7px;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background-color: #f9f9f5;
+	height: 40px;
+	margin-bottom: 7px;
 
-    color: #333;
-    line-height: 38px;
-    font-family: sans-serif;
-    font-weight: bold;
-    font-size: 0.9rem;
-    text-transform: uppercase;
+	color: #333;
+	line-height: 38px;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 0.9rem;
 
-    box-shadow: inset 0px 1px 0px white;
+	box-shadow: inset 0px 1px 0px white;
 
-    cursor: pointer;
+	cursor: pointer;
 }
 div#conversation section#drawPanel div#tools {
-    display: inline-block;
-    background-color: #e9e9e7;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    width: 66.6%;
-    margin: auto;
-    margin-top: 20px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	display: inline-block;
+	background-color: #e9e9e7;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	width: 66.6%;
+	margin: auto;
+	margin-top: 20px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
 }
 div#conversation section#drawPanel div#tools ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    margin: auto;
-    font-size: 0;
-    margin-bottom: 10px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	margin: auto;
+	font-size: 0;
+	margin-bottom: 10px;
 }
 div#conversation section#drawPanel div#tools ul li {
-    position: relative;
-    box-sizing: border-box;
-    width: 10.5%;
-    margin: 1%;
-    height: 40px;
-    display: inline-block;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    background-color: #f9f9f5;
+	position: relative;
+	box-sizing: border-box;
+	width: 10.5%;
+	margin: 1%;
+	height: 40px;
+	display: inline-block;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background-color: #f9f9f5;
 }
 div#conversation section#drawPanel div#tools ul li.active {
-    box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
-    border-color: orange;
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+	border-color: orange;
 }
 div#conversation section#drawPanel div#tools ul li.big {
-    width: 14.65%;
-    margin: 1%;
-    vertical-align: top;
+	width: 14.65%;
+	margin: 1%;
+	vertical-align: top;
 }
 div#conversation section#drawPanel div#tools ul li#hotkey {
-    font-size: 24px;
-    line-height: 37px;
-    color: black;
+	font-size: 24px;
+	line-height: 37px;
+	color: black;
 }
 div#conversation section#drawPanel div#tools ul li.big img {
-    max-width: 100%;
-    height: 38px;
+	max-width: 100%;
+	height: 38px;
 }
 div#conversation section#drawPanel div#tools ul li#white { background-color: #FFF; }
 div#conversation section#drawPanel div#tools ul li#grey { background-color: #808080; }
@@ -260,7 +280,7 @@ label {
 	font-size: 0.8rem;
 	color: #333;
 }
-input[type="text"] {
+input[type="text"], input[type="password"] {
 	border: 1px solid #1c60cc;
 	padding: 5px;
 
