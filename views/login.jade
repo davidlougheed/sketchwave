@@ -2,12 +2,12 @@ extends base.jade
 
 block content
     h1  Log In
-    form#formSignUp
+    form#formSignUp(method='post')
         label(for='username') Username
         input(type='text', name='username', id='username')
 
         label(for='password') Password
-        input(type='text', name='password', id='password')
+        input(type='password', name='password', id='password')
 
         br
         br

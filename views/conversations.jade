@@ -1,0 +1,16 @@
+extends base.jade
+
+block content
+	h1
+		span Conversations
+		div#controls
+			button#createConversation(type='button') Create
+
+	form#formCreateConversation
+		label(for='names') To:
+		input(type='text', name='names', id='names')
+		br
+		br
+		button(type='submit') Create
+
+	ul#conversations

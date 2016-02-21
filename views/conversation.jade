@@ -1,0 +1,144 @@
+extends base.jade
+
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			var drawCanvas = document.getElementById('drawCanvas');
+			var ctx = drawCanvas.getContext('2d');
+			var paint = false;
+
+			var brushColor = '#ff0000';
+			var brushSize = 5;
+			var toolType = 'brush';
+
+			var clickX = [];
+			var clickY = [];
+			var clickDrag = [];
+			var clickColor = [];
+			var clickSize = [];
+			var tool = [];
+
+			var stamps = [];
+
+			var redraw = function () {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				ctx.lineJoin = 'round';
+
+				for(var i = 0; i < clickX.length; i++) {
+					ctx.lineWidth = clickSize[i];
+					ctx.strokeStyle = clickColor[i];
+
+					ctx.beginPath();
+
+					if(clickDrag[i] && i != 0) {
+						ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+					} else {
+						ctx.moveTo(clickX[i] - 1, clickY[i]);
+					}
+
+					ctx.lineTo(clickX[i], clickY[i]);
+					ctx.closePath();
+					ctx.stroke();
+				}
+			};
+
+			var addPoint = function (x, y, dragging) {
+				clickX.push(x);
+				clickY.push(y);
+				clickDrag.push(dragging);
+				clickColor.push(brushColor);
+				clickSize.push(brushSize);
+			};
+
+			$(drawCanvas).on('mousedown', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
+				paint = true;
+
+				addPoint(mouseX, mouseY, false);
+				redraw();
+			});
+			$(drawCanvas).on('mousemove', function (event) {
+				if(paint) {
+					var mouseX = event.pageX - $(this).offset().left;
+					var mouseY = event.pageY - $(this).offset().top;
+
+					addPoint(mouseX, mouseY, true);
+					redraw();
+				}
+			});
+			$(drawCanvas).on('mouseup', function (event) {
+				paint = false;
+			});
+			$(drawCanvas).on('mouseleave', function (event) {
+				paint = false;
+			});
+
+			$('.colorTool').click(function () {
+				brushColor = $(this).css('backgroundColor');
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+			});
+			$('.stampTool').click(function () {
+				toolType = 'stamp';
+			});
+			$('.brushTool').click(function () {
+				brushSize = parseInt($(this).data('size'));
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+			});
+		});
+
+
+block content
+	div#conversation
+		section#messages
+			h1
+				span Conversation
+			section#messagesContainer
+				div.message
+					div.image
+				div.message
+					div.image
+
+		section#drawPanel
+			canvas#drawCanvas(height='320', width='480')
+			div#tools
+				ul#colors
+					li#white.colorTool
+					li#grey.colorTool
+					li#black.colorTool
+					li#red.colorTool
+					li#hotPink.colorTool
+					li#yellow.colorTool
+					li#blue.colorTool
+					li#green.colorTool
+
+				ul#images
+					li#dolphin.big.stampTool
+						img(src='/images/dolphin.png')
+					li#hand.big.stampTool
+						img(src='/images/hand.png')
+					li#pizza.big.stampTool
+						img(src='/images/pizza.png')
+					li#gabe.big.stampTool
+						img(src='/images/gabe.png')
+					li#sciencerules.big.stampTool
+						img(src='/images/sciencerules.png')
+
+				ul#brushes
+					li.big.brushTool(data-size='3')
+						div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
+					li.big.brushTool(data-size='5')
+						div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
+					li.big.brushTool(data-size='7')
+						div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
+					li.big.brushTool(data-size='12')
+						div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
+					li.big.brushTool(data-size='20')
+						div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')
