@@ -3,6 +3,12 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var authors = {};
+
+			$.get('/users_data/').done(function (data) {
+				authors = data['users'];
+			});
+
 			var convID = #{conversationID};
 			$.get('/conversation_data/' + convID.toString() + '/').done(function (data) {
 				$('#convName').text(data['conversation']['name']);
@@ -29,7 +35,11 @@ block scripts
 
 			var stamps = [];
 
-			var clearAllCanvasData = function () {
+			var background = null;
+
+			var pastMessages = 0;
+
+			var clearAllCanvasData = function (backgroundClear) {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 				clickX = [];
 				clickY = [];
@@ -38,27 +48,41 @@ block scripts
 				clickSize = [];
 				tool = [];
 				stamps = [];
+				if(backgroundClear) background = null;
 			};
 
 			var saveMemory = function () {
-
+				background = drawCanvas.toDataURL();
+				clearAllCanvasData(false);
 			};
 
 			var refreshMessages = function () {
 				$.get('/conversation_data/' + convID.toString()).then(function (data) {
-					$('#messagesContainer').html('');
-					for(var m in data['messages']) {
-						$('#messagesContainer').append('<div class="message"><div class="image">'
-								+ '<img src="' + data['messages'][m]['imageData'] + '">'
-								+ '</div></div>');
+					if(data['messages'].length > pastMessages) {
+						$('#messagesContainer').html('');
+
+						pastMessages = data['messages'].length;
+
+						for (var m in data['messages']) {
+							$('#messagesContainer').append('<div class="message">'
+									+ '<div class="author">' + authors[data['messages'][m]['UserId']]['username'] + '</div>'
+									+ '<div class="image">'
+									+ '<img src="' + data['messages'][m]['imageData'] + '">'
+									+ '</div></div>');
+						}
+
+						$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 					}
 				});
-
-				$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 			};
 
 			var redraw = function () {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				if(background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					ctx.drawImage(bgImage, 0, 0, 480, 320);
+				}
 				ctx.lineJoin = 'round';
 
 				for(var i = 0; i < clickX.length; i++) {
@@ -126,6 +150,13 @@ block scripts
 			});
 			$(drawCanvas).on('mouseup', function (event) {
 				paint = false;
+				saveMemory();
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				if (background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					ctx.drawImage(bgImage, 0, 0, 480, 320);
+				}
 			});
 			$(drawCanvas).on('mouseleave', function (event) {
 				paint = false;
@@ -178,7 +209,7 @@ block scripts
 			});
 
 			$('#clear').click(function () {
-				clearAllCanvasData();
+				clearAllCanvasData(true);
 			});
 			$('#send').click(function () {
 				var messageData = {
@@ -188,6 +219,7 @@ block scripts
 
 				$.post('/message/', messageData).done(function (data) {
 					// TODO: Handle error/success
+					clearAllCanvasData(true);
 					refreshMessages();
 				});
 			});

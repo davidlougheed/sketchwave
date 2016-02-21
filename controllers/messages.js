@@ -14,7 +14,8 @@ module.exports.controller = function (objects) {
 
         objects.models.Message.create({
             imageData: [req.body.imageData],
-            ConversationId: parseInt(req.body.conversationID)
+            ConversationId: parseInt(req.body.conversationID),
+            UserId: parseInt(req.user.id)
         }).then(function (message) {
             res.send({ success: true });
         });

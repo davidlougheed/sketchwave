@@ -133,7 +133,15 @@ div#conversation section#messages section#messagesContainer div.message {
 	margin-top: 40px;
 }
 div#conversation section#messages section#messagesContainer div.message:last-child {
-	margin-bottom: 80px;
+	margin-bottom: 40px;
+}
+div#conversation section#messages section#messagesContainer div.message div.author {
+    margin: auto;
+    margin-bottom: 5px;
+    max-width: 480px;
+    width: 100%;
+    color: #666;
+    font-family: sans-serif;
 }
 div#conversation section#messages section#messagesContainer div.message div.image {
 	background-color: white;
@@ -158,6 +166,8 @@ div#conversation section#drawPanel {
 	background-color: #f3f3f1;
 
 	text-align: center;
+
+    overflow-y: auto;
 }
 
 div#conversation section#drawPanel canvas#drawCanvas {
@@ -168,6 +178,9 @@ div#conversation section#drawPanel canvas#drawCanvas {
 	border-radius: 4px;
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
 	cursor: none;
+
+    display: block;
+    margin: auto;
 }
 div#conversation section#drawPanel div#commands {
 	width: 20%;

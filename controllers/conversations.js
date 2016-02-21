@@ -18,7 +18,7 @@ module.exports.controller = function (objects) {
 		}
 
 		objects.models.Conversation.create({
-			name: req.params.name
+			name: req.body.name
 		}).then(function (conversation) {
 			objects.models.User.findAll({
 				username: {

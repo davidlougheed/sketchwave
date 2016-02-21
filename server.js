@@ -39,7 +39,7 @@ app.set('view engine', 'jade');
 app.set('views', APP_BASE_PATH + '/views');
 
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}));
 app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
 app.use(passport.initialize());
 app.use(passport.session());
