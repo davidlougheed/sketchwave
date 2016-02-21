@@ -348,6 +348,8 @@ div#modal h1 {
 
 #stamps {
 	margin-bottom: 15px;
+	max-height: 400px;
+	overflow-y: auto;
 }
 #stamps .stamp {
 	display: inline-block;
@@ -429,7 +431,7 @@ button {
 	box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
 
 	font-size: 0.8rem;
-	color: #cceeff;
+	color: #e0f0ff;
 
 	outline: none;
 }

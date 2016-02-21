@@ -67,7 +67,31 @@ module.exports.controller = function (objects) {
 			return res.send('not authenticated'); // TODO: Handle non authentication
 		}
 
-        res.render('conversation', { user: req.user, conversationID: req.params.id });
+		objects.models.Conversation.findOne({where: {
+			id: req.params.id
+		}
+		}).then(function (conversation) {
+			objects.models.User.findOne({
+				where: {
+					id: req.user.id
+				}
+			}).then(function (user) {
+				conversation.getUsers().then(function (users) {
+					var permission = false;
+					for(var u in users) {
+						if(user.id == (users[u].toJSON())['id']) {
+							permission = true;
+						}
+					}
+
+					if(!permission) {
+						return res.send('no permission');
+					} else {
+						res.render('conversation', { user: req.user, conversationID: req.params.id });
+					}
+				});
+			});
+		});
     });
 	objects.router.put('/conversation/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');

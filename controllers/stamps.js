@@ -37,6 +37,10 @@ module.exports.controller = function (objects) {
 				id: parseInt(req.params.id)
 			}
 		}).then(function (stamp) {
+			if(stamp.UserId != req.user.id) {
+				return res.send({ error: 'wrong person' });
+			}
+
 			stamp.destroy();
 
 			return res.send({ success: true });
