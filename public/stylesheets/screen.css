@@ -119,6 +119,16 @@ ul#conversations li.conversation:last-child {
 ul#conversations li.conversation a {
     color: #666;
 }
+ul#conversations li.conversation div.controls {
+    float: right;
+}
+ul#conversations li.conversation div.controls button {
+    position: relative;
+    top: -5px;
+
+    height: 28px;
+    line-height: 12px;
+}
 
 div#conversation {
 	position: absolute;
@@ -333,4 +343,8 @@ button {
 
 	font-size: 0.8rem;
 	color: #cceeff;
+}
+
+@media screen and (max-width: 1040px) {
+
 }

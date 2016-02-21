@@ -21,13 +21,16 @@ module.exports.controller = function (objects) {
 		for(var n in names) {
 			names[n] = names[n].trim();
 		}
+		names.push(req.user.username);
 
 		objects.models.Conversation.create({
 			name: req.body.name
 		}).then(function (conversation) {
 			objects.models.User.findAll({
-				username: {
-					$in: names
+				where: {
+					username: {
+						$in: names
+					}
 				}
 			}).then(function (users) {
 				conversation.setUsers(users).then(function () {
@@ -63,6 +66,31 @@ module.exports.controller = function (objects) {
 
         res.render('conversation', { user: req.user, conversationID: req.params.id });
     });
+	objects.router.get('/conversation_users/:id/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send(''); // TODO: Handle non authentication
+		}
+
+		objects.models.Conversation.findOne({
+			where: {
+				id: req.params.id
+			}
+		}).then(function (conversation) {
+			conversation.getUsers().then(function (users) {
+				var usersData = [];
+
+				for(var u in users) {
+					var userData = users[u].toJSON();
+					delete userData['password'];
+					usersData.push(userData);
+				}
+
+				return res.send({ conversationID: req.params.id, users: usersData });
+			});
+		});
+	});
 	objects.router.get('/conversation_data/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 

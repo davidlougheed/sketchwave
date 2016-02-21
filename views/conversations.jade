@@ -5,9 +5,31 @@ block scripts
 		$(document).ready(function () {
 			$.get('/conversations_data/').done(function (data) {
 				for(var c in data['conversations']) {
-					$('#conversations').append('<li class="conversation"><a href="/conversation/'
+
+					$('#conversations').append('<li class="conversation" id="conversation-'
+							+ data['conversations'][c]['id'] + '"><a href="/conversation/'
 							+ data['conversations'][c]['id'] + '/">'
-							+ data['conversations'][c]['name'] + '</a> | Members: </li>');
+							+ data['conversations'][c]['name'] + '</a> | Members: <span class="members"></span>'
+							+ '<div class="controls"><button class="delete">Delete</button></div>'
+							+ '</li>');
+				}
+
+				for (var i = 0; i < $('.conversation').length; i++) {
+					$.get('/conversation_users/' + data['conversations'][i]['id'] + '/', function (userData) {
+						var userList = '';
+						for (var u in userData['users']) {
+							var userList;
+
+							userList += userData['users'][u]['username'];
+							if (userData['users'][u] !== userData['users'][userData['users'].length - 1]) {
+								userList += ', ';
+							}
+						}
+
+						console.log(userData['conversationID']);
+
+						$('#conversation-' + userData['conversationID']).children('.members').first().html(userList);
+					});
 				}
 			});
 
