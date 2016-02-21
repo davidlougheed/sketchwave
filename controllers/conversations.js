@@ -66,11 +66,28 @@ module.exports.controller = function (objects) {
 
         res.render('conversation', { user: req.user, conversationID: req.params.id });
     });
+	objects.router.put('/conversation/:id/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send('not authenticated'); // TODO: Handle non authentication
+		}
+
+		objects.models.Conversation.findOne({where: {
+				id: req.params.id
+			}
+		}).then(function (conversation) {
+			conversation.name = req.body.name;
+			conversation.save();
+
+			return res.send({ success: true });
+		});
+	});
 	objects.router.get('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send(''); // TODO: Handle non authentication
+			return res.send('not authenticated'); // TODO: Handle non authentication
 		}
 
 		objects.models.Conversation.findOne({

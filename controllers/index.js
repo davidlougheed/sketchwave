@@ -2,13 +2,25 @@ var bcrypt = require('bcrypt');
 
 module.exports.controller = function (objects) {
     objects.router.get('/', function (req, res) {
+        if(req.isAuthenticated()) {
+			return res.redirect('/conversations/');
+		}
+
         res.render('index');
     });
 
     objects.router.get('/signup/', function (req, res) {
+        if(req.isAuthenticated()) {
+            return res.redirect('/conversations/');
+        }
+
         res.render('signup');
     });
     objects.router.post('/signup/', function (req, res) {
+        if(req.isAuthenticated()) {
+            return res.redirect('/conversations/');
+        }
+
         //TODO: Handle errors properly
         if (!req.body) {
             return res.send('error no body');
@@ -29,6 +41,10 @@ module.exports.controller = function (objects) {
     });
 
     objects.router.get('/login/', function (req, res) {
+        if(req.isAuthenticated()) {
+            return res.redirect('/conversations/');
+        }
+
         res.render('login');
     });
     objects.router.post('/login/', objects.passport.authenticate('local', {

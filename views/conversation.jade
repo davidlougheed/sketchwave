@@ -231,6 +231,25 @@ block scripts
 				redraw();
 			});
 
+			$('#changeName').click(function () {
+				$('#convName').replaceWith('<input type="text" id="changeNameText" value="' + $('#convName').text() + '">');
+				$('#changeNameText').after(' <button id="saveName">Save Change</button>');
+				$('#saveName').click(function () {
+					$.ajax({
+						url: '/conversation/' + convID + '/',
+						method: 'PUT',
+						data: {
+							name: $('#changeNameText').val()
+						}
+					}).done(function (data) {
+						$('#saveName').remove();
+						$('#changeNameText').replaceWith('<span id="convName">' + $('#changeNameText').val() + '</span>');
+						$('#changeName').removeAttr('disabled');
+					});
+				});
+				$(this).attr('disabled', 'disabled');
+			});
+
 			// -----------------
 
 			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
@@ -250,6 +269,9 @@ block content
 		section#messages
 			h1
 				span#convName
+				div#controls
+					button#changeName Change Name
+					button#editMembers Edit Members
 			section#messagesContainer
 
 		section#drawPanel

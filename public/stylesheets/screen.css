@@ -70,16 +70,14 @@ section#main h1 div#controls {
 	vertical-align: top;
 }
 section#main h1 div#controls button {
-	padding: 7px 11px;
+    margin-left: 0.5rem;
+}
 
-	background-color: #1e90ff;
-	border: 1px solid #1c60cc;
-	border-radius: 4px;
-
-	box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
-
-	font-size: 0.8rem;
-	color: #cceeff;
+section#main p {
+    font-family: sans-serif;
+    font-size: 1.4rem;
+    line-height: 1.5em;
+    color: #444;
 }
 
 #cursor {
@@ -147,7 +145,7 @@ div#conversation section#messages section#messagesContainer {
 	overflow-y: auto;
 	position: absolute;
 	bottom: 0;
-	top: 53px;
+	top: 63px;
 	left: 0; right: 0;
 	padding: 40px 0;
 }
@@ -343,6 +341,12 @@ button {
 
 	font-size: 0.8rem;
 	color: #cceeff;
+}
+button[disabled="disabled"] {
+    background-color: #ccc;
+    border-color: #999;
+    color: #999;
+    cursor: not-allowed;
 }
 
 @media screen and (max-width: 1040px) {
