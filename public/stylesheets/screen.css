@@ -246,6 +246,9 @@ div#conversation section#drawPanel div#commands ul li {
 
 	cursor: pointer;
 }
+div#conversation section#drawPanel div#commands ul li:active {
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
 div#conversation section#drawPanel div#tools {
 	display: inline-block;
 	background-color: #e9e9e7;
@@ -389,6 +392,11 @@ button {
 
 	font-size: 0.8rem;
 	color: #cceeff;
+
+    outline: none;
+}
+button:active {
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
 }
 button[disabled="disabled"] {
     background-color: #ccc;

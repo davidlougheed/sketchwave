@@ -235,6 +235,18 @@ block scripts
 				};
 
 				$.post('/stamp/', messageData).done(function (data) {
+					$('body').append('<div id="modalBackground"></div>');
+					$('body').append('<div id="modal"><h1>Stamp was added!</h1>'
+							+ '<button id="okay">Okay</button>'
+							+ '</div>');
+					$('#okay').click(function () {
+						$('#modal').fadeOut('fast', function () {
+							$(this).remove();
+						});
+						$('#modalBackground').fadeOut('fast', function () {
+							$(this).remove();
+						});
+					});
 				});
 			});
 
