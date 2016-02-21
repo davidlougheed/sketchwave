@@ -4,40 +4,47 @@ block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
 			var reloadConversations = function () {
-				$('#conversations').html('');
 				$.get('/conversations_data/').done(function (data) {
+					$('#conversations').html('');
 					for (var c in data['conversations']) {
 						var rawDate = data['conversations'][c]['lastMessage'];
-						var formattedDate = moment(rawDate).format("h:mm:ss A; dddd, MMMM D, YYYY");
-						$('#conversations').append('<li class="conversation" data-id="' + data['conversations'][c]['id']
+						var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
+						if(rawDate == null) {
+							formattedDate = 'No posts yet.';
+						}
+						var users = data['users'][c];
+						var userList = '';
+
+						for (var u in data['users'][c]) {
+							userList += data['users'][c][u]['username'];
+							if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
+								userList += ', ';
+							}
+						}
+
+						var conversationHTML = '<li class="conversation" data-id="' + data['conversations'][c]['id']
 								+ '" id="conversation-'
 								+ data['conversations'][c]['id'] + '"><div id="link"><a href="/conversation/'
 								+ data['conversations'][c]['id'] + '/">'
-								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> <span class="members"></span><div class="date">' + formattedDate + '</div>'
-								+ '<div class="controls"><button class="delete">Delete</button></div>'
-								+ '</li>');
-					}
+								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> '
+								+ '<span class="members">' + userList + '</span><div class="date">Last message posted ' + formattedDate
+								+ '</div>';
 
-					for(var i = 0; i < data['conversations'].length; i++) {
-						$.get('/conversation_users/' + data['conversations'][i]['id'] + '/', function (userData) {
-							var userList = '';
-							for (var u in userData['users']) {
-								userList += userData['users'][u]['username'];
-								if (userData['users'][u] !== userData['users'][userData['users'].length - 1]) {
-									userList += ', ';
-								}
-							}
 
-							if(userData['users'].length > 1) {
-								$('#conversation-' + userData['conversationID']).children('.controls').first().children('.delete').first().remove();
-							}
+						if(data['users'].length == 1) {
+							conversationHTML += '<div class="controls"><button class="delete">Delete</button></div>';
+						}
 
-							$('#conversation-' + userData['conversationID']).children('.members').first().html(userList);
-						});
+						conversationHTML += '</li>';
+
+						$('#conversations').append(conversationHTML);
 					}
 				});
 			};
 			reloadConversations();
+			window.setInterval(function () {
+				reloadConversations();
+			}, 2000);
 
 			$('#formCreateConversation').hide();
 

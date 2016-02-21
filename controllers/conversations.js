@@ -1,3 +1,5 @@
+var async = require('async');
+
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
 		//TODO: Handle errors properly
@@ -57,7 +59,23 @@ module.exports.controller = function (objects) {
 
 					return 0;
 				});
-				return res.send({ conversations: conversations });
+
+				var usersList = [];
+
+				async.each(conversations, function(conversation, callback) {
+					conversation.getUsers().then(function (users) {
+						var userList = [];
+						for(var u in users) {
+							var userJSON = users[u].toJSON();
+							delete userJSON['password'];
+							userList.push(userJSON);
+						}
+						usersList.push(userList);
+						callback();
+					});
+				}, function (err) {
+					return res.send({ conversations: conversations, users: usersList });
+				});
 			});
 		});
 	});
