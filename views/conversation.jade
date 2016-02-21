@@ -1,0 +1,481 @@
+extends base.jade
+
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			var authors = {};
+
+			$.get('/users_data/').done(function (data) {
+				authors = data['users'];
+			});
+
+			var convID = #{conversationID};
+			$.get('/conversation_data/' + convID.toString() + '/').done(function (data) {
+				$('#convName').text(data['conversation']['name']);
+			});
+
+			$('#cursor').hide();
+
+			var drawCanvas = document.getElementById('drawCanvas');
+			var ctx = drawCanvas.getContext('2d');
+			var paint = false;
+			var hover = false;
+
+			var brushColor = '#ff0000';
+			var brushSize = 5;
+			var toolType = 'brush';
+			var stamp = 'dolphin';
+
+			var clickX = [];
+			var clickY = [];
+			var clickDrag = [];
+			var clickColor = [];
+			var clickSize = [];
+			var tool = [];
+
+			var stamps = [];
+
+			var background = null;
+
+			var pastMessages = 0;
+
+			var clearAllCanvasData = function (backgroundClear) {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				clickX = [];
+				clickY = [];
+				clickDrag = [];
+				clickColor = [];
+				clickSize = [];
+				tool = [];
+				stamps = [];
+				if(backgroundClear) background = null;
+			};
+
+			var saveMemory = function () {
+				background = drawCanvas.toDataURL();
+				clearAllCanvasData(false);
+			};
+
+			var refreshMessages = function () {
+				$.get('/conversation_data/' + convID.toString()).then(function (data) {
+					if(data['messages'].length > pastMessages) {
+						for (var m = pastMessages; m < data['messages'].length; m++) {
+							$('#messagesContainer').append('<div class="message">'
+									+ '<div class="author">' + authors[data['messages'][m]['UserId']]['username'] + '</div>'
+									+ '<div class="image">'
+									+ '<img src="' + data['messages'][m]['imageData'] + '">'
+									+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
+									+ '</div>');
+						}
+
+						pastMessages = data['messages'].length;
+
+						$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
+					}
+				});
+			};
+
+			var redraw = function () {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				if(background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					ctx.drawImage(bgImage, 0, 0, 480, 320);
+				}
+				ctx.lineJoin = 'round';
+
+				for(var i = 0; i < clickX.length; i++) {
+					if(tool[i] == 'brush') {
+						ctx.lineWidth = clickSize[i];
+						ctx.strokeStyle = clickColor[i];
+
+						ctx.beginPath();
+
+						if (clickDrag[i] && i != 0) {
+							ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+						} else {
+							ctx.moveTo(clickX[i] - 1, clickY[i]);
+						}
+
+						ctx.lineTo(clickX[i], clickY[i]);
+						ctx.closePath();
+						ctx.stroke();
+					} else {
+						if(stamps[i]) {
+							var size = 50 * (clickSize[i] / 5);
+
+							if(stamps[i] == 'hotswap') {
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
+							} else {
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 2), size, size);
+							}
+						}
+					}
+				}
+			};
+
+			var addPoint = function (x, y, dragging) {
+				clickX.push(x);
+				clickY.push(y);
+				clickDrag.push(dragging);
+				clickColor.push(brushColor);
+				clickSize.push(brushSize);
+
+				tool.push(toolType);
+
+				if(toolType == 'brush') {
+					stamps.push(null);
+				} else {
+					stamps.push(stamp);
+				}
+			};
+
+			$(drawCanvas).on('mousedown', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
+				paint = true;
+
+				addPoint(mouseX, mouseY, false);
+				redraw();
+			});
+			$(drawCanvas).on('mousemove', function (event) {
+				if(paint) {
+					var mouseX = event.pageX - $(this).offset().left;
+					var mouseY = event.pageY - $(this).offset().top;
+
+					addPoint(mouseX, mouseY, true);
+					redraw();
+				}
+
+				if(hover) {
+					$('#cursor').css({'top': (event.pageY - 112	).toString() + 'px', 'left': event.pageX.toString() + 'px'});
+				}
+			});
+			$(drawCanvas).on('mouseup', function (event) {
+				paint = false;
+				saveMemory();
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				if (background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					ctx.drawImage(bgImage, 0, 0, 480, 320);
+				}
+			});
+			$(drawCanvas).on('mouseleave', function (event) {
+				paint = false;
+				hover = false;
+				$('#cursor').hide();
+			});
+
+			$(drawCanvas).on('mouseenter', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
+				hover = true;
+				$('#cursor').show();
+				$('#cursor').css({'top': event.pageY.toString() + 'px', 'left': event.pageX.toString() + 'px'});
+			});
+
+			$('.colorTool').click(function () {
+				toolType = 'brush';
+
+				brushColor = $(this).css('backgroundColor');
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#images').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+			$('.stampTool').click(function () {
+				toolType = 'stamp';
+
+				stamp = $(this).attr('id');
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#colors').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+			$('.brushTool').click(function () {
+				brushSize = parseInt($(this).data('size'));
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+			});
+
+			$('#clear').click(function () {
+				clearAllCanvasData(true);
+			});
+			$('#send').click(function () {
+				var messageData = {
+					'imageData': drawCanvas.toDataURL(),
+					'conversationID': convID
+				};
+
+				$.post('/message/', messageData).done(function (data) {
+					// TODO: Handle error/success
+					clearAllCanvasData(true);
+					refreshMessages();
+				});
+			});
+
+			$('#stampIt').click(function () {
+				var messageData = {
+					'imageData': drawCanvas.toDataURL(),
+					'conversationID': convID
+				};
+
+				$.post('/stamp/', messageData).done(function (data) {
+					$('body').append('<div id="modalBackground"></div>');
+					$('body').append('<div id="modal"><h1>Stamp was added!</h1>'
+							+ '<button id="okay">Okay</button>'
+							+ '</div>');
+					$('#okay').click(function () {
+						$('#modal').fadeOut('fast', function () {
+							$(this).remove();
+						});
+						$('#modalBackground').fadeOut('fast', function () {
+							$(this).remove();
+						});
+					});
+				});
+			});
+
+			$('#hotkey').click(function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>User Stamps</h1>'
+						+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
+						+ '<button id="cancel">Cancel</button>'
+						+ '</div>');
+
+				$.post('/stamps/', { conversationID: convID }).done(function (data) {
+					for(var s in data['stamps']) {
+						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+						if(data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+							stampHTML += '<button class="stampDelete">Delete</button>';
+						}
+						stampHTML += '</div>';
+						$('#stamps').append(stampHTML);
+					}
+				});
+
+				$('body').on('click', '.stampDelete', function (event) {
+					event.stopPropagation();
+					$.ajax({
+						url: '/stamp/' + $(this).parent().data('id') + '/',
+						method: 'DELETE',
+					}).done(function (data) {
+						$('#stamps').html('<div class="stamp"><img src="/images/sciencerules.png"></div>');
+						$.post('/stamps/', {conversationID: convID}).done(function (data) {
+							for (var s in data['stamps']) {
+								var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+								if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+									stampHTML += '<button class="stampDelete">Delete</button>';
+								}
+								stampHTML += '</div>';
+								$('#stamps').append(stampHTML);
+							}
+						});
+					});
+				});
+
+				$('#cancel').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
+			});
+
+			$('body').on('click', '.stamp', function () {
+				$('#hotswap').children('img').first().attr('src', ($(this).children('img').first().attr('src')));
+
+				$('#hotswap').click();
+
+				$('#modal').fadeOut('fast', function () {
+					$(this).remove();
+				});
+				$('#modalBackground').fadeOut('fast', function () {
+					$(this).remove();
+				});
+			});
+
+			$('body').on('click', '.importToCanvas', function (event) {
+				var imageData = $(this).parent().parent().children('div.image').first().children('img').first().attr('src');
+
+				background = imageData;
+				clearAllCanvasData(false);
+				redraw();
+			});
+
+			$('#changeName').click(function () {
+				$('#convName').replaceWith('<input type="text" id="changeNameText" value="' + $('#convName').text() + '">');
+				$('#changeNameText').after(' <button id="saveName">Save Change</button>');
+				$('#saveName').click(function () {
+					$.ajax({
+						url: '/conversation/' + convID + '/',
+						method: 'PUT',
+						data: {
+							name: $('#changeNameText').val()
+						}
+					}).done(function (data) {
+						$('#saveName').remove();
+						$('#changeNameText').replaceWith('<span id="convName">' + $('#changeNameText').val() + '</span>');
+						$('#changeName').removeAttr('disabled');
+					});
+				});
+				$(this).attr('disabled', 'disabled');
+			});
+
+			$('#editMembers').click(function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>Edit Members</h1>'
+						+ '<div id="members"></div>'
+						+ '<input type="text" id="addMemberBox"> <button id="addMember">Add Member</button><br><br>'
+						+ '<button id="close">Close</button>'
+						+ '</div>');
+
+				$.get('/conversation_users/' + convID + '/').done(function (data) {
+					for (var u in data['users']) {
+						$('#members').append('<div class="member" data-username="'
+								+ data['users'][u]['username'] + '">' + data['users'][u]['username']
+								+ ' <button class="deleteMember">Delete</button></div>');
+					}
+				});
+
+				$('#addMember').click(function () {
+					var usernameToAdd = $('#addMemberBox').val();
+
+					$.ajax({
+						url: '/conversation_users/' + convID + '/',
+						method: 'PUT',
+						data: {
+							username: usernameToAdd
+						}
+					}).done(function (data) {
+						$('#members').html('');
+						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							for (var u in data['users']) {
+								$('#members').append('<div class="member">' + data['users'][u]['username']
+										+ ' <button class="deleteMember">Delete</button></div>');
+							}
+						});
+					});
+				});
+
+				$('body').on('click', '.deleteMember', function () {
+					$.ajax({
+						url: '/conversation_users/' + convID + '/',
+						method: 'DELETE',
+						data: {
+							username: $(this).parent().data('username')
+						}
+					}).done(function (data) {
+						$('#members').html('');
+						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							for (var u in data['users']) {
+								if(data['users'].length > 1) {
+									$('#members').append('<div class="member">' + data['users'][u]['username']
+											+ ' <button class="deleteMember">Delete</button></div>');
+								} else {
+									$('#members').append('<div class="member">' + data['users'][u]['username']
+											+ '</div>');
+								}
+							}
+						});
+					});
+				});
+
+				$('#close').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
+			});
+
+			// -----------------
+
+			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
+
+			refreshMessages();
+
+			window.setInterval(function () {
+				refreshMessages();
+			}, 500);
+		});
+
+
+block content
+	img#cursor(width='100', height='57', src='/images/cursor.png')
+
+	div#conversation
+		section#messages
+			h1
+				span#convName
+				div#controls
+					button#changeName Change Name
+					button#editMembers Edit Members
+			section#messagesContainer
+
+		section#drawPanel
+			canvas#drawCanvas(height='320', width='480')
+			div#commands
+				ul
+					li#send Send
+				ul
+					li#clear Clear
+				ul
+					li#stampIt StampIt!
+
+			div#tools
+				ul#colors
+					li#white.colorTool
+					li#grey.colorTool
+					li#black.colorTool
+					li#red.colorTool.active
+					li#hotPink.colorTool
+					li#yellow.colorTool
+					li#blue.colorTool
+					li#green.colorTool
+
+				ul#images
+					li#dolphin.big.stampTool
+						img(src='/images/dolphin.png')
+					li#hand.big.stampTool
+						img(src='/images/hand.png')
+					li#pizza.big.stampTool
+						img(src='/images/pizza.png')
+					li#gabe.big.stampTool
+						img(src='/images/gabe.png')
+					li#hotswap.big.stampTool
+						img(src='/images/sciencerules.png')
+					li#hotkey.big
+						span ⋮
+
+				ul#brushes
+					li.big.brushTool(data-size='3')
+						div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
+					li.big.brushTool(data-size='5').active
+						div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
+					li.big.brushTool(data-size='7')
+						div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
+					li.big.brushTool(data-size='12')
+						div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
+					li.big.brushTool(data-size='16')
+						div(style='width: 16px; height: 16px; margin: auto; background-color: black; border-radius: 16px; margin-top: 10px;')
+					li.big.brushTool(data-size='20')
+						div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')

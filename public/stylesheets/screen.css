@@ -1,7 +1,457 @@
+@charset "UTF-8";
+
 body {
+	padding: 0; margin: 0;
+	background-color: #f9f9f5;
 }
 
+header {
+	background: url(/images/wave.png);
+	background-repeat: repeat-x;
+	background-size: auto 70px;
+	background-position-x: 43px;
+	height: 112px;
+	position: absolute;
+	left: 0; right: 0;
+	z-index: 50;
+}
+header img {
+	vertical-align: top;
+	background-color: #f9f9f5;
+}
+header nav {
+	background-color: #1e90ff;
+	border-bottom: 2px solid #1c60cc;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+}
+header nav ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	height: 40px
+}
+header nav ul li {
+	display: inline-block;
+	margin: 0 0.5em;
+	height: 40px;
+	line-height: 38px;
+}
+header nav ul li a {
+	color: #cceeff;
+	text-decoration: none;
+	text-transform: uppercase;
+	font-family: sans-serif;
+	font-size: 0.9em;
+	font-weight: bold;
+}
+
+section#main {
+	padding: 30px;
+	position: absolute;
+	left: 0; right: 0; bottom: 0; top: 112px;
+}
+section#main h1 {
+	overflow: hidden;
+	margin-top: 0;
+	padding-bottom: 10px;
+	font-family: sans-serif;
+	color: #333;
+	border-bottom: 2px solid #1e90ff;
+}
+section#main h1 span {
+	float: left;
+	vertical-align: top;
+	position: relative;
+	top: 5px;
+}
+section#main h1 div#controls {
+	float: right;
+	vertical-align: top;
+}
+section#main h1 div#controls button {
+	margin-left: 0.5rem;
+}
+
+section#main p {
+	font-family: sans-serif;
+	font-size: 1.4rem;
+	line-height: 1.5em;
+	color: #444;
+}
+
+#cursor {
+	position: absolute;
+	z-index: 100;
+	margin-top: -54px;
+	user-select: none;
+	pointer-events: none;
+}
+
+/* conversation stuff */
+
+ul#conversations {
+	list-style: none;
+	padding: 0; margin: 0;
+	margin-top: 20px;
+	border-radius: 3px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
+}
+ul#conversations li.conversation {
+	padding: 10px;
+	border: 1px solid #bbb;
+	border-bottom: none;
+	background-color: #fefefd;
+
+	font-family: sans-serif;
+}
+ul#conversations li.conversation:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+ul#conversations li.conversation:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: 1px solid #bbb;
+}
+ul#conversations li.conversation div#link {
+	display: inline-block;
+	border-right: 1px solid #bbb;
+	padding-right: 10px;
+	margin-right: 10px;
+}
+ul#conversations li.conversation a {
+	color: #666;
+}
+ul#conversations li.conversation div.date {
+	display: inline-block;
+	border-left: 1px solid #bbb;
+	padding-left: 10px;
+	margin-left: 10px;
+}
+ul#conversations li.conversation div.controls {
+	float: right;
+}
+ul#conversations li.conversation div.controls button {
+	position: relative;
+	top: -5px;
+
+	height: 28px;
+	line-height: 12px;
+}
+
+div#conversation {
+	position: absolute;
+	z-index: 49;
+	left: 0; right: 0; bottom: 0; top: 0;
+	box-sizing: border-box;
+}
+div#conversation section#messages {
+	position: absolute;
+	box-sizing: border-box;
+	top: 0; left: 0; bottom: 0;
+	width: 50%;
+	padding: 20px;
+}
+div#conversation section#messages h1 {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	padding: 10px 20px;
+}
+div#conversation section#messages section#messagesContainer {
+	overflow-y: auto;
+	position: absolute;
+	bottom: 0;
+	top: 53px;
+	left: 0; right: 0;
+	padding: 40px 0;
+}
+div#conversation section#messages section#messagesContainer div.message {
+	margin-top: 40px;
+}
+div#conversation section#messages section#messagesContainer div.message:last-child {
+	margin-bottom: 40px;
+}
+div#conversation section#messages section#messagesContainer div.message div.author {
+	margin: auto;
+	margin-bottom: 5px;
+	max-width: 480px;
+	width: 100%;
+	color: #666;
+	font-family: sans-serif;
+}
+div#conversation section#messages section#messagesContainer div.message div.image {
+	background-color: white;
+	width: 480px;
+	height: 320px;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	margin: auto;
+	box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.1);
+}
+div#conversation section#messages section#messagesContainer div.message div.controls {
+	margin: auto;
+	margin-top: 5px;
+	max-width: 480px;
+	width: 100%;
+	color: #666;
+	font-family: sans-serif;
+}
+div#conversation section#drawPanel {
+	box-sizing: border-box;
+	position: absolute;
+	left: 50%; right: 0;
+	top: 0; bottom: 0;
+	width: 50%;
+
+	padding: 20px;
+
+	border-left: 1px solid #ccc;
+
+	background-color: #f3f3f1;
+
+	text-align: center;
+
+	overflow-y: auto;
+}
+
+div#conversation section#drawPanel canvas#drawCanvas {
+	background-color: white;
+	width: 480px;
+	height: 320px;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	cursor: none;
+
+	display: block;
+	margin: auto;
+}
+div#conversation section#drawPanel div#commands {
+	width: 20%;
+	display: inline-block;
+	box-sizing: border-box;
+	background-color: #e9e9e7;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	margin: auto;
+	margin-right: 2%;
+	margin-top: 20px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	vertical-align: top;
+	padding: 10px;
+}
+div#conversation section#drawPanel div#commands ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+div#conversation section#drawPanel div#commands ul li {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background-color: #f9f9f5;
+	height: 40px;
+	margin-bottom: 7px;
+
+	color: #333;
+	line-height: 38px;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 0.9rem;
+
+	box-shadow: inset 0px 1px 0px white;
+
+	cursor: pointer;
+}
+div#conversation section#drawPanel div#commands ul li:active {
+	box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+div#conversation section#drawPanel div#tools {
+	display: inline-block;
+	background-color: #e9e9e7;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	width: 66.6%;
+	margin: auto;
+	margin-top: 20px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+}
+div#conversation section#drawPanel div#tools ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	margin: auto;
+	font-size: 0;
+	margin-bottom: 10px;
+}
+div#conversation section#drawPanel div#tools ul li {
+	position: relative;
+	box-sizing: border-box;
+	width: 10.5%;
+	margin: 1%;
+	height: 40px;
+	display: inline-block;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background-color: #f9f9f5;
+}
+div#conversation section#drawPanel div#tools ul li.active {
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+	border-color: orange;
+}
+div#conversation section#drawPanel div#tools ul li.big {
+	width: 14.65%;
+	margin: 1%;
+	vertical-align: top;
+}
+div#conversation section#drawPanel div#tools ul li#hotkey {
+	font-size: 24px;
+	line-height: 37px;
+	color: black;
+}
+div#conversation section#drawPanel div#tools ul li.big img {
+	max-width: 100%;
+	height: 38px;
+}
+div#conversation section#drawPanel div#tools ul li#white { background-color: #FFF; }
+div#conversation section#drawPanel div#tools ul li#grey { background-color: #808080; }
+div#conversation section#drawPanel div#tools ul li#black { background-color: #000; }
+div#conversation section#drawPanel div#tools ul li#red { background-color: #F00; }
+div#conversation section#drawPanel div#tools ul li#hotPink { background-color: #FF69B4; }
+div#conversation section#drawPanel div#tools ul li#yellow { background-color: #FFFF00; }
+div#conversation section#drawPanel div#tools ul li#blue { background-color: #00F; }
+div#conversation section#drawPanel div#tools ul li#green { background-color: #0F0; }
+
+div#modalBackground {
+	z-index: 101;
+	position: fixed;
+	top: 0; bottom: 0;
+	left: 0; right: 0;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+div#modal {
+	z-index: 102;
+	position: fixed;
+	width: 50%;
+	margin-left: 25%;
+	margin-top: 40px;
+	padding: 20px;
+
+	border: 1px solid #999;
+	border-radius: 4px;
+	background-color: #f9f9f5;
+
+	box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.2);
+}
+div#modal h1 {
+	margin-top: 0;
+	font-family: sans-serif;
+	color: #666;
+	font-size: 1.3rem;
+}
+
+#stamps {
+	margin-bottom: 15px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+#stamps .stamp {
+	display: inline-block;
+	width: 19%;
+	margin: 5px 0.5%;
+	box-sizing: border-box;
+	border: 1px solid #999;
+	border-radius: 3px;
+	position: relative;
+}
+#stamps .stamp.active {
+	border: 1px solid orange;
+	box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+#stamps .stamp img {
+	width: 100%;
+	height: auto;
+}
+#stamps .stamp button.stampDelete {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	padding: 3px 5px;
+	font-size: 0.7rem;
+}
+
+#members {
+	margin: 10px 0;
+}
+#members .member {
+	padding: 10px;
+	background-color: #fefefd;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	margin-bottom: 5px;
+
+	font-family: sans-serif;
+}
+#members .member button {
+	float: right;
+	position: relative;
+	top: -7px;
+}
+
+form {
+	clear: both;
+	padding: 15px;
+	background-color: #fefefd;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
 label {
-    display: block;
-    margin-top: 10px;
+	display: block;
+	margin-top: 10px;
+
+	text-transform: uppercase;
+	font-weight: bold;
+	font-family: sans-serif;
+	font-size: 0.8rem;
+	color: #333;
+}
+input[type="text"], input[type="password"] {
+	border: 1px solid #1c60cc;
+	padding: 5px;
+
+	border-radius: 4px;
+	box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.2);
+
+	font-size: 0.85rem;
+}
+button {
+	padding: 7px 11px;
+
+	background-color: #1e90ff;
+	border: 1px solid #1c60cc;
+	border-radius: 4px;
+
+	box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
+
+	font-size: 0.8rem;
+	color: #e0f0ff;
+
+	outline: none;
+}
+button:active {
+	box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+button[disabled="disabled"] {
+	background-color: #ccc;
+	border-color: #999;
+	color: #999;
+	cursor: not-allowed;
+}
+
+@media screen and (max-width: 1040px) {
+
 }

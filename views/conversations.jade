@@ -1,0 +1,118 @@
+extends base.jade
+
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			var reloadConversations = function () {
+				$.get('/conversations_data/').done(function (data) {
+					$('#conversations').html('');
+					for (var c in data['conversations']) {
+						var rawDate = data['conversations'][c]['lastMessage'];
+						var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
+						if(rawDate == null) {
+							formattedDate = 'No posts yet.';
+						}
+						var users = data['users'][c];
+						var userList = '';
+
+						for (var u in data['users'][c]) {
+							userList += data['users'][c][u]['username'];
+							if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
+								userList += ', ';
+							}
+						}
+
+						var conversationHTML = '<li class="conversation" data-id="' + data['conversations'][c]['id']
+								+ '" id="conversation-'
+								+ data['conversations'][c]['id'] + '"><div id="link"><a href="/conversation/'
+								+ data['conversations'][c]['id'] + '/">'
+								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> '
+								+ '<span class="members">' + userList + '</span><div class="date">Last message posted: '
+								+ formattedDate + '</div>';
+
+
+						if(data['users'][c].length == 1) {
+							conversationHTML += '<div class="controls"><button class="delete">Delete</button></div>';
+						}
+
+						conversationHTML += '</li>';
+
+						$('#conversations').append(conversationHTML);
+					}
+				});
+			};
+			reloadConversations();
+			window.setInterval(function () {
+				reloadConversations();
+			}, 2000);
+
+			$.get('/users_data/').done(function (data) {
+				$('#names').html('');
+				for(var u in data['users']) {
+					if(data['users'][u]['id'] != #{user.id})
+					$('#names').append('<option value="' + data['users'][u]['username'] + '">' + data['users'][u]['username'] + '</option>');
+				}
+
+				$('#names').select2();
+			});
+
+			$('#formCreateConversation').hide();
+
+			$('#createConversation').click(function () {
+				$('#formCreateConversation').slideDown();
+			});
+			$('#cancelConversation').click(function () {
+				$('#formCreateConversation').slideUp();
+			});
+
+			$('body').on('click', '.delete', function () {
+				$('body').append('<div id="modalBackground"></div>');
+				$('body').append('<div id="modal"><h1>Are you sure you want to delete conversation "'
+						+ $(this).parent().parent().children('a').first().text() + '"?</h1>'
+						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') +  '">'
+						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
+						+ '</div>');
+
+				$('#confirmDelete').click(function () {
+					$.ajax({
+						url: '/conversation/' + $(this).parent().children('#toDelete').first().val() + '/',
+						method: 'DELETE',
+					}).done(function (data) {
+						$('#modal').fadeOut('fast', function () {
+							$(this).remove();
+						});
+						$('#modalBackground').fadeOut('fast', function () {
+							$(this).remove();
+							reloadConversations();
+						});
+					});
+				});
+				$('#cancelDelete').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
+					});
+				});
+			});
+		});
+
+
+block content
+	h1
+		span Conversations
+		div#controls
+			button#createConversation(type='button') Create
+
+	form#formCreateConversation(method='post')
+		label(for='names') To:
+		select(name='names[]', id='names', class='js-basic-multiple', multiple='multiple', style='width: 400px')
+		label(for='names') Name
+		input(type='text', name='name', id='name')
+		br
+		br
+		button(type='submit') Create
+		button(type='button', id='cancelConversation' style='margin-left: 0.5em') Cancel
+
+	ul#conversations
