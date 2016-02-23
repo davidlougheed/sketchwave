@@ -366,10 +366,11 @@ block scripts
 							username: usernameToAdd
 						}
 					}).done(function (data) {
-						$('#members').html('');
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							$('#members').html('');
 							for (var u in data['users']) {
-								$('#members').append('<div class="member">' + data['users'][u]['username']
+								$('#members').append('<div class="member" data-username="'
+										+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 										+ ' <button class="deleteMember">Delete</button></div>');
 							}
 						});
@@ -384,14 +385,16 @@ block scripts
 							username: $(this).parent().data('username')
 						}
 					}).done(function (data) {
-						$('#members').html('');
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
+							$('#members').html('');
 							for (var u in data['users']) {
 								if(data['users'].length > 1) {
-									$('#members').append('<div class="member">' + data['users'][u]['username']
+									$('#members').append('<div class="member" data-username="'
+											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 											+ ' <button class="deleteMember">Delete</button></div>');
 								} else {
-									$('#members').append('<div class="member">' + data['users'][u]['username']
+									$('#members').append('<div class="member" data-username="'
+											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 											+ '</div>');
 								}
 							}

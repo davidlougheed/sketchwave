@@ -1,7 +1,7 @@
 {
 	"host": "localhost",
 	"port": 4321,
-	"sessionSecret": "replaceThis",
+	"sessionSecret": "dj21984r3n!#N#&*R",
 	"database": {
 		"name": "pixelchat",
 		"username": "pixelchat",
