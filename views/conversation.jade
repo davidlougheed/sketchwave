@@ -433,49 +433,51 @@ block content
 
 		section#drawPanel
 			canvas#drawCanvas(height='320', width='480')
-			div#commands
-				ul
-					li#send Send
-				ul
-					li#clear Clear
-				ul
-					li#stampIt StampIt!
 
-			div#tools
-				ul#colors
-					li#white.colorTool
-					li#grey.colorTool
-					li#black.colorTool
-					li#red.colorTool.active
-					li#hotPink.colorTool
-					li#yellow.colorTool
-					li#blue.colorTool
-					li#green.colorTool
+			div#drawingControls
+				div#commands
+					ul
+						li#send Send
+					ul
+						li#clear Clear
+					ul
+						li#stampIt StampIt!
 
-				ul#images
-					li#dolphin.big.stampTool
-						img(src='/images/dolphin.png')
-					li#hand.big.stampTool
-						img(src='/images/hand.png')
-					li#pizza.big.stampTool
-						img(src='/images/pizza.png')
-					li#gabe.big.stampTool
-						img(src='/images/gabe.png')
-					li#hotswap.big.stampTool
-						img(src='/images/sciencerules.png')
-					li#hotkey.big
-						span ⋮
+				div#tools
+					ul#colors
+						li#white.colorTool
+						li#grey.colorTool
+						li#black.colorTool
+						li#red.colorTool.active
+						li#hotPink.colorTool
+						li#yellow.colorTool
+						li#blue.colorTool
+						li#green.colorTool
 
-				ul#brushes
-					li.big.brushTool(data-size='3')
-						div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
-					li.big.brushTool(data-size='5').active
-						div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
-					li.big.brushTool(data-size='7')
-						div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
-					li.big.brushTool(data-size='12')
-						div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
-					li.big.brushTool(data-size='16')
-						div(style='width: 16px; height: 16px; margin: auto; background-color: black; border-radius: 16px; margin-top: 10px;')
-					li.big.brushTool(data-size='20')
-						div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')
+					ul#images
+						li#dolphin.big.stampTool
+							img(src='/images/dolphin.png')
+						li#hand.big.stampTool
+							img(src='/images/hand.png')
+						li#pizza.big.stampTool
+							img(src='/images/pizza.png')
+						li#gabe.big.stampTool
+							img(src='/images/gabe.png')
+						li#hotswap.big.stampTool
+							img(src='/images/sciencerules.png')
+						li#hotkey.big
+							span ⋮
+
+					ul#brushes
+						li.big.brushTool(data-size='3')
+							div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
+						li.big.brushTool(data-size='5').active
+							div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
+						li.big.brushTool(data-size='7')
+							div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
+						li.big.brushTool(data-size='12')
+							div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
+						li.big.brushTool(data-size='16')
+							div(style='width: 16px; height: 16px; margin: auto; background-color: black; border-radius: 16px; margin-top: 10px;')
+						li.big.brushTool(data-size='20')
+							div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')
