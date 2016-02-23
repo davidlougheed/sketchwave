@@ -310,6 +310,9 @@ div#conversation section#drawPanel div#drawingControls div#tools ul li.active {
 	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
 	border-color: orange;
 }
+div#conversation section#drawPanel div#drawingControls div#tools ul li:active {
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+}
 div#conversation section#drawPanel div#drawingControls div#tools ul li.big {
 	width: 14.65%;
 	margin: 0 1%;

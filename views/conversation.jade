@@ -51,9 +51,8 @@ block scripts
 				if(backgroundClear) background = null;
 			};
 
-			var saveMemory = function () {
+			var moveImageDataToBg = function () {
 				background = drawCanvas.toDataURL();
-				clearAllCanvasData(false);
 			};
 
 			var refreshMessages = function () {
@@ -154,12 +153,15 @@ block scripts
 			});
 			$(drawCanvas).on('mouseup', function (event) {
 				paint = false;
-				saveMemory();
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				moveImageDataToBg();
 				if (background) {
 					var bgImage = document.createElement('img');
 					bgImage.setAttribute('src', background);
-					ctx.drawImage(bgImage, 0, 0, 480, 320);
+					bgImage.onload = function () {
+						clearAllCanvasData(false);
+						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+						ctx.drawImage(bgImage, 0, 0, 480, 320);
+					};
 				}
 			});
 			$(drawCanvas).on('mouseleave', function (event) {
