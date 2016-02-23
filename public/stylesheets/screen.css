@@ -206,10 +206,7 @@ div#conversation section#drawPanel {
 	top: 0; bottom: 0;
 	width: 50%;
 
-	padding: 20px;
-
 	border-left: 1px solid #ccc;
-
 	background-color: #f3f3f1;
 
 	text-align: center;
@@ -227,33 +224,41 @@ div#conversation section#drawPanel canvas#drawCanvas {
 	cursor: none;
 
 	display: block;
-	margin: auto;
+	margin: 20px auto;
 }
-div#conversation section#drawPanel div#commands {
+div#conversation section#drawPanel div#drawingControls {
+	background-color: #e9e9e7;
+	position: absolute;
+	top: 360px; bottom: 0;
+	left: 0; right: 0;
+
+	border-top: 1px solid #bbb;
+}
+div#conversation section#drawPanel div#drawingControls div#commands {
 	width: 20%;
 	display: inline-block;
 	box-sizing: border-box;
 	background-color: #e9e9e7;
-	border: 1px solid #bbb;
-	border-radius: 4px;
-	margin: auto;
-	margin-right: 2%;
-	margin-top: 20px;
-	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	border-right: 1px solid #bbb;
 	vertical-align: top;
-	padding: 10px;
+	padding: 15px;
+
+	position: absolute;
+	left: 0;
+	top: 0; bottom: 0;
 }
-div#conversation section#drawPanel div#commands ul {
+div#conversation section#drawPanel div#drawingControls div#commands ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
-div#conversation section#drawPanel div#commands ul li {
+div#conversation section#drawPanel div#drawingControls div#commands ul li {
+	box-sizing: border-box;
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	background-color: #f9f9f5;
 	height: 40px;
-	margin-bottom: 7px;
+	margin-bottom: 10px;
 
 	color: #333;
 	line-height: 38px;
@@ -265,20 +270,20 @@ div#conversation section#drawPanel div#commands ul li {
 
 	cursor: pointer;
 }
-div#conversation section#drawPanel div#commands ul li:active {
+div#conversation section#drawPanel div#drawingControls div#commands ul li:active {
 	box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
 }
-div#conversation section#drawPanel div#tools {
+div#conversation section#drawPanel div#drawingControls div#tools {
+	position: absolute;
+	left: 20%;
+	top: 0; bottom: 0;
+
+	box-sizing: border-box;
 	display: inline-block;
-	background-color: #e9e9e7;
-	border: 1px solid #bbb;
-	border-radius: 4px;
-	width: 66.6%;
-	margin: auto;
-	margin-top: 20px;
-	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.15);
+	width: 80%;
+	padding: 15px;
 }
-div#conversation section#drawPanel div#tools ul {
+div#conversation section#drawPanel div#drawingControls div#tools ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -287,43 +292,49 @@ div#conversation section#drawPanel div#tools ul {
 	font-size: 0;
 	margin-bottom: 10px;
 }
-div#conversation section#drawPanel div#tools ul li {
+div#conversation section#drawPanel div#drawingControls div#tools ul li {
 	position: relative;
 	box-sizing: border-box;
 	width: 10.5%;
-	margin: 1%;
+	margin-right: 2%;
 	height: 40px;
 	display: inline-block;
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	background-color: #f9f9f5;
 }
-div#conversation section#drawPanel div#tools ul li.active {
+div#conversation section#drawPanel div#drawingControls div#tools ul li:last-child {
+	margin-right: 0;
+}
+div#conversation section#drawPanel div#drawingControls div#tools ul li.active {
 	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
 	border-color: orange;
 }
-div#conversation section#drawPanel div#tools ul li.big {
+div#conversation section#drawPanel div#drawingControls div#tools ul li:active {
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+}
+div#conversation section#drawPanel div#drawingControls div#tools ul li.big {
 	width: 14.65%;
-	margin: 1%;
+	margin: 0 1%;
 	vertical-align: top;
 }
-div#conversation section#drawPanel div#tools ul li#hotkey {
+div#conversation section#drawPanel div#drawingControls div#tools ul li#hotkey {
 	font-size: 24px;
 	line-height: 37px;
 	color: black;
 }
-div#conversation section#drawPanel div#tools ul li.big img {
+div#conversation section#drawPanel div#drawingControls div#tools ul li.big img {
 	max-width: 100%;
 	height: 38px;
 }
-div#conversation section#drawPanel div#tools ul li#white { background-color: #FFF; }
-div#conversation section#drawPanel div#tools ul li#grey { background-color: #808080; }
-div#conversation section#drawPanel div#tools ul li#black { background-color: #000; }
-div#conversation section#drawPanel div#tools ul li#red { background-color: #F00; }
-div#conversation section#drawPanel div#tools ul li#hotPink { background-color: #FF69B4; }
-div#conversation section#drawPanel div#tools ul li#yellow { background-color: #FFFF00; }
-div#conversation section#drawPanel div#tools ul li#blue { background-color: #00F; }
-div#conversation section#drawPanel div#tools ul li#green { background-color: #0F0; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#white { background-color: #FFF; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#grey { background-color: #808080; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#black { background-color: #000; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#red { background-color: #F00; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#hotPink { background-color: #FF69B4; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#yellow { background-color: #FFFF00; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#blue { background-color: #00F; }
+div#conversation section#drawPanel div#drawingControls div#tools ul li#green { background-color: #0F0; }
 
 div#modalBackground {
 	z-index: 101;
