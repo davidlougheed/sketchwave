@@ -19,6 +19,10 @@ block scripts
 
 			var drawCanvas = document.getElementById('drawCanvas');
 			var ctx = drawCanvas.getContext('2d');
+			ctx.mozImageSmoothingEnabled = false;
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.msImageSmoothingEnabled = false;
+			ctx.imageSmoothingEnabled = false;
 			var paint = false;
 			var hover = false;
 
