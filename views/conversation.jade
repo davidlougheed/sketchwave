@@ -3,6 +3,7 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var socket = io();
 			var authors = {};
 
 			$.get('/users_data/').done(function (data) {
@@ -223,11 +224,23 @@ block scripts
 					'conversationID': convID
 				};
 
-				$.post('/message/', messageData).done(function (data) {
+				/*$.post('/message/', messageData).done(function (data) {
 					// TODO: Handle error/success
 					clearAllCanvasData(true);
 					refreshMessages();
-				});
+				});*/
+
+				clearAllCanvasData(true);
+				socket.emit('newMessage', messageData);
+
+				$('#messagesContainer').append('<div class="message">'
+						+ '<div class="author">#{user.username}</div>'
+						+ '<div class="image">'
+						+ '<img src="' + messageData.imageData + '">'
+						+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
+						+ '</div>');
+
+				$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 			});
 
 			$('#stampIt').click(function () {
@@ -414,13 +427,22 @@ block scripts
 
 			// -----------------
 
+			socket.emit('addUser', #{user.id});
+
 			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 
 			refreshMessages();
 
-			window.setInterval(function () {
-				refreshMessages();
-			}, 500);
+			socket.on('newMessage', function (data) {
+				$('#messagesContainer').append('<div class="message">'
+						+ '<div class="author">' + authors[data['UserId']]['username'] + '</div>'
+						+ '<div class="image">'
+						+ '<img src="' + data['imageData'] + '">'
+						+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
+						+ '</div>');
+
+				$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
+			});
 		});
 
 
@@ -429,11 +451,12 @@ block content
 
 	div#conversation
 		section#messages
-			h1
-				span#convName
-				div#controls
-					button#changeName Change Name
-					button#editMembers Edit Members
+			header
+				h1
+					span#convName
+					div#controls
+						button#changeName Change Name
+						button#editMembers Edit Members
 			section#messagesContainer
 
 		section#drawPanel

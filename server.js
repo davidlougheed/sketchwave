@@ -1,7 +1,10 @@
+var http = require('http');
 var fs = require('fs');
 
 var express = require('express');
 var jade = require('jade');
+
+var socketIO = require('socket.io');
 
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -31,7 +34,9 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, function (username
 }));
 
 var app = express();
+var appServer = http.createServer(app);
 var appRouter = express.Router();
+var io = socketIO.listen(appServer);
 
 var config = require('./config.json');
 
@@ -64,13 +69,14 @@ fs.readdirSync(controllerDir).filter(function (file) {
 	var route = require(controllerDir + '/' + file);
 	route.controller({
 		router: appRouter,
+		io: io,
 		passport: passport,
 		models: models
 	});
 });
 
 models.sequelize.sync().then(function () {
-	var server = app.listen(config.port, config.host, function () {
+	var server = appServer.listen(config.port, config.host, function () {
 		console.log('Server running on ' + server.address().port);
 	});
 });

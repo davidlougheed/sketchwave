@@ -7,7 +7,7 @@ module.exports.controller = function (objects) {
 		}
 
 		objects.models.User.findAll().then(function (users) {
-            //TODO: THIS FUCKING SUCKS
+            //TODO: THIS HECKING SUCKS
             var usersData = {};
 
             for(var u in users) {

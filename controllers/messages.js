@@ -29,4 +29,31 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
+
+	objects.io.on('connection', function (socket) {
+		// TODO: HOW TO AUTHENTICATE?
+
+		socket.on('addUser', function (userID) {
+			socket.userID = userID;
+		});
+
+		socket.on('newMessage', function (data) {
+			objects.models.Message.create({
+				imageData: [data.imageData],
+				ConversationId: parseInt(data.conversationID),
+				UserId: parseInt(socket.userID)
+			}).then(function (message) {
+				objects.models.Conversation.findOne({
+					where: {
+						id: parseInt(data.conversationID)
+					}
+				}).then(function (conversation) {
+					conversation.lastMessage = Date.now();
+					conversation.save();
+
+					socket.broadcast.emit('newMessage', message.toJSON());
+				});
+			});
+		});
+	});
 };
