@@ -9,7 +9,7 @@ header#siteHeader {
 	background: url(/images/wave.png);
 	background-repeat: repeat-x;
 	background-size: auto 70px;
-	background-position-x: 43px;
+	background-position: 43px 0;
 	height: 112px;
 	position: absolute;
 	left: 0; right: 0;

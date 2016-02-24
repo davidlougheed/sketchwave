@@ -76,7 +76,7 @@ block scripts
 				$('#confirmDelete').click(function () {
 					$.ajax({
 						url: '/conversation/' + $(this).parent().children('#toDelete').first().val() + '/',
-						method: 'DELETE',
+						method: 'DELETE'
 					}).done(function (data) {
 						$('#modal').fadeOut('fast', function () {
 							$(this).remove();

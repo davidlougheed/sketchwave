@@ -59,7 +59,7 @@ module.exports.controller = function (objects) {
 
 				var usersList = [];
 
-				async.each(conversations, function(conversation, callback) {
+				async.eachSeries(conversations, function(conversation, callback) {
 					conversation.getUsers().then(function (users) {
 						var userList = [];
 						for(var u in users) {
