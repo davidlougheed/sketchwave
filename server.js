@@ -4,13 +4,13 @@ var fs = require('fs');
 var express = require('express');
 var jade = require('jade');
 
+var redis = require('redis');
 var socketIO = require('socket.io');
+var connectRedis = require('connect-redis');
 
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-
-var sequelize = require('sequelize');
 
 var passport = require('passport');
 var bcrypt = require('bcrypt');
@@ -33,6 +33,9 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, function (username
 	});
 }));
 
+var redisClient  = redis.createClient();
+var redisStore = connectRedis(session);
+
 var app = express();
 var appServer = http.createServer(app);
 var appRouter = express.Router();
@@ -45,7 +48,12 @@ app.set('views', APP_BASE_PATH + '/views');
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}));
-app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
+app.use(session({
+	store: new redisStore({host: 'localhost', port: 6379, client: redisClient, ttl: 400}),
+	secret: config.sessionSecret,
+	resave: false,
+	saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -71,7 +79,8 @@ fs.readdirSync(controllerDir).filter(function (file) {
 		router: appRouter,
 		io: io,
 		passport: passport,
-		models: models
+		models: models,
+		config: config
 	});
 });
 

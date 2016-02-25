@@ -196,7 +196,8 @@ div#conversation section#messages section#messagesContainer div.message {
 div#conversation section#messages section#messagesContainer div.message:last-child {
 	margin-bottom: 60px;
 }
-div#conversation section#messages section#messagesContainer div.message div.author {
+div#conversation section#messages section#messagesContainer div.message div.topBar {
+	overflow: hidden;
 	margin: auto;
 	margin-bottom: 5px;
 	max-width: 480px;
@@ -204,7 +205,14 @@ div#conversation section#messages section#messagesContainer div.message div.auth
 	color: #666;
 	font-family: sans-serif;
 }
+div#conversation section#messages section#messagesContainer div.message div.topBar div.author {
+	float: left;
+}
+div#conversation section#messages section#messagesContainer div.message div.topBar div.date {
+	float: right;
+}
 div#conversation section#messages section#messagesContainer div.message div.image {
+	clear: both;
 	background-color: white;
 	width: 100%;
 	max-width: 480px;

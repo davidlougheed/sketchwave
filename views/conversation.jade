@@ -15,7 +15,11 @@ block scripts
 				$('#convName').text(data['conversation']['name']);
 			});
 
-			$('#cursor').hide();
+			var $body = $('body');
+			var $cursor = $('#cursor');
+			var $messagesContainer = $('#messagesContainer');
+
+			$cursor.hide();
 
 			var drawCanvas = document.getElementById('drawCanvas');
 			var ctx = drawCanvas.getContext('2d');
@@ -44,6 +48,22 @@ block scripts
 
 			var pastMessages = 0;
 
+			var displayMessage = function (username, imageData, date, immediate) {
+				$messagesContainer.append('<div class="message">'
+						+ '<div class="topBar"><div class="author">' + username + '</div><div class="date">'
+						+ date + '</div></div>'
+						+ '<div class="image">'
+						+ '<img src="' + imageData + '">'
+						+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
+						+ '</div>');
+
+				if(immediate) {
+					$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+				} else {
+					$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
+				}
+			};
+
 			var clearAllCanvasData = function (backgroundClear) {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 				clickX = [];
@@ -60,21 +80,17 @@ block scripts
 				background = drawCanvas.toDataURL();
 			};
 
-			var refreshMessages = function () {
+			var refreshMessages = function (immediate) {
 				$.get('/conversation_data/' + convID.toString()).then(function (data) {
 					if(data['messages'].length > pastMessages) {
 						for (var m = pastMessages; m < data['messages'].length; m++) {
-							$('#messagesContainer').append('<div class="message">'
-									+ '<div class="author">' + authors[data['messages'][m]['UserId']]['username'] + '</div>'
-									+ '<div class="image">'
-									+ '<img src="' + data['messages'][m]['imageData'] + '">'
-									+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
-									+ '</div>');
+							var rawDate = data['messages'][m]['createdAt'];
+							var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
+							displayMessage(authors[data['messages'][m]['UserId']]['username'],
+									data['messages'][m]['imageData'], formattedDate, immediate);
 						}
 
 						pastMessages = data['messages'].length;
-
-						$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
 					}
 				});
 			};
@@ -109,9 +125,11 @@ block scripts
 							var size = 50 * (clickSize[i] / 5);
 
 							if(stamps[i] == 'hotswap') {
-								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
+										clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
 							} else {
-								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2), clickY[i] - Math.round(size / 2), size, size);
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
+										clickY[i] - Math.round(size / 2), size, size);
 							}
 						}
 					}
@@ -132,6 +150,10 @@ block scripts
 				} else {
 					stamps.push(stamp);
 				}
+			};
+
+			var drawCursor = function (x, y) {
+				$cursor.css({'top': (y - 112).toString() + 'px', 'left': x.toString() + 'px'});
 			};
 
 			$(drawCanvas).on('mousedown', function (event) {
@@ -164,7 +186,7 @@ block scripts
 				}
 
 				if(hover) {
-					$('#cursor').css({'top': (event.pageY - 112	).toString() + 'px', 'left': event.pageX.toString() + 'px'});
+					drawCursor(event.pageX, event.pageY);
 				}
 			});
 			$(drawCanvas).on('touchmove', function (event) {
@@ -204,7 +226,7 @@ block scripts
 			$(drawCanvas).on('mouseleave', function (event) {
 				paint = false;
 				hover = false;
-				$('#cursor').hide();
+				$cursor.hide();
 			});
 
 			$(drawCanvas).on('mouseenter', function (event) {
@@ -212,14 +234,14 @@ block scripts
 				var mouseY = event.pageY - $(this).offset().top;
 
 				hover = true;
-				$('#cursor').show();
-				$('#cursor').css({'top': event.pageY.toString() + 'px', 'left': event.pageX.toString() + 'px'});
+				$cursor.show();
+				drawCursor(event.pageX, event.pageY);
 			});
 
 			$('.colorTool').click(function () {
 				toolType = 'brush';
-
 				brushColor = $(this).css('backgroundColor');
+
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
 				});
@@ -231,7 +253,6 @@ block scripts
 			});
 			$('.stampTool').click(function () {
 				toolType = 'stamp';
-
 				stamp = $(this).attr('id');
 
 				$(this).parent().children('li').each(function () {
@@ -245,22 +266,12 @@ block scripts
 			});
 			$('.brushTool').click(function () {
 				brushSize = parseInt($(this).data('size'));
+
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
 				});
 				$(this).addClass('active');
 			});
-
-			var displayMessage = function(username, imageData) {
-				$('#messagesContainer').append('<div class="message">'
-						+ '<div class="author">' + username + '</div>'
-						+ '<div class="image">'
-						+ '<img src="' + imageData + '">'
-						+ '</div><div class="controls"><button class="importToCanvas">Bastardize &rarr;</button></div>'
-						+ '</div>');
-
-				$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
-			};
 
 			$('#clear').click(function () {
 				clearAllCanvasData(true);
@@ -274,7 +285,7 @@ block scripts
 				clearAllCanvasData(true);
 				socket.emit('newMessage', messageData);
 
-				displayMessage('#{user.username}', messageData.imageData);
+				displayMessage('#{user.username}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"));
 			});
 
 			$('#stampIt').click(function () {
@@ -284,8 +295,8 @@ block scripts
 				};
 
 				$.post('/stamp/', messageData).done(function (data) {
-					$('body').append('<div id="modalBackground"></div>');
-					$('body').append('<div id="modal"><h1>Stamp was added!</h1>'
+					$body.append('<div id="modalBackground"></div>');
+					$body.append('<div id="modal"><h1>Stamp was added!</h1>'
 							+ '<button id="okay">Okay</button>'
 							+ '</div>');
 					$('#okay').click(function () {
@@ -300,15 +311,16 @@ block scripts
 			});
 
 			$('#hotkey').click(function () {
-				$('body').append('<div id="modalBackground"></div>');
-				$('body').append('<div id="modal"><h1>User Stamps</h1>'
+				$body.append('<div id="modalBackground"></div>');
+				$body.append('<div id="modal"><h1>User Stamps</h1>'
 						+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
 						+ '<button id="cancel">Cancel</button>'
 						+ '</div>');
 
 				$.post('/stamps/', { conversationID: convID }).done(function (data) {
 					for(var s in data['stamps']) {
-						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
+								+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
 						if(data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
 							stampHTML += '<button class="stampDelete">Delete</button>';
 						}
@@ -317,7 +329,7 @@ block scripts
 					}
 				});
 
-				$('body').on('click', '.stampDelete', function (event) {
+				$body.on('click', '.stampDelete', function (event) {
 					event.stopPropagation();
 					$.ajax({
 						url: '/stamp/' + $(this).parent().data('id') + '/',
@@ -326,7 +338,8 @@ block scripts
 						$('#stamps').html('<div class="stamp"><img src="/images/sciencerules.png"></div>');
 						$.post('/stamps/', {conversationID: convID}).done(function (data) {
 							for (var s in data['stamps']) {
-								var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id'] + '"><img src="' + data['stamps'][s]['imageData'] + '">';
+								var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
+										+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
 								if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
 									stampHTML += '<button class="stampDelete">Delete</button>';
 								}
@@ -347,7 +360,7 @@ block scripts
 				});
 			});
 
-			$('body').on('click', '.stamp', function () {
+			$body.on('click', '.stamp', function () {
 				$('#hotswap').children('img').first().attr('src', ($(this).children('img').first().attr('src')));
 
 				$('#hotswap').click();
@@ -360,8 +373,9 @@ block scripts
 				});
 			});
 
-			$('body').on('click', '.importToCanvas', function (event) {
-				var imageData = $(this).parent().parent().children('div.image').first().children('img').first().attr('src');
+			$body.on('click', '.importToCanvas', function (event) {
+				var imageData = $(this).parent().parent()
+						.children('div.image').first().children('img').first().attr('src');
 
 				background = imageData;
 				clearAllCanvasData(false);
@@ -369,7 +383,8 @@ block scripts
 			});
 
 			$('#changeName').click(function () {
-				$('#convName').replaceWith('<input type="text" id="changeNameText" value="' + $('#convName').text() + '">');
+				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
+						+ $('#convName').text() + '">');
 				$('#changeNameText').after(' <button id="saveName">Save Change</button>');
 				$('#saveName').click(function () {
 					$.ajax({
@@ -380,7 +395,8 @@ block scripts
 						}
 					}).done(function (data) {
 						$('#saveName').remove();
-						$('#changeNameText').replaceWith('<span id="convName">' + $('#changeNameText').val() + '</span>');
+						$('#changeNameText').replaceWith('<span id="convName">'
+								+ $('#changeNameText').val() + '</span>');
 						$('#changeName').removeAttr('disabled');
 					});
 				});
@@ -388,8 +404,8 @@ block scripts
 			});
 
 			$('#editMembers').click(function () {
-				$('body').append('<div id="modalBackground"></div>');
-				$('body').append('<div id="modal"><h1>Edit Members</h1>'
+				$body.append('<div id="modalBackground"></div>');
+				$body.append('<div id="modal"><h1>Edit Members</h1>'
 						+ '<div id="members"></div>'
 						+ '<input type="text" id="addMemberBox"> <button id="addMember">Add Member</button><br><br>'
 						+ '<button id="close">Close</button>'
@@ -424,7 +440,7 @@ block scripts
 					});
 				});
 
-				$('body').on('click', '.deleteMember', function () {
+				$body.on('click', '.deleteMember', function () {
 					$.ajax({
 						url: '/conversation_users/' + convID + '/',
 						method: 'DELETE',
@@ -476,12 +492,13 @@ block scripts
 
 			socket.emit('addUser', #{user.id});
 
-			$('#messagesContainer').animate({scrollTop: $('#messagesContainer')[0].scrollHeight.toString() + 'px'});
-
-			refreshMessages();
+			refreshMessages(true);
 
 			socket.on('newMessage', function (data) {
-				displayMessage(authors[data['UserId']]['username'], data['imageData']);
+				var rawDate = data['createdAt'];
+				var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
+
+				displayMessage(authors[data['UserId']]['username'], data['imageData'], formattedDate);
 			});
 		});
 
