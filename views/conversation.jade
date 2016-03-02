@@ -535,8 +535,12 @@ block content
 				h1
 					span#convName
 					div#controls
-						button#changeName Change Name
-						button#editMembers Edit Members
+						button#changeName
+							i.material-icons edit
+							span Change Name
+						button#editMembers
+							i.material-icons people
+							span Members
 			section#messagesContainer
 
 		section#drawPanel
@@ -545,11 +549,17 @@ block content
 			div#drawingControls
 				div#commands
 					ul
-						li#send Send
+						li#send
+							i.material-icons send
+							span Send
 					ul
-						li#clear Clear
+						li#clear
+							i.material-icons clear
+							span Clear
 					ul
-						li#stampIt StampIt!
+						li#stampIt
+							i.material-icons image
+							span StampIt!
 
 				div#tools
 					ul#colors
@@ -574,7 +584,7 @@ block content
 						li#hotswap.big.stampTool
 							img(src='/images/sciencerules.png')
 						li#hotkey.big
-							span ⋮
+							i.material-icons collections
 
 					div#brushSize
 						h3 Brush Size

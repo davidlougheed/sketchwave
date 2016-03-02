@@ -1,13 +1,53 @@
 @charset "UTF-8";
 
+/*** FONTS ***/
+
+@font-face {
+	font-family: 'Material Icons';
+	font-style: normal;
+	font-weight: 400;
+	src: url(/bower_components/material-design-icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+	src: local('Material Icons'),
+	local('MaterialIcons-Regular'),
+	url(/bower_components/material-design-icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+	url(/bower_components/material-design-icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+	url(/bower_components/material-design-icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;  /* Preferred icon size */
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+
+	/* Support for all WebKit browsers. */
+	-webkit-font-smoothing: antialiased;
+	/* Support for Safari and Chrome. */
+	text-rendering: optimizeLegibility;
+
+	/* Support for Firefox. */
+	-moz-osx-font-smoothing: grayscale;
+
+	/* Support for IE. */
+	font-feature-settings: 'liga';
+}
+
+/*** STYLES ***/
+
 body {
 	padding: 0; margin: 0;
 	background-color: #f9f9f5;
 }
 
 header#siteHeader {
-	background: url(/images/wave.png);
-	background-repeat: repeat-x;
+	background: url(/images/wave.png) repeat-x;
 	background-size: auto 70px;
 	background-position: 43px 0;
 	height: 112px;
@@ -59,7 +99,7 @@ section#main h1 {
 	color: #333;
 	border-bottom: 2px solid #1e90ff;
 }
-section#main h1 span {
+section#main h1 > span {
 	float: left;
 	vertical-align: top;
 	position: relative;
@@ -310,6 +350,15 @@ div#conversation section#drawPanel div#drawingControls div#commands ul li {
 div#conversation section#drawPanel div#drawingControls div#commands ul li:active {
 	box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
 }
+div#conversation section#drawPanel div#drawingControls div#commands ul li i {
+	vertical-align: top;
+	margin-right: 0.4rem;
+	margin-top: 9px;
+
+	font-size: 18px;
+	color: #666;
+}
+
 div#conversation section#drawPanel div#drawingControls div#tools {
 	position: absolute;
 	left: 20%;
@@ -369,6 +418,11 @@ div#conversation section#drawPanel div#drawingControls div#tools ul li#hotkey {
 div#conversation section#drawPanel div#drawingControls div#tools ul li.big img {
 	max-width: 100%;
 	height: 38px;
+}
+div#conversation section#drawPanel div#drawingControls div#tools ul li i {
+	margin-top: 10px;
+	font-size: 18px;
+	color: #666;
 }
 div#conversation section#drawPanel div#drawingControls div#tools ul li#white { background-color: #FFF; }
 div#conversation section#drawPanel div#drawingControls div#tools ul li#grey { background-color: #808080; }
@@ -519,6 +573,15 @@ button[disabled="disabled"] {
 	border-color: #999;
 	color: #999;
 	cursor: not-allowed;
+}
+button i.material-icons {
+	vertical-align: top;
+	margin-right: 0.3rem;
+	font-size: 18px;
+}
+button > span {
+	position: relative;
+	top: 2px;
 }
 
 @media screen and (max-width: 1040px) {

@@ -57,6 +57,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/bower_components', express.static(APP_BASE_PATH + '/bower_components'));
 app.use(express.static(APP_BASE_PATH + '/public'));
 app.use('/', appRouter);
 

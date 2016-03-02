@@ -1,0 +1,22 @@
+{
+  "name": "sketchwave",
+  "description": "",
+  "main": "server.js",
+  "authors": [
+    "David Lougheed <david.lougheed@gmail.com>"
+  ],
+  "license": "Not Applicable",
+  "moduleType": [],
+  "homepage": "https://sketchwave.tech",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "material-design-icons": "^2.2.0"
+  }
+}
