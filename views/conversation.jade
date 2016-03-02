@@ -488,6 +488,16 @@ block scripts
 				}
 			});
 
+			$(window).resize(function () {
+				if(window.innerWidth > 1040) {
+					$('#drawPanel').css({left: '50%'});
+				} else {
+					if($('#drawPanel').css('left') != '0px') {
+						$('#drawPanel').css({left: '100%'});
+					}
+				}
+			});
+
 			// -----------------
 
 			socket.emit('addUser', #{user.id});

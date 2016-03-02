@@ -102,7 +102,10 @@ module.exports.controller = function (objects) {
 					if(!permission) {
 						return res.send('no permission');
 					} else {
-						res.render('conversation', { user: req.user, conversationID: req.params.id });
+						res.render('conversation', {
+							user: req.user,
+							conversationID: req.params.id,
+						});
 					}
 				});
 			});

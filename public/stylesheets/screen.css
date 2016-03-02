@@ -224,6 +224,7 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 div#conversation section#messages section#messagesContainer div.message div.image img {
 	width: 100%;
 	max-width: 480px;
+	vertical-align: top;
 }
 div#conversation section#messages section#messagesContainer div.message div.controls {
 	margin: auto;
@@ -380,6 +381,7 @@ div#modalBackground {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 div#modal {
+	box-sizing: border-box;
 	z-index: 102;
 	position: fixed;
 	width: 50%;
@@ -421,6 +423,7 @@ div#modal h1 {
 #stamps .stamp img {
 	width: 100%;
 	height: auto;
+	vertical-align: top;
 }
 #stamps .stamp button.stampDelete {
 	position: absolute;
@@ -522,6 +525,15 @@ button[disabled="disabled"] {
 	button#toggleCanvas {
 		display: block;
 	}
+
+	div#modal {
+		width: 74%;
+		margin-left: 13%;
+	}
+
+	#stamps .stamp {
+		width: 24%;
+	}
 }
 
 @media screen and (max-width: 540px) {
@@ -533,5 +545,9 @@ button[disabled="disabled"] {
 	}
 	div#conversation section#messages section#messagesContainer div.message div.image {
 		margin: 0;
+	}
+
+	#stamps .stamp {
+		width: 32.32%;
 	}
 }
