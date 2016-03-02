@@ -11,9 +11,6 @@ block scripts
 			});
 
 			var convID = #{conversationID};
-			$.get('/conversation_data/' + convID.toString() + '/').done(function (data) {
-				$('#convName').text(data['conversation']['name']);
-			});
 
 			var $body = $('body');
 			var $cursor = $('#cursor');
@@ -82,6 +79,9 @@ block scripts
 
 			var refreshMessages = function (immediate) {
 				$.get('/conversation_data/' + convID.toString()).then(function (data) {
+					// TODO: If not editing
+					$('#convName').text(data['conversation']['name']);
+
 					if(data['messages'].length > pastMessages) {
 						for (var m = pastMessages; m < data['messages'].length; m++) {
 							var rawDate = data['messages'][m]['createdAt'];
@@ -106,7 +106,8 @@ block scripts
 
 				for(var i = 0; i < clickX.length; i++) {
 					if(tool[i] == 'brush') {
-						ctx.lineWidth = clickSize[i];
+						// make brush size feel more natural
+						ctx.lineWidth = (Math.pow(clickSize[i] / 320, 1.75) * 160) + 1;
 						ctx.strokeStyle = clickColor[i];
 
 						ctx.beginPath();
@@ -122,14 +123,12 @@ block scripts
 						ctx.stroke();
 					} else {
 						if(stamps[i]) {
-							var size = 50 * (clickSize[i] / 5);
-
 							if(stamps[i] == 'hotswap') {
 								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
 										clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
 							} else {
-								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
-										clickY[i] - Math.round(size / 2), size, size);
+								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
+										clickY[i] - (clickSize[i] / 2), clickSize[i], clickSize[i]);
 							}
 						}
 					}
@@ -242,6 +241,8 @@ block scripts
 				toolType = 'brush';
 				brushColor = $(this).css('backgroundColor');
 
+				$('#brushSizeRange').change(); // Refresh size, make sure it's correct
+
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
 				});
@@ -255,6 +256,8 @@ block scripts
 				toolType = 'stamp';
 				stamp = $(this).attr('id');
 
+				$('#brushSizeRange').change(); // Refresh size, make sure it's correct
+
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
 				});
@@ -264,13 +267,9 @@ block scripts
 					$(this).removeClass('active');
 				});
 			});
-			$('.brushTool').click(function () {
-				brushSize = parseInt($(this).data('size'));
 
-				$(this).parent().children('li').each(function () {
-					$(this).removeClass('active');
-				});
-				$(this).addClass('active');
+			$('#brushSizeRange').on('input change', function () {
+				brushSize = Math.round(($(this).val() / 100.0) * 320);
 			});
 
 			$('#clear').click(function () {
@@ -385,7 +384,8 @@ block scripts
 			$('#changeName').click(function () {
 				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
 						+ $('#convName').text() + '">');
-				$('#changeNameText').after(' <button id="saveName">Save Change</button>');
+				$('#changeNameText').after(' <button id="saveName">Save</button> '
+						+ '<button id="cancelChange">Cancel</button>');
 				$('#saveName').click(function () {
 					$.ajax({
 						url: '/conversation/' + convID + '/',
@@ -395,10 +395,20 @@ block scripts
 						}
 					}).done(function (data) {
 						$('#saveName').remove();
+						$('#cancelChange').remove();
+
 						$('#changeNameText').replaceWith('<span id="convName">'
 								+ $('#changeNameText').val() + '</span>');
 						$('#changeName').removeAttr('disabled');
 					});
+				});
+				$('#cancelChange').click(function () {
+					$('#saveName').remove();
+					$('#cancelChange').remove();
+
+					$('#changeNameText').replaceWith('<span id="convName">'
+							+ $('#changeNameText').val() + '</span>');
+					$('#changeName').removeAttr('disabled');
 				});
 				$(this).attr('disabled', 'disabled');
 			});
@@ -500,6 +510,8 @@ block scripts
 
 			// -----------------
 
+			$('#brushSizeRange').change();
+
 			socket.emit('addUser', #{user.id});
 
 			refreshMessages(true);
@@ -564,16 +576,6 @@ block content
 						li#hotkey.big
 							span ⋮
 
-					ul#brushes
-						li.big.brushTool(data-size='3')
-							div(style='width: 3px; height: 3px; margin: auto; background-color: black; border-radius: 3px; margin-top: 17px;')
-						li.big.brushTool(data-size='5').active
-							div(style='width: 5px; height: 5px; margin: auto; background-color: black; border-radius: 5px; margin-top: 16px;')
-						li.big.brushTool(data-size='7')
-							div(style='width: 7px; height: 7px; margin: auto; background-color: black; border-radius: 7px; margin-top: 15px;')
-						li.big.brushTool(data-size='12')
-							div(style='width: 12px; height: 12px; margin: auto; background-color: black; border-radius: 12px; margin-top: 12px;')
-						li.big.brushTool(data-size='16')
-							div(style='width: 16px; height: 16px; margin: auto; background-color: black; border-radius: 16px; margin-top: 10px;')
-						li.big.brushTool(data-size='20')
-							div(style='width: 20px; height: 20px; margin: auto; background-color: black; border-radius: 20px; margin-top: 8px;')
+					div#brushSize
+						h3 Brush Size
+						input#brushSizeRange(type='range', min='1', max='100', value='10')
