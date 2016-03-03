@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "material-design-icons": "^2.2.0"
+    "material-design-icons": "^2.2.0",
+    "jquery": "^2.2.1"
   }
 }

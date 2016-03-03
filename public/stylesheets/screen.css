@@ -81,9 +81,21 @@ header nav ul li a {
 	color: #cceeff;
 	text-decoration: none;
 	text-transform: uppercase;
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-size: 0.9em;
 	font-weight: bold;
+	transition: color 0.1s;
+}
+header nav ul li a:hover {
+	color: #e9f3ff;
+	transition: color 0.1s;
+}
+header nav ul li a i.material-icons {
+	margin-right: 0.3rem;
+	font-size: 24px;
+	width: 24px;
+	position: relative;
+	top: 6px;
 }
 
 section#main {
@@ -94,16 +106,14 @@ section#main {
 section#main h1 {
 	overflow: hidden;
 	margin-top: 0;
-	padding-bottom: 10px;
-	font-family: sans-serif;
+	padding-bottom: 5px;
+	font-family: "Open Sans", sans-serif;
 	color: #333;
-	border-bottom: 2px solid #1e90ff;
+	border-bottom: 2px solid #6f9fce;
 }
 section#main h1 > span {
 	float: left;
 	vertical-align: top;
-	position: relative;
-	top: 5px;
 }
 section#main h1 div#controls {
 	float: right;
@@ -148,12 +158,13 @@ ul#conversations {
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
 }
 ul#conversations li.conversation {
-	padding: 10px;
+	height: 48px;
+
 	border: 1px solid #bbb;
 	border-bottom: none;
 	background-color: #fefefd;
 
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 }
 ul#conversations li.conversation:first-child {
 	border-top-left-radius: 4px;
@@ -164,20 +175,27 @@ ul#conversations li.conversation:last-child {
 	border-bottom-right-radius: 4px;
 	border-bottom: 1px solid #bbb;
 }
-ul#conversations li.conversation div#link {
+ul#conversations li.conversation div.link {
 	display: inline-block;
+	height: 48px;
+	line-height: 48px;
+
 	border-right: 1px solid #bbb;
-	padding-right: 10px;
-	margin-right: 10px;
+	padding: 0 15px;
 }
 ul#conversations li.conversation a {
 	color: #666;
 }
+ul#conversations li.conversation div.memberList {
+	display: inline-block;
+	height: 48px;
+	line-height: 48px;
+
+	padding: 0 15px;
+}
 ul#conversations li.conversation div.date {
 	display: inline-block;
-	border-left: 1px solid #bbb;
-	padding-left: 10px;
-	margin-left: 10px;
+	color: #777;
 }
 ul#conversations li.conversation div.controls {
 	float: right;
@@ -211,8 +229,10 @@ div#conversation section#messages header {
 	top: 0;
 	padding: 10px 10px 10px 20px;
 	height: 32px;
-	border-bottom: 2px solid #5897fb;
-	background-color: #fefefd;
+	border-bottom: 2px solid #6f9fce;
+	background-color: rgba(254, 254, 253, 0.9);
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(10px);
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 div#conversation section#messages header h1 {
@@ -222,13 +242,19 @@ div#conversation section#messages header h1 {
 	height: 34px;
 	line-height: 24px;
 	top: 0;
+	color: #505055;
+}
+div#conversation section#messages header h1 span#convName {
+	position: relative;
+	top: 4px;
 }
 div#conversation section#messages section#messagesContainer {
 	overflow-y: auto;
 	position: absolute;
-	bottom: 0;
-	top: 54px;
+	bottom: 0; top: 0;
 	left: 0; right: 0;
+
+	padding-top: 54px;
 }
 div#conversation section#messages section#messagesContainer div.message {
 	margin-top: 40px;
@@ -242,14 +268,15 @@ div#conversation section#messages section#messagesContainer div.message div.topB
 	margin-bottom: 5px;
 	max-width: 480px;
 	width: 100%;
-	color: #666;
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar div.author {
 	float: left;
+	color: #555;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar div.date {
 	float: right;
+	color: #888;
 }
 div#conversation section#messages section#messagesContainer div.message div.image {
 	clear: both;
@@ -337,11 +364,10 @@ div#conversation section#drawPanel div#drawingControls div#commands ul li {
 	height: 40px;
 	margin-bottom: 10px;
 
-	color: #333;
+	color: #444;
 	line-height: 38px;
-	font-family: sans-serif;
-	font-weight: bold;
-	font-size: 0.9rem;
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.85rem;
 
 	box-shadow: inset 0px 1px 0px white;
 
@@ -352,10 +378,11 @@ div#conversation section#drawPanel div#drawingControls div#commands ul li:active
 }
 div#conversation section#drawPanel div#drawingControls div#commands ul li i {
 	vertical-align: top;
-	margin-right: 0.4rem;
-	margin-top: 9px;
+	margin-right: 0.3rem;
+	margin-top: 10px;
 
 	font-size: 18px;
+	width: 18px;
 	color: #666;
 }
 
@@ -371,8 +398,9 @@ div#conversation section#drawPanel div#drawingControls div#tools {
 }
 div#conversation section#drawPanel div#drawingControls div#tools h3 {
 	color: #666;
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-size: 1rem;
+	font-weight: normal;
 	margin: 0;
 }
 div#conversation section#drawPanel div#drawingControls div#tools ul {
@@ -389,6 +417,7 @@ div#conversation section#drawPanel div#drawingControls div#tools ul li {
 	box-sizing: border-box;
 	width: 10.5%;
 	margin-right: 2%;
+	padding: 4px;
 	height: 40px;
 	display: inline-block;
 	border: 1px solid #bbb;
@@ -417,11 +446,13 @@ div#conversation section#drawPanel div#drawingControls div#tools ul li#hotkey {
 }
 div#conversation section#drawPanel div#drawingControls div#tools ul li.big img {
 	max-width: 100%;
-	height: 38px;
+	max-height: 30px;
 }
 div#conversation section#drawPanel div#drawingControls div#tools ul li i {
-	margin-top: 10px;
+	margin-top: 6px;
+	vertical-align: top;
 	font-size: 18px;
+	width: 18px;
 	color: #666;
 }
 div#conversation section#drawPanel div#drawingControls div#tools ul li#white { background-color: #FFF; }
@@ -453,7 +484,7 @@ div#modal {
 	margin-top: 40px;
 	padding: 20px;
 
-	border: 1px solid #999;
+	border: 1px solid #666;
 	border-radius: 4px;
 	background-color: #f9f9f5;
 
@@ -461,7 +492,10 @@ div#modal {
 }
 div#modal h1 {
 	margin-top: 0;
-	font-family: sans-serif;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #ccc;
+	font-family: "Open Sans", sans-serif;
+	font-weight: 300;
 	color: #666;
 	font-size: 1.3rem;
 }
@@ -501,18 +535,19 @@ div#modal h1 {
 	margin: 10px 0;
 }
 #members .member {
-	padding: 10px 3px 10px 10px;
+	padding: 10px 5px 10px 10px;
 	background-color: #fefefd;
 	border: 1px solid #aaa;
 	border-radius: 4px;
 	margin-bottom: 5px;
 
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
+	color: #333;
 }
 #members .member button {
 	float: right;
 	position: relative;
-	top: -7px;
+	top: -5px;
 }
 
 form {
@@ -533,19 +568,28 @@ label {
 	font-size: 0.8rem;
 	color: #333;
 }
+
 input[type="text"], input[type="password"] {
-	border: 1px solid #1c60cc;
+	border: 1px solid #4f5f6e;
 	padding: 5px;
 	height: 32px;
+	max-width: 100%;
+	width: 200px;
 	box-sizing: border-box;
 
-	border-radius: 4px;
+	border-radius: 3px;
 	box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.2);
 
 	font-size: 0.85rem;
 
 	vertical-align: top;
+
+	outline: none;
 }
+input[type="text"]:focus, input[type="password"]:focus {
+	border-color: #1e90ff;
+}
+
 button {
 	height: 32px;
 	box-sizing: border-box;
@@ -560,7 +604,7 @@ button {
 	box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
 
 	font-size: 0.8rem;
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 	color: #e0f0ff;
 
 	outline: none;
@@ -578,10 +622,7 @@ button i.material-icons {
 	vertical-align: top;
 	margin-right: 0.3rem;
 	font-size: 18px;
-}
-button > span {
-	position: relative;
-	top: 2px;
+	width: 18px;
 }
 
 @media screen and (max-width: 1040px) {

@@ -24,10 +24,11 @@ block scripts
 
 						var conversationHTML = '<li class="conversation" data-id="' + data['conversations'][c]['id']
 								+ '" id="conversation-'
-								+ data['conversations'][c]['id'] + '"><div id="link"><a href="/conversation/'
+								+ data['conversations'][c]['id'] + '"><div class="link"><a href="/conversation/'
 								+ data['conversations'][c]['id'] + '/">'
-								+ data['conversations'][c]['name'] + '</a></div><strong>Members:</strong> '
-								+ '<span class="members">' + userList + '</span><div class="date">Last message posted: '
+								+ data['conversations'][c]['name'] + '</a></div>'
+								+ '<div class="memberList"><strong>Members:</strong> '
+								+ '<span class="members">' + userList + '</span></div> <div class="date">Last message posted: '
 								+ formattedDate + '</div>';
 
 
@@ -103,7 +104,9 @@ block content
 	h1
 		span Conversations
 		div#controls
-			button#createConversation(type='button') Create
+			button#createConversation(type='button').transparent
+				i.material-icons add
+				span Create
 
 	form#formCreateConversation(method='post')
 		label(for='names') To:

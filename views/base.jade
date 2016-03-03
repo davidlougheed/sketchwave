@@ -1,32 +1,40 @@
 doctype html
 html
-    head
-        title SketchWave
+	head
+		title SketchWave
 
-        meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
-        meta(charset='utf-8')
+		meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
+		meta(charset='utf-8')
 
-        link(rel='stylesheet', href='/stylesheets/select2.min.css')
-        link(rel='stylesheet', href='/stylesheets/screen.css')
+		link(rel='icon' href='/images/dolphin.png')
 
-        script(src='/scripts/moment-with-locales.js')
-        script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js')
-        script(src='https://cdn.socket.io/socket.io-1.4.5.js')
-        script(src='/scripts/select2.full.min.js')
+		link(href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css')
+		link(rel='stylesheet', href='/stylesheets/select2.min.css')
 
-        block scripts
-    body
-        header#siteHeader
-            img(src='/images/sketchwave.png' height='70')
-            nav
-                ul
-                    if user
-                        li
-                            a(href='/conversations') Conversations
-                        li(style='float: right')
-                            a(href='/logout') Log Out (#{user.username})
-                    else
-                        li
-                            a(href='/') Home
-        section#main
-            block content
+		link(rel='stylesheet', href='/stylesheets/screen.css')
+
+		script(src='/scripts/moment-with-locales.js')
+		script(src='/bower_components/jquery/dist/jquery.min.js')
+		script(src='https://cdn.socket.io/socket.io-1.4.5.js')
+		script(src='/scripts/select2.full.min.js')
+
+		block scripts
+	body
+		header#siteHeader
+			img(src='/images/sketchwave.png' height='70')
+			nav
+				ul
+					if user
+						li
+							a(href='/conversations')
+								i.material-icons forum
+								span Conversations
+						li(style='float: right')
+							a(href='/logout') Log Out (#{user.username})
+					else
+						li
+							a(href='/')
+								i.material-icons home
+								span Home
+		section#main
+			block content

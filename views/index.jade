@@ -4,9 +4,13 @@ block content
 	h1
 		span Home
 		div#controls
-			button(onclick='window.location.replace("/login")') Log In
+			button(onclick='window.location.replace("/login")').transparent
+				i.material-icons exit_to_app
+				span Log In
 			button(onclick='window.location.replace("/signup")') Sign Up
 
-	p Welcome to SketchWave. Chat with your friends exclusively through crudely drawn images! It’s a brutal system, you’ll feel the carpal tunnel burn, and you’ll make some whack stuff, but is dank. That’s our promise to you.
+	p.
+		Welcome to SketchWave. Chat with your friends exclusively through crudely drawn images! It’s a brutal system,
+		you’ll feel the carpal tunnel burn, and you’ll make some whack stuff, but is dank. That’s our promise to you.
 
 	img(style='position: fixed; bottom: 0; right: 0;', src='/images/gabed.png')
