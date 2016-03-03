@@ -15,6 +15,10 @@ block scripts
 			var $body = $('body');
 			var $cursor = $('#cursor');
 			var $messagesContainer = $('#messagesContainer');
+			var $editMembersButton = $('#editMembers');
+			var $drawPanel = $('#drawPanel');
+			var $brushSizeRange = $('#brushSizeRange');
+			var $hotSwapButton = $('#hotswap');
 
 			$cursor.hide();
 
@@ -244,7 +248,7 @@ block scripts
 				toolType = 'brush';
 				brushColor = $(this).css('backgroundColor');
 
-				$('#brushSizeRange').change(); // Refresh size, make sure it's correct
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
 
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
@@ -259,7 +263,7 @@ block scripts
 				toolType = 'stamp';
 				stamp = $(this).attr('id');
 
-				$('#brushSizeRange').change(); // Refresh size, make sure it's correct
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
 
 				$(this).parent().children('li').each(function () {
 					$(this).removeClass('active');
@@ -271,7 +275,7 @@ block scripts
 				});
 			});
 
-			$('#brushSizeRange').on('input change', function () {
+			$brushSizeRange.on('input change', function () {
 				brushSize = Math.round(($(this).val() / 100.0) * 320);
 			});
 
@@ -313,42 +317,36 @@ block scripts
 			});
 
 			$('#hotkey').click(function () {
+				var refreshStamps = function () {
+					$.post('/stamps/', {conversationID: convID}).done(function (data) {
+						for (var s in data['stamps']) {
+							var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
+									+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
+							if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+								stampHTML += '<button class="stampDelete">Delete</button>';
+							}
+							stampHTML += '</div>';
+							$('#stamps').append(stampHTML);
+						}
+					});
+				};
+
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>User Stamps</h1>'
 						+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
 						+ '<button id="cancel">Cancel</button>'
 						+ '</div>');
 
-				$.post('/stamps/', { conversationID: convID }).done(function (data) {
-					for (var s in data['stamps']) {
-						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
-								+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
-						if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
-							stampHTML += '<button class="stampDelete">Delete</button>';
-						}
-						stampHTML += '</div>';
-						$('#stamps').append(stampHTML);
-					}
-				});
+				refreshStamps();
 
 				$body.on('click', '.stampDelete', function (event) {
 					event.stopPropagation();
 					$.ajax({
 						url: '/stamp/' + $(this).parent().data('id') + '/',
-						method: 'DELETE',
+						method: 'DELETE'
 					}).done(function (data) {
 						$('#stamps').html('<div class="stamp"><img src="/images/sciencerules.png"></div>');
-						$.post('/stamps/', {conversationID: convID}).done(function (data) {
-							for (var s in data['stamps']) {
-								var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
-										+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
-								if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
-									stampHTML += '<button class="stampDelete">Delete</button>';
-								}
-								stampHTML += '</div>';
-								$('#stamps').append(stampHTML);
-							}
-						});
+						refreshStamps();
 					});
 				});
 
@@ -363,9 +361,8 @@ block scripts
 			});
 
 			$body.on('click', '.stamp', function () {
-				$('#hotswap').children('img').first().attr('src', ($(this).children('img').first().attr('src')));
-
-				$('#hotswap').click();
+				$hotSwapButton.children('img').first().attr('src', ($(this).children('img').first().attr('src')));
+				$hotSwapButton.click();
 
 				$('#modal').fadeOut('fast', function () {
 					$(this).remove();
@@ -376,10 +373,8 @@ block scripts
 			});
 
 			$body.on('click', '.importToCanvas', function (event) {
-				var imageData = $(this).parent().parent()
+				background = $(this).parent().parent()
 						.children('div.image').first().children('img').first().attr('src');
-
-				background = imageData;
 				clearAllCanvasData(false);
 				redraw();
 			});
@@ -416,7 +411,7 @@ block scripts
 				$(this).attr('disabled', 'disabled');
 			});
 
-			$('#editMembers').click(function () {
+			$editMembersButton.click(function () {
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>Edit Members</h1>'
 						+ '<div id="members"></div>'
@@ -424,6 +419,8 @@ block scripts
 						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
 						+ '<button id="close">Close</button>'
 						+ '</div>');
+
+				var $membersList = $('#members');
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
 					for (var u in data['users']) {
@@ -445,9 +442,9 @@ block scripts
 						}
 					}).done(function (data) {
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
-							$('#members').html('');
+							$membersList.html('');
 							for (var u in data['users']) {
-								$('#members').append('<div class="member" data-username="'
+								$membersList.append('<div class="member" data-username="'
 										+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 										+ ' <button class="deleteMember iconOnly"><i class="material-icons">delete</i></button></div>');
 							}
@@ -464,14 +461,14 @@ block scripts
 						}
 					}).done(function (data) {
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
-							$('#members').html('');
+							$membersList.html('');
 							for (var u in data['users']) {
 								if (data['users'].length > 1) {
-									$('#members').append('<div class="member" data-username="'
+									$membersList.append('<div class="member" data-username="'
 											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 											+ ' <button class="deleteMember">Delete</button></div>');
 								} else {
-									$('#members').append('<div class="member" data-username="'
+									$membersList.append('<div class="member" data-username="'
 											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 											+ '</div>');
 								}
@@ -491,31 +488,29 @@ block scripts
 			});
 
 			$('#toggleCanvas').click(function () {
-				console.log($('#drawPanel').css('left'));
-
-				if ($('#drawPanel').css('left') != '0px') {
-					$('#drawPanel').animate({left: 0});
+				if ($drawPanel.css('left') != '0px') {
+					$drawPanel.animate({left: 0});
 					$(this).text('View Messages');
-					$('#drawCanvas').focus();
+					$drawPanel.focus();
 				} else {
-					$('#drawPanel').animate({left: '100%'});
+					$drawPanel.animate({left: '100%'});
 					$(this).text('Draw');
 				}
 			});
 
 			$(window).resize(function () {
 				if (window.innerWidth > 1040) {
-					$('#drawPanel').css({left: '50%'});
+					$drawPanel.css({left: '50%'});
 				} else {
-					if ($('#drawPanel').css('left') != '0px') {
-						$('#drawPanel').css({left: '100%'});
+					if ($drawPanel.css('left') != '0px') {
+						$drawPanel.css({left: '100%'});
 					}
 				}
 			});
 
 			// -----------------
 
-			$('#brushSizeRange').change();
+			$brushSizeRange.change();
 
 			socket.emit('addUser', #{user.id});
 

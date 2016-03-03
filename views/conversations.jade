@@ -3,9 +3,12 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var $body = $('body');
+			var $conversations = $('#conversations');
+
 			var reloadConversations = function () {
 				$.get('/conversations_data/').done(function (data) {
-					$('#conversations').html('');
+					$conversations.html('');
 					for (var c in data['conversations']) {
 						var rawDate = data['conversations'][c]['lastMessage'];
 						var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
@@ -38,7 +41,7 @@ block scripts
 
 						conversationHTML += '</li>';
 
-						$('#conversations').append(conversationHTML);
+						$conversations.append(conversationHTML);
 					}
 				});
 			};
@@ -66,9 +69,9 @@ block scripts
 				$('#formCreateConversation').slideUp();
 			});
 
-			$('body').on('click', '.delete', function () {
-				$('body').append('<div id="modalBackground"></div>');
-				$('body').append('<div id="modal"><h1>Are you sure you want to delete conversation "'
+			$body.on('click', '.delete', function () {
+				$body.append('<div id="modalBackground"></div>');
+				$body.append('<div id="modal"><h1>Are you sure you want to delete conversation "'
 						+ $(this).parent().parent().children('a').first().text() + '"?</h1>'
 						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') +  '">'
 						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
