@@ -1,10 +1,10 @@
 var async = require('async');
+var appError = require('../modules/app-error');
 
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
-		//TODO: Handle errors properly
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {});
 		}
 
 		res.render('conversations', { user: req.user });
@@ -37,11 +37,12 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
+
 	objects.router.get('/conversations_data/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
+			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 
 		objects.models.User.findOne({
@@ -63,9 +64,11 @@ module.exports.controller = function (objects) {
 					conversation.getUsers().then(function (users) {
 						var userList = [];
 						for(var u in users) {
-							var userJSON = users[u].toJSON();
-							delete userJSON['password'];
-							userList.push(userJSON);
+							if (users.hasOwnProperty(u)) {
+								var userJSON = users[u].toJSON();
+								delete userJSON['password'];
+								userList.push(userJSON);
+							}
 						}
 						usersList.push(userList);
 						callback();
@@ -79,7 +82,7 @@ module.exports.controller = function (objects) {
 
     objects.router.get('/conversation/:id/', function (req, res) {
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {});
 		}
 
 		objects.models.Conversation.findOne({where: {
@@ -115,7 +118,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {});
 		}
 		if (!req.body) {
 			return res.send('error no body');
@@ -135,7 +138,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {});
 		}
 		if (!req.body) {
 			return res.send('error no body');
@@ -170,9 +173,10 @@ module.exports.controller = function (objects) {
 			return res.send('error no body');
 		}
 
-		objects.models.Conversation.findOne({where: {
-			id: req.params.id
-		}
+		objects.models.Conversation.findOne({
+			where: {
+				id: req.params.id
+			}
 		}).then(function (conversation) {
 			objects.models.User.findOne({
 				where: {
@@ -182,9 +186,9 @@ module.exports.controller = function (objects) {
 				if(user) {
 					conversation.removeUser(user);
 
-					return res.send({success: true});
+					return res.send({ success: true });
 				} else {
-					return res.send({success: false});
+					return res.send({ success: false });
 				}
 			});
 		});
@@ -195,7 +199,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {});
 		}
 
 		objects.models.Conversation.findOne({

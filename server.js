@@ -61,6 +61,15 @@ app.use('/bower_components', express.static(APP_BASE_PATH + '/bower_components')
 app.use(express.static(APP_BASE_PATH + '/public'));
 app.use('/', appRouter);
 
+app.use(function (req, res) {
+	res.status(404);
+	res.render('errors/404.jade', {});
+});
+app.use(function (req, res) {
+	res.status(403);
+	res.render('errors/403.jade', {});
+});
+
 passport.serializeUser(function(user, done) {
 	done(null, user.id);
 });
