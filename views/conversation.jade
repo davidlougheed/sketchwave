@@ -51,10 +51,11 @@ block scripts
 						+ date + '</div></div>'
 						+ '<div class="image">'
 						+ '<img src="' + imageData + '">'
-						+ '</div><div class="controls"><button class="importToCanvas"><i class="material-icons">gesture</i><span>Bastardize</span></button></div>'
+						+ '</div><div class="controls"><button class="importToCanvas transparent noMargin">'
+						+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>'
 						+ '</div>');
 
-				if(immediate) {
+				if (immediate) {
 					$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
 				} else {
 					$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
@@ -70,7 +71,9 @@ block scripts
 				clickSize = [];
 				tool = [];
 				stamps = [];
-				if(backgroundClear) background = null;
+				if (backgroundClear) {
+					background = null;
+				}
 			};
 
 			var moveImageDataToBg = function () {
@@ -82,7 +85,7 @@ block scripts
 					// TODO: If not editing
 					$('#convName').text(data['conversation']['name']);
 
-					if(data['messages'].length > pastMessages) {
+					if (data['messages'].length > pastMessages) {
 						for (var m = pastMessages; m < data['messages'].length; m++) {
 							var rawDate = data['messages'][m]['createdAt'];
 							var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
@@ -97,15 +100,15 @@ block scripts
 
 			var redraw = function () {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				if(background) {
+				if (background) {
 					var bgImage = document.createElement('img');
 					bgImage.setAttribute('src', background);
 					ctx.drawImage(bgImage, 0, 0, 480, 320);
 				}
 				ctx.lineJoin = 'round';
 
-				for(var i = 0; i < clickX.length; i++) {
-					if(tool[i] == 'brush') {
+				for (var i = 0; i < clickX.length; i++) {
+					if (tool[i] == 'brush') {
 						// make brush size feel more natural
 						ctx.lineWidth = (Math.pow(clickSize[i] / 320, 1.75) * 160) + 1;
 						ctx.strokeStyle = clickColor[i];
@@ -122,8 +125,8 @@ block scripts
 						ctx.closePath();
 						ctx.stroke();
 					} else {
-						if(stamps[i]) {
-							if(stamps[i] == 'hotswap') {
+						if (stamps[i]) {
+							if (stamps[i] == 'hotswap') {
 								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
 										clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
 							} else {
@@ -144,7 +147,7 @@ block scripts
 
 				tool.push(toolType);
 
-				if(toolType == 'brush') {
+				if (toolType == 'brush') {
 					stamps.push(null);
 				} else {
 					stamps.push(stamp);
@@ -176,7 +179,7 @@ block scripts
 				redraw();
 			});
 			$(drawCanvas).on('mousemove', function (event) {
-				if(paint) {
+				if (paint) {
 					var mouseX = event.pageX - $(this).offset().left;
 					var mouseY = event.pageY - $(this).offset().top;
 
@@ -184,7 +187,7 @@ block scripts
 					redraw();
 				}
 
-				if(hover) {
+				if (hover) {
 					drawCursor(event.pageX, event.pageY);
 				}
 			});
@@ -317,10 +320,10 @@ block scripts
 						+ '</div>');
 
 				$.post('/stamps/', { conversationID: convID }).done(function (data) {
-					for(var s in data['stamps']) {
+					for (var s in data['stamps']) {
 						var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
 								+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
-						if(data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
+						if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
 							stampHTML += '<button class="stampDelete">Delete</button>';
 						}
 						stampHTML += '</div>';
@@ -417,7 +420,8 @@ block scripts
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>Edit Members</h1>'
 						+ '<div id="members"></div>'
-						+ '<input type="text" id="addMemberBox"> <button id="addMember">Add Member</button><br><br>'
+						+ '<input type="text" id="addMemberBox"> <button id="addMember">'
+						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
 						+ '<button id="close">Close</button>'
 						+ '</div>');
 
@@ -425,7 +429,8 @@ block scripts
 					for (var u in data['users']) {
 						$('#members').append('<div class="member" data-username="'
 								+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-								+ ' <button class="deleteMember">Delete</button></div>');
+								+ ' <button class="deleteMember iconOnly transparent">'
+								+ '<i class="material-icons">clear</i></button></div>');
 					}
 				});
 
@@ -444,7 +449,7 @@ block scripts
 							for (var u in data['users']) {
 								$('#members').append('<div class="member" data-username="'
 										+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-										+ ' <button class="deleteMember">Delete</button></div>');
+										+ ' <button class="deleteMember iconOnly"><i class="material-icons">delete</i></button></div>');
 							}
 						});
 					});
@@ -461,7 +466,7 @@ block scripts
 						$.get('/conversation_users/' + convID + '/').done(function (data) {
 							$('#members').html('');
 							for (var u in data['users']) {
-								if(data['users'].length > 1) {
+								if (data['users'].length > 1) {
 									$('#members').append('<div class="member" data-username="'
 											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
 											+ ' <button class="deleteMember">Delete</button></div>');
@@ -488,7 +493,7 @@ block scripts
 			$('#toggleCanvas').click(function () {
 				console.log($('#drawPanel').css('left'));
 
-				if($('#drawPanel').css('left') != '0px') {
+				if ($('#drawPanel').css('left') != '0px') {
 					$('#drawPanel').animate({left: 0});
 					$(this).text('View Messages');
 					$('#drawCanvas').focus();
@@ -499,10 +504,10 @@ block scripts
 			});
 
 			$(window).resize(function () {
-				if(window.innerWidth > 1040) {
+				if (window.innerWidth > 1040) {
 					$('#drawPanel').css({left: '50%'});
 				} else {
-					if($('#drawPanel').css('left') != '0px') {
+					if ($('#drawPanel').css('left') != '0px') {
 						$('#drawPanel').css({left: '100%'});
 					}
 				}
@@ -516,11 +521,26 @@ block scripts
 
 			refreshMessages(true);
 
+			if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
+				Notification.requestPermission();
+			}
+
 			socket.on('newMessage', function (data) {
 				var rawDate = data['createdAt'];
 				var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 
 				displayMessage(authors[data['UserId']]['username'], data['imageData'], formattedDate);
+
+				if (!document.hasFocus()) {
+					if (Notification.permission === 'granted') {
+						// TODO: Notification toggle
+						var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
+					} else if (Notification.permission !== 'denied') {
+						Notification.requestPermission(function (permission) {
+							var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
+						});
+					}
+				}
 			});
 		});
 
@@ -535,10 +555,10 @@ block content
 				h1
 					span#convName
 					div#controls
-						button#changeName
+						button#changeName.transparent
 							i.material-icons edit
 							span Change Name
-						button#editMembers
+						button#editMembers.transparent
 							i.material-icons people
 							span Members
 			section#messagesContainer
