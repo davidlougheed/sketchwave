@@ -41,7 +41,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
 		}
 
 		objects.models.User.findOne({
@@ -247,7 +247,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send(''); // TODO: Handle non authentication
+			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
 		}
 
 		//TODO: Fetch conversations from database
