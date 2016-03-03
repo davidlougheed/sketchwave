@@ -48,9 +48,9 @@ body {
 
 header#siteHeader {
 	background: url(/images/wave.png) repeat-x;
-	background-size: auto 70px;
+	background-size: auto 62px;
 	background-position: 43px 0;
-	height: 112px;
+	height: 104px;
 	position: absolute;
 	left: 0; right: 0;
 	z-index: 51;
@@ -101,7 +101,7 @@ header nav ul li a i.material-icons {
 section#main {
 	padding: 30px;
 	position: absolute;
-	left: 0; right: 0; bottom: 0; top: 112px;
+	left: 0; right: 0; bottom: 0; top: 104px;
 }
 section#main h1 {
 	overflow: hidden;
