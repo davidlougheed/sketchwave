@@ -11,6 +11,7 @@ var connectRedis = require('connect-redis');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var flash = require('connect-flash');
 
 var passport = require('passport');
 var bcrypt = require('bcrypt');
@@ -23,10 +24,10 @@ var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({ usernameField: 'username' }, function (username, password, done) {
 	models.User.findOne({where: {username: username}}).then(function (user) {
 		if(user === null) {
-			return done(null, false, {message: 'noUser'});
+			return done(null, false, { success: false, message: 'No user with that name' });
 		}
 		if(!bcrypt.compareSync(password, user.password)) {
-			return done(null, false, {message: 'incorrectPassword'});
+			return done(null, false, { success: false, message: 'Incorrect password' });
 		}
 
 		return done(null, user);
@@ -54,6 +55,7 @@ app.use(session({
 	resave: false,
 	saveUninitialized: false
 }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
