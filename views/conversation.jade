@@ -382,8 +382,8 @@ block scripts
 			$('#changeName').click(function () {
 				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
 						+ $('#convName').text() + '">');
-				$('#changeNameText').after(' <button id="saveName">Save</button> '
-						+ '<button id="cancelChange">Cancel</button>');
+				$('#changeNameText').after(' <button id="saveName"><i class="material-icons">done</i><span>Save</span></button> '
+						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i><span>Cancel</span></button>');
 				$('#saveName').click(function () {
 					$.ajax({
 						url: '/conversation/' + convID + '/',
@@ -561,46 +561,42 @@ block content
 		section#drawPanel
 			canvas#drawCanvas(height='320', width='480')
 
-			div#drawingControls
-				div#commands
-					ul
-						li#send
-							i.material-icons send
-							span Send
-					ul
-						li#clear
-							i.material-icons clear
-							span Clear
-					ul
-						li#stampIt
-							i.material-icons image
-							span StampIt!
+			div#commands
+				div(style='float: left;')
+					button#stampIt
+						i.material-icons image
+						span Stamp It!
+				div(style='float: right;')
+					button#clear.iconOnly.transparent.big
+						i.material-icons clear
+					button#send.iconOnly.transparent.big
+						i.material-icons send
 
-				div#tools
-					ul#colors
-						li#white.colorTool
-						li#grey.colorTool
-						li#black.colorTool
-						li#red.colorTool.active
-						li#hotPink.colorTool
-						li#yellow.colorTool
-						li#blue.colorTool
-						li#green.colorTool
+			div#tools
+				ul#colors
+					li#white.colorTool
+					li#grey.colorTool
+					li#black.colorTool
+					li#red.colorTool.active
+					li#hotPink.colorTool
+					li#yellow.colorTool
+					li#blue.colorTool
+					li#green.colorTool
 
-					ul#images
-						li#dolphin.big.stampTool
-							img(src='/images/dolphin.png')
-						li#hand.big.stampTool
-							img(src='/images/hand.png')
-						li#pizza.big.stampTool
-							img(src='/images/pizza.png')
-						li#gabe.big.stampTool
-							img(src='/images/gabe.png')
-						li#hotswap.big.stampTool
-							img(src='/images/sciencerules.png')
-						li#hotkey.big
-							i.material-icons collections
+				ul#images
+					li#dolphin.big.stampTool
+						img(src='/images/dolphin.png')
+					li#hand.big.stampTool
+						img(src='/images/hand.png')
+					li#pizza.big.stampTool
+						img(src='/images/pizza.png')
+					li#gabe.big.stampTool
+						img(src='/images/gabe.png')
+					li#hotswap.big.stampTool
+						img(src='/images/sciencerules.png')
+					li#hotkey.big
+						i.material-icons collections
 
-					div#brushSize
-						h3 Brush Size
-						input#brushSizeRange(type='range', min='1', max='100', value='10')
+				div#brushSize
+					h3 Brush Size
+					input#brushSizeRange(type='range', min='1', max='100', value='10')

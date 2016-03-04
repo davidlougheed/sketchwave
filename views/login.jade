@@ -1,15 +1,14 @@
 extends base.jade
 
 block content
-    h1  Log In
-    form#formSignUp(method='post')
-        label(for='username') Username
-        input(type='text', name='username', id='username' autocapitalize='off' autocorrect='off')
+    h1#bigForm  Log In
+    form#formLogIn(method='post')
+        if error != ''
+            div.siteMessage.error #{error}
 
-        label(for='password') Password
-        input(type='password', name='password', id='password')
+        input(type='text', name='username', id='username'
+            autocapitalize='off', autocorrect='off', placeholder='Username')
+        input(type='password', name='password', id='password', placeholder='Password')
 
-        br
-        br
-
-        button(type='submit') Log In
+        button(type='submit')
+            i.material-icons exit_to_app

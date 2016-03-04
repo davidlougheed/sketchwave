@@ -25,7 +25,9 @@ block scripts
 							}
 						}
 
-						var conversationHTML = '<li class="conversation" data-id="' + data['conversations'][c]['id']
+						var conversationHTML = '<li class="conversation'
+								+ ((data['users'][c].length == 1) ? ' deletable' : '')
+								+ '" data-id="' + data['conversations'][c]['id']
 								+ '" id="conversation-'
 								+ data['conversations'][c]['id'] + '"><div class="link"><a href="/conversation/'
 								+ data['conversations'][c]['id'] + '/">'
@@ -36,7 +38,9 @@ block scripts
 
 
 						if(data['users'][c].length == 1) {
-							conversationHTML += '<div class="controls"><button class="delete">Delete</button></div>';
+							conversationHTML += '<div class="controls">'
+									+ '<button class="delete transparent iconOnly noMargin">'
+									+ '<i class="material-icons">clear</i></button></div>';
 						}
 
 						conversationHTML += '</li>';
