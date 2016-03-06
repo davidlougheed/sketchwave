@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "material-design-icons": "^2.2.0",
-    "jquery": "^2.2.1"
+    "jquery": "^2.2.1",
+    "select2": "^4.0.1"
   }
 }
