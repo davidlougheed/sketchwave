@@ -2,6 +2,7 @@
 	"host": "localhost",
 	"port": 4321,
 	"sessionSecret": "replaceThis",
+	"captchaSecret": "replaceThis",
 	"database": {
 		"name": "pixelchat",
 		"username": "pixelchat",

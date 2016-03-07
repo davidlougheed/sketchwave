@@ -4,6 +4,7 @@ var appError = require('../modules/app-error');
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
 		if(!req.isAuthenticated()) {
+			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
 			return appError.generate(req, res, 403, {});
 		}
 
@@ -82,6 +83,7 @@ module.exports.controller = function (objects) {
 
     objects.router.get('/conversation/:id/', function (req, res) {
 		if(!req.isAuthenticated()) {
+			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
 			return appError.generate(req, res, 403, {});
 		}
 
@@ -194,8 +196,6 @@ module.exports.controller = function (objects) {
 		});
 	});
 	objects.router.delete('/conversation/:id/', function (req, res) {
-		//TODO: CONFIRM DELETE HAS CORRECT OWNER
-
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
@@ -207,26 +207,41 @@ module.exports.controller = function (objects) {
 				id: req.params.id
 			}
 		}).then(function (conversation) {
-			objects.models.Message.findAll({
+			if(conversation == null) {
+				return res.send({ success: false });
+			}
+
+			conversation.getUsers({
 				where: {
-					ConversationId: conversation.id
+					id: req.user.id
 				}
-			}).then(function (messages) {
-				for(var m in messages) {
-					messages[m].destroy();
+			}).then(function (users) {
+				if (users != null && users.length > 0) {
+					objects.models.Message.findAll({
+						where: {
+							ConversationId: conversation.id
+						}
+					}).then(function (messages) {
+						for(var m in messages) {
+							messages[m].destroy();
+						}
+					});
+
+					conversation.destroy();
+
+					return res.send({ success: true });
+				} else {
+					// User is not part of the conversation and should not be able to delete it
+					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
 				}
 			});
-
-			conversation.destroy();
-
-			return res.send({ success: true });
 		});
 	});
 	objects.router.get('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 
 		objects.models.Conversation.findOne({
@@ -234,16 +249,28 @@ module.exports.controller = function (objects) {
 				id: req.params.id
 			}
 		}).then(function (conversation) {
-			conversation.getUsers().then(function (users) {
-				var usersData = [];
-
-				for(var u in users) {
-					var userData = users[u].toJSON();
-					delete userData['password'];
-					usersData.push(userData);
+			// TODO: Optimize this so it's not making 2 queries to DB?
+			conversation.getUsers({
+				where: {
+					id: req.user.id
 				}
+			}).then(function (users) {
+				if(users != null && users.length > 0) {
+					conversation.getUsers().then(function (users) {
+						var usersData = [];
 
-				return res.send({ conversationID: req.params.id, users: usersData });
+						for(var u in users) {
+							var userData = users[u].toJSON();
+							delete userData['password'];
+							usersData.push(userData);
+						}
+
+						return res.send({ conversationID: req.params.id, users: usersData });
+					});
+				} else {
+					// User is not part of the conversation and should not be able to access data
+					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
+				}
 			});
 		});
 	});
@@ -251,22 +278,32 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
+			return res.send({ error: 'not_authenticated' }); // TODO: Handle more gracefully
 		}
 
 		//TODO: Fetch conversations from database
-		//TODO: MAKE IT SPECIFIC ON PERSON/OWNER!!!
 		objects.models.Conversation.findOne({
 			where: {
 				id: req.params.id
 			}
 		}).then(function (conversation) {
-			objects.models.Message.findAll({
+			conversation.getUsers({
 				where: {
-					ConversationId: conversation.id
+					id: req.user.id
 				}
-			}).then(function (messages) {
-				return res.send({ conversation: conversation, messages: messages });
+			}).then(function (users) {
+				if (users != null && users.length > 0) {
+					objects.models.Message.findAll({
+						where: {
+							ConversationId: conversation.id
+						}
+					}).then(function (messages) {
+						return res.send({conversation: conversation, messages: messages});
+					});
+				} else {
+					// User is not part of the conversation and should not be able to access data
+					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
+				}
 			});
 		});
 	});

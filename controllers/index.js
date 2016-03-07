@@ -1,4 +1,5 @@
 var bcrypt = require('bcrypt');
+var request = require('request');
 
 module.exports.controller = function (objects) {
 	objects.router.get('/', function (req, res) {
@@ -34,19 +35,38 @@ module.exports.controller = function (objects) {
 		if (req.body.username.length < 3) { return res.send({ success: false, error: 'usernameTooShort' }); }
         if (req.body.password.length < 8) { return res.send({ success: false, error: 'passwordTooShort' }); }
 
-		// TODO: CHECK CAPTCHA !!!!!!!!!!!!
+		// Check CAPTCHA
+		request.post('https://www.google.com/recaptcha/api/siteverify', {
+			form: {
+				secret: objects.config.captchaSecret,
+				response: req.body['g-recaptcha-response'],
+				remoteip: req.headers['x-forwarded-for'] // IP Address of client
+			}
+		}, function (err, response, body) {
+			if (err) {
+				throw err;
+			}
 
-		var salt = bcrypt.genSaltSync(10);
-		var hashedPassword = bcrypt.hashSync(req.body.password, salt);
+			if (JSON.parse(body)['success'] === true) {
+				// TODO: Currently synchronous
+				var salt = bcrypt.genSaltSync(10);
+				var hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-		objects.models.User.create({
-			username: req.body.username,
-			password: hashedPassword
-		}).then(function (user) {
-			req.login(user, function(err) {
-				if (err) { return next(err); }
-				return res.redirect('/conversations/');
-			});
+				objects.models.User.create({
+					username: req.body.username,
+					password: hashedPassword
+				}).then(function (user) {
+					req.login(user, function (err) {
+						if (err) {
+							return next(err);
+						}
+						return res.redirect('/conversations/');
+					});
+				});
+			} else {
+				// TODO: Handle reCAPTCHA failure
+				return res.send({ error: 'captcha_failure' });
+			}
 		});
 	});
 
