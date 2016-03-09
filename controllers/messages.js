@@ -4,12 +4,12 @@ module.exports.controller = function (objects) {
 
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not authenticated' }); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 
 		if (!req.body) {
-			return res.send({ error: 'error no body' });
+			return res.send({ error: 'no_body' });
 		}
 
 		objects.models.Message.create({
@@ -34,26 +34,33 @@ module.exports.controller = function (objects) {
 		// TODO: HOW TO AUTHENTICATE?
 
 		socket.on('addUser', function (userID) {
-			socket.userID = userID;
+			// TODO: Send user connect message, handle online stuff...
 		});
 
 		socket.on('newMessage', function (data) {
-			objects.models.Message.create({
-				imageData: [data.imageData],
-				ConversationId: parseInt(data.conversationID),
-				UserId: parseInt(socket.userID)
-			}).then(function (message) {
-				objects.models.Conversation.findOne({
-					where: {
-						id: parseInt(data.conversationID)
-					}
-				}).then(function (conversation) {
-					conversation.lastMessage = Date.now();
-					conversation.save();
+			// If user is properly signed in
+			// TODO: Check part of conversation that conversationID specifies
 
-					socket.broadcast.emit('newMessage', message.toJSON());
+			if (socket.request.session.passport.user) {
+				objects.models.Message.create({
+					imageData: [data.imageData],
+					ConversationId: parseInt(data.conversationID),
+					UserId: parseInt(socket.request.session.passport.user)
+				}).then(function (message) {
+					objects.models.Conversation.findOne({
+						where: {
+							id: parseInt(data.conversationID)
+						}
+					}).then(function (conversation) {
+						conversation.lastMessage = Date.now();
+						conversation.save();
+
+						socket.broadcast.emit('newMessage', message.toJSON());
+					});
 				});
-			});
+			} else {
+				// TODO: Handle socket non-auth error
+			}
 		});
 	});
 };

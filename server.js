@@ -40,21 +40,31 @@ var redisStore = connectRedis(session);
 var app = express();
 var appServer = http.createServer(app);
 var appRouter = express.Router();
-var io = socketIO.listen(appServer);
 
 var config = require('./config.json');
+
+var sessionMiddleware = session({
+	store: new redisStore({
+		host: config.redis.host,
+		port: config.redis.port,
+		client: redisClient,
+		ttl: config.redis.ttl
+	}),
+	secret: config.sessionSecret,
+	resave: false,
+	saveUninitialized: false
+});
+
+var io = socketIO.listen(appServer).use(function (socket, next) {
+	sessionMiddleware(socket.request, {}, next);
+});
 
 app.set('view engine', 'jade');
 app.set('views', APP_BASE_PATH + '/views');
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}));
-app.use(session({
-	store: new redisStore({host: 'localhost', port: 6379, client: redisClient, ttl: 400}),
-	secret: config.sessionSecret,
-	resave: false,
-	saveUninitialized: false
-}));
+app.use(sessionMiddleware);
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());

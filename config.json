@@ -3,11 +3,18 @@
 	"port": 4321,
 	"sessionSecret": "replaceThis",
 	"captchaSecret": "replaceThis",
+
 	"database": {
 		"name": "pixelchat",
 		"username": "pixelchat",
 		"password": "ds8921KJhas!@#",
 		"host": "localhost",
 		"port": 5432
+	},
+
+	"redis": {
+		"host": "localhost",
+		"port": 6379,
+		"ttl": 400
 	}
 }
