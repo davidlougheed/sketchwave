@@ -1,6 +1,6 @@
 module.exports.errors = {
-    403: 'Forbidden',
-    404: 'Not Found'
+    403: 'forbidden',
+    404: 'notFound'
 };
 
 module.exports.generate = function (req, res, error, meta) {

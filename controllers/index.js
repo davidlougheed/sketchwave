@@ -3,7 +3,7 @@ var request = require('request');
 
 module.exports.controller = function (objects) {
 	objects.router.get('/', function (req, res) {
-		if(req.isAuthenticated()) {
+		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 
@@ -11,14 +11,14 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.router.get('/signup/', function (req, res) {
-		if(req.isAuthenticated()) {
+		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 
 		res.render('signup');
 	});
 	objects.router.post('/signup/', function (req, res) {
-		if(req.isAuthenticated()) {
+		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 
@@ -71,7 +71,7 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.router.get('/login/', function (req, res) {
-		if(req.isAuthenticated()) {
+		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 

@@ -23,10 +23,10 @@ var models = require('./models');
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({ usernameField: 'username' }, function (username, password, done) {
 	models.User.findOne({where: {username: username}}).then(function (user) {
-		if(user === null) {
+		if (user === null) {
 			return done(null, false, { success: false, message: 'No user with that name' });
 		}
-		if(!bcrypt.compareSync(password, user.password)) {
+		if (!bcrypt.compareSync(password, user.password)) {
 			return done(null, false, { success: false, message: 'Incorrect password' });
 		}
 

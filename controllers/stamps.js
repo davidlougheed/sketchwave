@@ -5,10 +5,10 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not authenticated' }); // TODO: Handle non authentication
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 		if (!req.body) {
-			return res.send({ error: 'error no body' });
+			return res.send({ success: false, error: 'no_body' });
 		}
 
 		objects.models.Stamp.create({
@@ -26,10 +26,10 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not authenticated' }); // TODO: Handle non authentication
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 		if (!req.body) {
-			return res.send({ error: 'error no body' });
+			return res.send({ success: false, error: 'no_body' });
 		}
 
 		objects.models.Stamp.findOne({
@@ -38,7 +38,7 @@ module.exports.controller = function (objects) {
 			}
 		}).then(function (stamp) {
 			if(stamp.UserId != req.user.id) {
-				return res.send({ error: 'wrong person' });
+				return res.send({ success: false, error: 'wrong person' });
 			}
 
 			stamp.destroy();
@@ -51,20 +51,18 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not authenticated' }); // TODO: Handle non authentication
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 		if (!req.body) {
-			return res.send({ error: 'error no body' });
+			return res.send({ success: false, error: 'no_body' });
 		}
-
-        console.log(req.body.conversationID);
 
 		objects.models.Stamp.findAll({
 			where: {
 				ConversationId: req.body.conversationID
 			}
 		}).then(function (stamps) {
-			return res.send({ stamps: stamps });
+			return res.send({ success: true, stamps: stamps });
 		})
 	});
 };

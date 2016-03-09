@@ -3,7 +3,7 @@ var appError = require('../modules/app-error');
 
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
 			return appError.generate(req, res, 403, {});
 		}
@@ -12,14 +12,14 @@ module.exports.controller = function (objects) {
 	});
 	objects.router.post('/conversations/', function (req, res) {
 		//TODO: Handle errors properly
-		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return appError.generate(req, res, 403, {});
 		}
 		if (!req.body) {
 			return res.send('error no body');
 		}
 
-		var names = req.body.names;
+		var names = req.body.names || [];
 		names.push(req.user.username);
 
 		objects.models.Conversation.create({
@@ -43,7 +43,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, 403, {}); // TODO: Handle non authentication
 		}
 
 		objects.models.User.findOne({
@@ -82,7 +82,7 @@ module.exports.controller = function (objects) {
 	});
 
     objects.router.get('/conversation/:id/', function (req, res) {
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
 			return appError.generate(req, res, 403, {});
 		}
@@ -119,7 +119,7 @@ module.exports.controller = function (objects) {
 	objects.router.put('/conversation/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			return appError.generate(req, res, 403, {});
 		}
 		if (!req.body) {
@@ -139,11 +139,11 @@ module.exports.controller = function (objects) {
 	objects.router.put('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			return appError.generate(req, res, 403, {});
 		}
 		if (!req.body) {
-			return res.send('error no body');
+			return res.send({error: 'no-body'});
 		}
 
 		objects.models.Conversation.findOne({where: {
@@ -168,11 +168,11 @@ module.exports.controller = function (objects) {
 	objects.router.delete('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
-			return res.send('not authenticated'); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
 		}
 		if (!req.body) {
-			return res.send('error no body');
+			return res.send({error: 'no_body'});
 		}
 
 		objects.models.Conversation.findOne({
@@ -198,7 +198,7 @@ module.exports.controller = function (objects) {
 	objects.router.delete('/conversation/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			return appError.generate(req, res, 403, {});
 		}
 
@@ -232,7 +232,7 @@ module.exports.controller = function (objects) {
 					return res.send({ success: true });
 				} else {
 					// User is not part of the conversation and should not be able to delete it
-					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
+					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
 				}
 			});
 		});
@@ -240,7 +240,7 @@ module.exports.controller = function (objects) {
 	objects.router.get('/conversation_users/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
+		if (!req.isAuthenticated()) {
 			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
 
@@ -265,11 +265,11 @@ module.exports.controller = function (objects) {
 							usersData.push(userData);
 						}
 
-						return res.send({ conversationID: req.params.id, users: usersData });
+						return res.send({ success: true, conversationID: req.params.id, users: usersData });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
+					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
 				}
 			});
 		});
@@ -278,7 +278,7 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
-			return res.send({ error: 'not_authenticated' }); // TODO: Handle more gracefully
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle more gracefully
 		}
 
 		//TODO: Fetch conversations from database
@@ -298,11 +298,11 @@ module.exports.controller = function (objects) {
 							ConversationId: conversation.id
 						}
 					}).then(function (messages) {
-						return res.send({conversation: conversation, messages: messages});
+						return res.send({ success: true, conversation: conversation, messages: messages });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ error: 'not_allowed' }); // TODO: Handle more gracefully
+					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
 				}
 			});
 		});

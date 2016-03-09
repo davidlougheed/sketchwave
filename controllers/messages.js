@@ -31,8 +31,6 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.io.on('connection', function (socket) {
-		// TODO: HOW TO AUTHENTICATE?
-
 		socket.on('addUser', function (userID) {
 			// TODO: Send user connect message, handle online stuff...
 		});
