@@ -116,13 +116,15 @@ block content
 				span Create
 
 	form#formCreateConversation(method='post')
-		label(for='names') To:
+		label(for='names') With
 		select(name='names[]', id='names', class='js-basic-multiple', multiple='multiple', style='width: 400px')
 		label(for='names') Name
 		input(type='text', name='name', id='name')
 		br
 		br
-		button(type='submit') Create
-		button(type='button', id='cancelConversation' style='margin-left: 0.5em') Cancel
+		button(type='submit', style='margin-right: 0.2rem')
+			i.material-icons add
+			span Create
+		button(type='button', id='cancelConversation').transparent Cancel
 
 	ul#conversations
