@@ -158,7 +158,7 @@ button#toggleCanvas {
 
 ul#conversations {
 	list-style: none;
-	padding: 0; margin: 0;
+	padding: 0;
 	margin: 20px 0;
 	border-radius: 3px;
 	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
@@ -183,10 +183,14 @@ ul#conversations li.conversation:last-child {
 	border-bottom: 1px solid #bbb;
 }
 ul#conversations li.conversation div.link {
+	position: relative;
+	z-index: 11;
+
 	display: inline-block;
 	height: 48px;
 	line-height: 48px;
 
+	/*background-color: #fefefd;*/
 	border-right: 1px solid #bbb;
 	padding: 0 15px;
 }
@@ -199,15 +203,31 @@ ul#conversations li.conversation div.memberList {
 	line-height: 48px;
 
 	padding: 0 15px;
+
+	color: #333;
 }
 ul#conversations li.conversation div.date {
 	position: absolute;
 	right: 15px;
 	display: inline-block;
-	height: 48px;
+	height: 47px;
+	z-index: 10;
+	padding-left: 5px;
+
+	background-color: #fefefd;
+
 	font-size: 0.8rem;
 	line-height: 48px;
 	color: #777;
+}
+ul#conversations li.conversation div.date:before {
+	position: absolute;
+	left: -20px;
+	width: 20px; height: 47px;
+	display: inline-block;
+
+	background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
+	content: "";
 }
 ul#conversations li.conversation.deletable div.date {
 	right: 48px;
@@ -803,6 +823,45 @@ form#formLogIn button i {
 
 	#stamps .stamp {
 		width: 24%;
+	}
+}
+
+@media screen and (max-width: 800px) {
+	ul#conversations {
+		box-shadow: none;
+	}
+
+	ul#conversations li.conversation {
+		height: auto;
+		margin-bottom: 10px;
+
+		border: 1px solid #bbb;
+		border-radius: 4px;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+		font-family: "Open Sans", sans-serif;
+	}
+
+	ul#conversations li.conversation div.link {
+		box-sizing: border-box;
+		width: 100%;
+
+		border-right: none;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	ul#conversations li.conversation div.date {
+		top: 0;
+	}
+
+	ul#conversations li.conversation div.controls {
+		position: absolute;
+		top: 0;
+		right: 0;
+		min-width: 48px;
+	}
+	ul#conversations li.conversation div.controls button {
+		left: 14px;
 	}
 }
 
