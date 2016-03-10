@@ -66,6 +66,10 @@ block scripts
 				}
 			};
 
+			var displayMetaMessage = function (message) {
+				$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
+			};
+
 			var clearAllCanvasData = function (backgroundClear) {
 				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 				clickX = [];
@@ -515,7 +519,12 @@ block scripts
 
 			$brushSizeRange.change();
 
-			socket.emit('addUser', { user: #{user.id}, conversation: convID});
+			socket.emit('addUser', { user: #{user.id}, conversationID: convID});
+
+			$(window).on('beforeunload', function (event) {
+				socket.emit('removeUser', { user: #{user.id}, conversationID: convID});
+				socket.disconnect();
+			});
 
 			refreshMessages(true);
 
@@ -541,6 +550,13 @@ block scripts
 						}
 					}
 				}
+			});
+
+			socket.on('addUser', function (data) {
+				console.log(data + ' joined');
+			});
+			socket.on('removeUser', function (data) {
+				console.log(data + ' left');
 			});
 		});
 

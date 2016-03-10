@@ -1,17 +1,26 @@
 extends base.jade
 
 block content
-    h1  Sign Up
-    form#formSignUp(method='post', action='/signup')
-        label(for='username') Username
-        input(type='text', name='username', id='username')
+	h1  Sign Up
+	form#formSignUp(method='post', action='/signup')
+		// TODO: Proper errors such as "already taken", etc...
+		label(for='username')
+			span Username
+			em (min. 3 characters)
+		input(type='text', name='username', id='username',
+			pattern='.{3,}', required='required', title='3 characters minimum')
 
-        label(for='password') Password
-        input(type='password', name='password', id='password')
+		label(for='password')
+			span Password
+			em (min. 8 characters)
+		input(type='password', name='password', id='password'
+			pattern='.{8,}', required='required', title='8 characters minimum')
 
-        label(for='password2') Password Again
-        input(type='password', name='password2', id='password2')
+		label(for='password2')
+			span Password Again
+		input(type='password', name='password2', id='password2'
+			pattern='.{8,}', required='required', title='8 characters minimum')
 
-        div.g-recaptcha(data-sitekey='6LcU6hkTAAAAAIAlMCEAA6gEMzYWbcyY3M2l2opa')
+		div.g-recaptcha(data-sitekey='6LcU6hkTAAAAAIAlMCEAA6gEMzYWbcyY3M2l2opa')
 
-        button(type='submit', name='submit') Sign Up
+		button(type='submit', name='submit') Sign Up

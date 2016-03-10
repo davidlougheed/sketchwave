@@ -130,10 +130,59 @@ section#main h1#bigForm {
 }
 
 section#main p {
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-size: 1.4rem;
 	line-height: 1.5em;
 	color: #444;
+}
+
+section#main blockquote {
+	position: relative;
+	margin-right: 40px;
+}
+section#main blockquote p {
+	color: #555;
+	font-weight: 300;
+	text-align: justify;
+	display: inline-block;
+	position: relative;
+}
+section#main blockquote footer:before {
+	content: "— ";
+}
+section#main blockquote footer {
+	text-align: right;
+	margin-right: 160px;
+	font-family: "Open Sans", sans-serif;
+	font-style: italic;
+	font-weight: bold;
+	color: #333;
+}
+section#main blockquote p:before {
+	content: "“";
+
+	position: absolute;
+	top: 5px;
+	left: -50px;
+
+	font-size: 6rem;
+	font-family: serif;
+	color: #888;
+}
+section#main blockquote p:after {
+	content: "”";
+
+	position: absolute;
+	top: 10px;
+	right: -50px;
+
+	font-size: 6rem;
+	font-family: serif;
+	color: #888;
+}
+
+#gabeFace {
+	transition: left 0.2s ease-out;
 }
 
 #cursor {
@@ -172,6 +221,9 @@ ul#conversations li.conversation {
 	background-color: #fefefd;
 
 	font-family: "Open Sans", sans-serif;
+
+	white-space: nowrap;
+	overflow-x: hidden;
 }
 ul#conversations li.conversation:first-child {
 	border-top-left-radius: 4px;
@@ -208,11 +260,12 @@ ul#conversations li.conversation div.memberList {
 }
 ul#conversations li.conversation div.date {
 	position: absolute;
-	right: 15px;
+	right: 0px;
 	display: inline-block;
 	height: 47px;
 	z-index: 10;
 	padding-left: 5px;
+	padding-right: 15px;
 
 	background-color: #fefefd;
 
@@ -290,6 +343,16 @@ div#conversation section#messages section#messagesContainer {
 	left: 0; right: 0;
 
 	padding-top: 54px;
+}
+div#conversation section#messages section#messagesContainer div.metaMessage {
+	margin: 40px auto 0 auto;
+	max-width: 480px;
+	width: 100%;
+
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.85rem;
+	color: #555;
+	text-align: center;
 }
 div#conversation section#messages section#messagesContainer div.message {
 	margin-top: 40px;
@@ -491,8 +554,12 @@ div#modal {
 	position: fixed;
 	width: 50%;
 	margin-left: 25%;
-	margin-top: 40px;
+	/*margin-top: 40px;*/
+	top: 40px; bottom: 50px;
 	padding: 20px;
+
+	max-height: 500px;
+	overflow-y: auto;
 
 	border: 1px solid #666;
 	border-radius: 4px;
@@ -543,8 +610,6 @@ div#modal h1 {
 
 #members {
 	margin: 10px 0;
-	max-height: 400px;
-	overflow-y: auto;
 }
 #members .member {
 	padding: 10px 5px 10px 10px;
@@ -584,13 +649,22 @@ label {
 	font-size: 0.8rem;
 	color: #333;
 }
+label span {
+	margin-right: 0.3rem;
+}
+label em {
+	color: #777;
+	font-weight: normal;
+}
 
 input[type="text"], input[type="password"] {
+	-webkit-appearance: none;
+
 	border: 1px solid #4f5f6e;
 	padding: 5px 10px;
 	height: 32px;
 	max-width: 100%;
-	width: 200px;
+	width: 250px;
 	box-sizing: border-box;
 
 	border-radius: 3px;
@@ -827,6 +901,10 @@ form#formLogIn button i {
 }
 
 @media screen and (max-width: 800px) {
+	#gabeFace {
+		display: none;
+	}
+
 	ul#conversations {
 		box-shadow: none;
 	}
@@ -840,6 +918,8 @@ form#formLogIn button i {
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
 		font-family: "Open Sans", sans-serif;
+
+		white-space: normal;
 	}
 
 	ul#conversations li.conversation div.link {

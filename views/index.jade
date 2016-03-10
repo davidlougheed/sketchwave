@@ -1,5 +1,15 @@
 extends base.jade
 
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			var $gabeFace = $('#gabeFace');
+
+			$('body').on('mousemove', function (event) {
+				$gabeFace.css('left', event.pageX - ($gabeFace.width() / 2));
+			});
+		});
+
 block content
 	h1
 		span Home
@@ -8,9 +18,19 @@ block content
 				i.material-icons exit_to_app
 				span Log In
 			button(onclick='window.location.replace("/signup")') Sign Up
+			
+	blockquote
+		p.
+			In a world of increasing data-overload, who wants to be stuck with grandpa's writing system?
+			Throw away those letters, but on SketchWave you can keep the stamps!
+		footer Gabe, SketchWave Spiritual Adviser
+	blockquote
+		p.
+			Your conversation is the canvas, and the world is yours to bastardize.
+		footer Gabe, Chair of SketchWave's Department of Arcane Arts
+	blockquote
+		p.
+			Let fun replace functionality and join us in communicating in the sketchiest way possible.
+		footer Gabe, Head of Combustion
 
-	p.
-		Welcome to SketchWave. Chat with your friends exclusively through crudely drawn images! It’s a brutal system,
-		you’ll feel the carpal tunnel burn, and you’ll make some whack stuff, but is dank. That’s our promise to you.
-
-	img(style='position: fixed; bottom: 0; right: 0;', src='/images/gabed.png')
+	img#gabeFace(style='position: fixed; bottom: 0; left: 100px;', src='/images/gabed.png')
