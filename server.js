@@ -52,7 +52,9 @@ var sessionMiddleware = session({
 	}),
 	secret: config.sessionSecret,
 	resave: false,
-	saveUninitialized: false
+	saveUninitialized: false,
+
+	cookie: { maxAge: 60000 }
 });
 
 var io = socketIO.listen(appServer).use(function (socket, next) {

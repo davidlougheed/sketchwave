@@ -523,6 +523,8 @@ div#modal h1 {
 
 #members {
 	margin: 10px 0;
+	max-height: 400px;
+	overflow-y: auto;
 }
 #members .member {
 	padding: 10px 5px 10px 10px;

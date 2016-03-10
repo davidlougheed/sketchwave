@@ -31,13 +31,15 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.io.on('connection', function (socket) {
-		socket.on('addUser', function (userID) {
+		socket.on('addUser', function (data) {
 			// TODO: Send user connect message, handle online stuff...
+
+			socket.join('conversation' + data.conversation.toString());
 		});
 
 		socket.on('newMessage', function (data) {
 			// If user is properly signed in
-			// TODO: Check part of conversation that conversationID specifies
+			// TODO: Check user is part of conversation that conversationID specifies
 
 			if (socket.request.session.passport.user) {
 				objects.models.Message.create({
@@ -53,7 +55,8 @@ module.exports.controller = function (objects) {
 						conversation.lastMessage = Date.now();
 						conversation.save();
 
-						socket.broadcast.emit('newMessage', message.toJSON());
+						socket.broadcast.to('conversation' + data.conversationID.toString())
+							.emit('newMessage', message.toJSON());
 					});
 				});
 			} else {

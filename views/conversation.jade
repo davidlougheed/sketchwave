@@ -386,6 +386,8 @@ block scripts
 				$('#changeNameText').after(' <button id="saveName"><i class="material-icons">done</i><span>Save</span></button> '
 						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i><span>Cancel</span></button>');
 				$('#saveName').click(function () {
+					// TODO: Socket send a message that name has changed
+
 					$.ajax({
 						url: '/conversation/' + convID + '/',
 						method: 'PUT',
@@ -513,7 +515,7 @@ block scripts
 
 			$brushSizeRange.change();
 
-			socket.emit('addUser', #{user.id});
+			socket.emit('addUser', { user: #{user.id}, conversation: convID});
 
 			refreshMessages(true);
 
@@ -522,19 +524,21 @@ block scripts
 			}
 
 			socket.on('newMessage', function (data) {
-				var rawDate = data['createdAt'];
-				var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
+				if(parseInt(data['ConversationId']) == convID) {
+					var rawDate = data['createdAt'];
+					var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 
-				displayMessage(authors[data['UserId']]['username'], data['imageData'], formattedDate);
+					displayMessage(authors[data['UserId']]['username'], data['imageData'], formattedDate);
 
-				if (!document.hasFocus()) {
-					if (Notification.permission === 'granted') {
-						// TODO: Notification toggle
-						var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
-					} else if (Notification.permission !== 'denied') {
-						Notification.requestPermission(function (permission) {
+					if (!document.hasFocus() && authors[data['UserId']] != #{user.id}) {
+						if (Notification.permission === 'granted') {
+							// TODO: Notification toggle
 							var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
-						});
+						} else if (Notification.permission !== 'denied') {
+							Notification.requestPermission(function (permission) {
+								var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
+							});
+						}
 					}
 				}
 			});
