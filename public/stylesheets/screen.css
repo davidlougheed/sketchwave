@@ -139,7 +139,7 @@ section#main p {
 #cursor {
 	position: absolute;
 	z-index: 100;
-	margin-top: -54px;
+	margin-top: -46px;
 	user-select: none;
 	pointer-events: none;
 }
@@ -329,6 +329,14 @@ div#conversation section#drawPanel {
 	text-align: center;
 
 	overflow-y: auto;
+}
+
+div#conversation section#drawPanel div#scrollIt {
+	position: absolute;
+	top: 0; bottom: 53px;
+	left: 0; right: 0;
+	overflow: auto;
+	padding-bottom: 20px;
 }
 
 div#conversation section#drawPanel canvas#drawCanvas {
@@ -734,8 +742,10 @@ form#formLogIn button i {
 	max-width: 100%;
 }
 .select2-container--default .select2-selection--multiple {
+	box-sizing: border-box;
 	border: 1px solid #4f5f6e;
 	min-height: 32px;
+	padding: 5px 0;
 	max-width: 100%;
 
 	border-radius: 3px;
@@ -744,15 +754,27 @@ form#formLogIn button i {
 	font-family: "Open Sans", sans-serif;
 	font-size: 0.8rem;
 	color: #555;
-	line-height: 18px;
 }
 .select2-container--default.select2-container--focus .select2-selection--multiple {
 	border-color: #1e90ff;
+}
+.select2-container--default .select2-search--inline .select2-search__field {
+	margin-top: 3px;
+	margin-bottom: 3px;
 }
 
 .select2-dropdown {
 	font-family: "Open Sans", sans-serif;
 	font-size: 0.9rem;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+	vertical-align: top;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	vertical-align: top;
+	height: 19px;
+	margin-top: 0;
+	border-radius: 2px;
 }
 
 /* RESPONSIVE MEDIA QUERIES */
@@ -795,5 +817,10 @@ form#formLogIn button i {
 
 	#stamps .stamp {
 		width: 32.32%;
+	}
+
+	input[type="text"], input[type="password"] {
+		max-width: 100%;
+		width: 100%;
 	}
 }

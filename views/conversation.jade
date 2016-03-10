@@ -130,9 +130,10 @@ block scripts
 						ctx.stroke();
 					} else {
 						if (stamps[i]) {
+							var size = clickSize[i] * 1.5;
 							if (stamps[i] == 'hotswap') {
 								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
-										clickY[i] - Math.round(size / 3), size, size * (2.0 / 3.0));
+										clickY[i] - Math.round(size / 3), size, size / 1.5);
 							} else {
 								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
 										clickY[i] - (clickSize[i] / 2), clickSize[i], clickSize[i]);
@@ -559,7 +560,37 @@ block content
 			section#messagesContainer
 
 		section#drawPanel
-			canvas#drawCanvas(height='320', width='480')
+			div#scrollIt
+				canvas#drawCanvas(height='320', width='480')
+
+				div#tools
+					ul#colors
+						li#white.colorTool
+						li#grey.colorTool
+						li#black.colorTool
+						li#red.colorTool.active
+						li#hotPink.colorTool
+						li#yellow.colorTool
+						li#blue.colorTool
+						li#green.colorTool
+
+					ul#images
+						li#dolphin.big.stampTool
+							img(src='/images/dolphin.png')
+						li#hand.big.stampTool
+							img(src='/images/hand.png')
+						li#pizza.big.stampTool
+							img(src='/images/pizza.png')
+						li#gabe.big.stampTool
+							img(src='/images/gabe.png')
+						li#hotswap.big.stampTool
+							img(src='/images/sciencerules.png')
+						li#hotkey.big
+							i.material-icons collections
+
+					div#brushSize
+						h3 Brush Size
+						input#brushSizeRange(type='range', min='1', max='100', value='10')
 
 			div#commands
 				div(style='float: left;')
@@ -571,32 +602,3 @@ block content
 						i.material-icons clear
 					button#send.iconOnly.transparent.big
 						i.material-icons send
-
-			div#tools
-				ul#colors
-					li#white.colorTool
-					li#grey.colorTool
-					li#black.colorTool
-					li#red.colorTool.active
-					li#hotPink.colorTool
-					li#yellow.colorTool
-					li#blue.colorTool
-					li#green.colorTool
-
-				ul#images
-					li#dolphin.big.stampTool
-						img(src='/images/dolphin.png')
-					li#hand.big.stampTool
-						img(src='/images/hand.png')
-					li#pizza.big.stampTool
-						img(src='/images/pizza.png')
-					li#gabe.big.stampTool
-						img(src='/images/gabe.png')
-					li#hotswap.big.stampTool
-						img(src='/images/sciencerules.png')
-					li#hotkey.big
-						i.material-icons collections
-
-				div#brushSize
-					h3 Brush Size
-					input#brushSizeRange(type='range', min='1', max='100', value='10')
