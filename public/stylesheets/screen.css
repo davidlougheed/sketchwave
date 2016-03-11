@@ -943,6 +943,11 @@ form#formLogIn button i {
 	ul#conversations li.conversation div.controls button {
 		left: 14px;
 	}
+	ul#conversations li.conversation div.memberList {
+		height: auto;
+		padding: 10px;
+		line-height: 1.4em;
+	}
 }
 
 @media screen and (max-width: 540px) {
