@@ -3,14 +3,13 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var convID = #{conversationID};
+
+			var active = true;
+
 			var socket = io();
 			var authors = {};
-
-			$.get('/users_data/').done(function (data) {
-				authors = data['users'];
-			});
-
-			var convID = #{conversationID};
+			var stamps = {};
 
 			var $body = $('body');
 			var $cursor = $('#cursor');
@@ -19,6 +18,22 @@ block scripts
 			var $drawPanel = $('#drawPanel');
 			var $brushSizeRange = $('#brushSizeRange');
 			var $hotSwapButton = $('#hotswap');
+
+			$messagesContainer.append('<div class="loader"'
+				+ 'style="position: absolute; left: 50%; margin-left: -23px; margin-top: 50px;"></div>');
+
+			// TODO: Make authors specific to convo and handle add/remove with sockets
+			$.get('/users_data/').done(function (data) {
+				authors = data['users'];
+			});
+
+			$.post('/stamps/', {conversationID: convID}).done(function (data) {
+				for (var s in data['stamps']) {
+					stamps = data['stamps'];
+				}
+			});
+
+			$messagesContainer.remove('.loader');
 
 			$cursor.hide();
 
@@ -296,6 +311,12 @@ block scripts
 				clearAllCanvasData(true);
 				socket.emit('newMessage', messageData);
 
+				if (window.innerWidth <= 1040) {
+					if ($drawPanel.css('left') != '0px') {
+						$drawPanel.css({left: '100%'});
+					}
+				}
+
 				displayMessage('#{user.username}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"));
 			});
 
@@ -515,16 +536,23 @@ block scripts
 				}
 			});
 
+			$(window).on('beforeunload', function (event) {
+				socket.emit('removeUser', {user: #{user.id}, conversationID: convID});
+				socket.disconnect();
+			});
+
+			window.setInterval(function () {
+				if(active) {
+					// Keep session alive
+					$.get('/keepalive/');
+				}
+			}, 10000);
+
 			// -----------------
 
 			$brushSizeRange.change();
 
 			socket.emit('addUser', { user: #{user.id}, conversationID: convID});
-
-			$(window).on('beforeunload', function (event) {
-				socket.emit('removeUser', { user: #{user.id}, conversationID: convID});
-				socket.disconnect();
-			});
 
 			refreshMessages(true);
 
