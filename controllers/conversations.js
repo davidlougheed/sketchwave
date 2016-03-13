@@ -307,4 +307,59 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
+
+	objects.io.on('connection', function (socket) {
+		socket.on('userOnline', function (data) {
+
+		});
+		socket.on('userOffline', function (data) {
+
+		});
+
+		socket.on('addUser', function (data) {
+			// TODO: Send user connect message, handle online/offline stuff...
+			// TODO: Cache conversation data FOR ALL APP!!! SO THAT NOT SO MANY DB REQUESTS ARE MADE
+
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						socket.join('conversation' + data.conversationID.toString());
+
+						socket.broadcast.to('conversation' + data.conversationID.toString())
+							.emit('addUser', users[0].username);
+					}
+				});
+			});
+		});
+		socket.on('removeUser', function (data) {
+			// TODO: Send user disconnect message, handle online/offline stuff...
+
+			socket.leave('conversation' + data.conversationID.toString());
+
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						socket.broadcast.to('conversation' + data.conversationID.toString())
+							.emit('removeUser', users[0].username);
+					}
+				});
+			});
+		});
+	});
 };

@@ -87,4 +87,9 @@ module.exports.controller = function (objects) {
 		req.logout();
 		res.redirect('/');
 	});
+
+	objects.router.get('/keepalive/', function (req, res) {
+		req.session.lastAccess = new Date().getTime();
+		res.sendStatus(200);
+	});
 };
