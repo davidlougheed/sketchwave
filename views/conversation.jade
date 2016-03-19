@@ -33,7 +33,8 @@ block scripts
 				}
 			});
 
-			$messagesContainer.remove('.loader');
+			// Done loading, get rid of the loading animation thing
+			$messagesContainer.children('.loader').first().remove();
 
 			$cursor.hide();
 
@@ -186,9 +187,12 @@ block scripts
 				var mouseX = event.pageX - $(this).offset().left;
 				var mouseY = event.pageY - $(this).offset().top;
 
+				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
+				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+
 				paint = true;
 
-				addPoint(mouseX, mouseY, false);
+				addPoint(scaledMouseX, scaledMouseY, false);
 				redraw();
 			});
 			$(drawCanvas).on('touchstart', function (event) {
@@ -197,9 +201,12 @@ block scripts
 				var mouseX = touch.pageX - $(this).offset().left;
 				var mouseY = touch.pageY - $(this).offset().top;
 
+				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
+				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+
 				paint = true;
 
-				addPoint(mouseX, mouseY, false);
+				addPoint(scaledMouseX, scaledMouseY, false);
 				redraw();
 			});
 			$(drawCanvas).on('mousemove', function (event) {
@@ -207,7 +214,10 @@ block scripts
 					var mouseX = event.pageX - $(this).offset().left;
 					var mouseY = event.pageY - $(this).offset().top;
 
-					addPoint(mouseX, mouseY, true);
+					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
+					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+
+					addPoint(scaledMouseX, scaledMouseY, true);
 					redraw();
 				}
 
@@ -224,7 +234,10 @@ block scripts
 					var mouseX = touch.pageX - $(this).offset().left;
 					var mouseY = touch.pageY - $(this).offset().top;
 
-					addPoint(mouseX, mouseY, true);
+					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
+					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+
+					addPoint(scaledMouseX, scaledMouseY, true);
 					redraw();
 				}
 			});
@@ -349,7 +362,7 @@ block scripts
 							var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
 									+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
 							if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
-								stampHTML += '<button class="stampDelete">Delete</button>';
+								stampHTML += '<button class="stampDelete"><i class="material-icons">clear</i></button>';
 							}
 							stampHTML += '</div>';
 							$('#stamps').append(stampHTML);
@@ -358,9 +371,10 @@ block scripts
 				};
 
 				$body.append('<div id="modalBackground"></div>');
-				$body.append('<div id="modal"><h1>User Stamps</h1>'
+				$body.append('<div id="modal"><h1><span>User Stamps</span><div class="controls">'
+						+ '<button id="closeModal" class="transparent iconOnly big noMargin">'
+						+ '<i class="material-icons">clear</i></button></div></h1>'
 						+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
-						+ '<button id="cancel">Cancel</button>'
 						+ '</div>');
 
 				refreshStamps();
@@ -376,7 +390,7 @@ block scripts
 					});
 				});
 
-				$('#cancel').click(function () {
+				$('#closeModal').click(function () {
 					$('#modal').fadeOut('fast', function () {
 						$(this).remove();
 					});
@@ -441,11 +455,11 @@ block scripts
 
 			$editMembersButton.click(function () {
 				$body.append('<div id="modalBackground"></div>');
-				$body.append('<div id="modal"><h1>Edit Members</h1>'
-						+ '<div id="members"></div>'
+				$body.append('<div id="modal"><h1><span>Edit Members</span><div class="controls">'
+						+ '<button id="closeModal" class="transparent iconOnly big noMargin"><i class="material-icons">clear</i>'
+						+ '</button></div></h1><div id="members"></div>'
 						+ '<input type="text" id="addMemberBox"> <button id="addMember">'
 						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
-						+ '<button id="close">Close</button>'
 						+ '</div>');
 
 				var $membersList = $('#members');
@@ -474,7 +488,8 @@ block scripts
 							for (var u in data['users']) {
 								$membersList.append('<div class="member" data-username="'
 										+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-										+ ' <button class="deleteMember iconOnly"><i class="material-icons">delete</i></button></div>');
+										+ ' <button class="deleteMember iconOnly transparent">'
+										+ '<i class="material-icons">clear</i></button></div>');
 							}
 						});
 					});
@@ -505,7 +520,7 @@ block scripts
 					});
 				});
 
-				$('#close').click(function () {
+				$('#closeModal').click(function () {
 					$('#modal').fadeOut('fast', function () {
 						$(this).remove();
 					});
@@ -646,7 +661,8 @@ block content
 						i.material-icons image
 						span Stamp It!
 				div(style='float: right;')
-					button#clear.iconOnly.transparent.big
+					button#clear.transparent.big.borderRight
 						i.material-icons clear
-					button#send.iconOnly.transparent.big
+						span Clear
+					button#send.iconOnly.transparent.big.highlight
 						i.material-icons send

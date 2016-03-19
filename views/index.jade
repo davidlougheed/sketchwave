@@ -8,16 +8,23 @@ block scripts
 			$('body').on('mousemove', function (event) {
 				$gabeFace.css('left', event.pageX - ($gabeFace.width() / 2));
 			});
+
+			$('#btnLogIn').on('click touchstart', function () {
+				window.location.replace('/login');
+			});
+			$('#btnSignUp').on('click touchstart', function () {
+				window.location.replace('/signup');
+			});
 		});
 
 block content
 	h1
 		span Home
 		div#controls
-			button(onclick='window.location.replace("/login")').transparent
+			button#btnLogIn.transparent
 				i.material-icons exit_to_app
 				span Log In
-			button(onclick='window.location.replace("/signup")') Sign Up
+			button#btnSignUp Sign Up
 
 	blockquote
 		p.

@@ -3,8 +3,11 @@ extends base.jade
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
+			var socket = io();
+
 			var $body = $('body');
 			var $conversations = $('#conversations');
+			var $names = $('#names');
 
 			var reloadConversations = function () {
 				$.get('/conversations_data/').done(function (data) {
@@ -25,16 +28,17 @@ block scripts
 							}
 						}
 
+						var conversationID = data['conversations'][c]['id'];
+
 						var conversationHTML = '<li class="conversation'
 								+ ((data['users'][c].length == 1) ? ' deletable' : '')
-								+ '" data-id="' + data['conversations'][c]['id']
+								+ '" data-id="' + conversationID
 								+ '" id="conversation-'
-								+ data['conversations'][c]['id'] + '"><div class="link"><a href="/conversation/'
-								+ data['conversations'][c]['id'] + '/">'
-								+ data['conversations'][c]['name'] + '</a></div>'
+								+ conversationID + '"><div class="link"><a href="/conversation/'
+								+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
 								+ '<div class="memberList"><strong>Members:</strong> '
-								+ '<span class="members">' + userList + '</span></div> <div class="date">Last message posted: '
-								+ formattedDate + '</div>';
+								+ '<span class="members">' + userList + '</span></div> '
+								+ '<div class="date">Last message posted: ' + formattedDate + '</div>';
 
 
 						if(data['users'][c].length == 1) {
@@ -49,19 +53,17 @@ block scripts
 					}
 				});
 			};
-			reloadConversations();
-			window.setInterval(function () {
-				reloadConversations();
-			}, 2000);
 
 			$.get('/users_data/').done(function (data) {
-				$('#names').html('');
+				$names.html('');
+
 				for(var u in data['users']) {
 					if(data['users'][u]['id'] != #{user.id})
-					$('#names').append('<option value="' + data['users'][u]['username'] + '">' + data['users'][u]['username'] + '</option>');
+						$names.append('<option value="' + data['users'][u]['username'] + '">'
+								+ data['users'][u]['username'] + '</option>');
 				}
 
-				$('#names').select2();
+				$names.select2();
 			});
 
 			$('#formCreateConversation').hide();
@@ -76,7 +78,7 @@ block scripts
 			$body.on('click', '.delete', function () {
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>Are you sure you want to delete conversation "'
-						+ $(this).parent().parent().children('a').first().text() + '"?</h1>'
+						+ $(this).parent().parent().children('.link').first().children('a').first().text() + '"?</h1>'
 						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') +  '">'
 						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
 						+ '</div>');
@@ -103,6 +105,14 @@ block scripts
 						$(this).remove();
 					});
 				});
+			});
+
+			// -----------------
+
+			reloadConversations();
+
+			socket.on('newMessage', function (data) {
+				reloadConversations();
 			});
 		});
 

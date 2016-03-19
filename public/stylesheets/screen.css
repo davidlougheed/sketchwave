@@ -102,6 +102,7 @@ section#main {
 	padding: 30px;
 	position: absolute;
 	left: 0; right: 0; bottom: 0; top: 104px;
+	overflow-x: hidden;
 }
 section#main h1 {
 	overflow: hidden;
@@ -127,6 +128,9 @@ section#main h1#bigForm {
 	margin: auto;
 	border-bottom: none;
 	color: #555;
+}
+section#main h1#bigForm.wider {
+	max-width: 500px;
 }
 
 section#main p {
@@ -183,6 +187,7 @@ section#main blockquote p:after {
 
 #gabeFace {
 	transition: left 0.2s ease-out;
+	pointer-events: none;
 }
 
 #cursor {
@@ -195,10 +200,12 @@ section#main blockquote p:after {
 
 button#toggleCanvas {
 	position: fixed;
-	right: 20px;
-	bottom: 20px;
+	width: 114px;
+	left: 50%;
+	margin-left: -57px;
+	bottom: 10px;
 	z-index: 95;
-	box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.3), inset 0px 1px 0px rgba(255, 255, 255, 0.2);
+	box-shadow: 0 1px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
 	display: none;
 }
@@ -390,6 +397,12 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	width: 100%;
 	max-width: 480px;
 	vertical-align: top;
+
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
 }
 div#conversation section#messages section#messagesContainer div.message div.controls {
 	margin: auto;
@@ -425,6 +438,7 @@ div#conversation section#drawPanel div#scrollIt {
 div#conversation section#drawPanel canvas#drawCanvas {
 	display: block;
 	margin: 20px auto 0 auto;
+	box-sizing: border-box;
 
 	background-color: white;
 	border: 1px solid #bbb;
@@ -434,9 +448,17 @@ div#conversation section#drawPanel canvas#drawCanvas {
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	cursor: none;
 
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	user-select: none;
+
+	max-width: 100%;
 }
 
 div#conversation section#drawPanel div#commands {
@@ -565,7 +587,7 @@ div#modal {
 	border-radius: 4px;
 	background-color: #f9f9f5;
 
-	box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 15px rgba(0, 0, 0, 0.2);
 }
 div#modal h1 {
 	margin-top: 0;
@@ -575,6 +597,14 @@ div#modal h1 {
 	font-weight: 300;
 	color: #666;
 	font-size: 1.3rem;
+	overflow: hidden;
+}
+div#modal h1 span {
+	float: left;
+}
+div#modal h1 div.controls {
+	float: right;
+	margin-top: -1px;
 }
 
 #stamps {
@@ -749,6 +779,9 @@ button.transparent {
 button.transparent.noMargin {
 	margin: 0;
 }
+button.transparent.highlight {
+	color: #1e90ff;
+}
 button.transparent:hover {
 	opacity: 1.0;
 	transition: opacity 0.1s;
@@ -776,6 +809,21 @@ button.iconOnly.big i.material-icons {
 	font-size: 24px;
 	width: 24px;
 	margin-top: -3px;
+}
+button.big i.material-icons {
+	font-size: 24px;
+	width: 24px;
+	margin-top: -3px;
+}
+button.big span {
+	font-size: 17px;
+	font-weight: 300;
+	line-height: 18px;
+}
+button.big.borderRight {
+	border-radius: 0;
+	border-right: 1px solid #c3c3c3;
+	padding-right: 20px;
 }
 
 form#formLogIn {
@@ -857,7 +905,15 @@ form#formLogIn button i {
 	margin-left: -1px;
 }
 
-/* SELECT2 OVERRIDES */
+form#formSignUp {
+	box-sizing: border-box;
+
+	max-width: 500px;
+	width: 100%;
+	margin: auto;
+}
+
+/*** SELECT2 OVERRIDES ***/
 
 .select2-container--default {
 	max-width: 100%;
@@ -898,7 +954,7 @@ form#formLogIn button i {
 	border-radius: 2px;
 }
 
-/* RESPONSIVE MEDIA QUERIES */
+/*** RESPONSIVE MEDIA QUERIES ***/
 
 @media screen and (max-width: 1040px) {
 	div#conversation section#messages {
@@ -975,7 +1031,7 @@ form#formLogIn button i {
 	}
 }
 
-@media screen and (max-width: 540px) {
+@media screen and (max-width: 530px) {
 	div#conversation section#messages section#messagesContainer div.message {
 		padding: 0 20px;
 	}
@@ -984,6 +1040,11 @@ form#formLogIn button i {
 	}
 	div#conversation section#messages section#messagesContainer div.message div.image {
 		margin: 0;
+	}
+
+	div#conversation section#drawPanel div#scrollIt {
+		box-sizing: border-box;
+		padding: 0 20px 20px 20px;
 	}
 
 	#stamps .stamp {

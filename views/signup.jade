@@ -1,7 +1,20 @@
 extends base.jade
 
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			$('#btnLogIn').on('click touchstart', function () {
+				window.location.replace('/login');
+			});
+		});
+
 block content
-	h1  Sign Up
+	h1#bigForm.wider
+		span Sign Up
+		div#controls
+			button#btnLogIn.transparent
+				i.material-icons exit_to_app
+				span Log In
 	form#formSignUp(method='post', action='/signup')
 		// TODO: Proper errors such as "already taken", etc...
 		label(for='username')
