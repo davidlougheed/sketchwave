@@ -11,6 +11,9 @@ block scripts
 			var authors = {};
 			var stamps = {};
 
+			var pastMessages = 0;
+			var messagesLoaded = 0;
+
 			var $body = $('body');
 			var $cursor = $('#cursor');
 			var $messagesContainer = $('#messagesContainer');
@@ -59,11 +62,9 @@ block scripts
 			var clickSize = [];
 			var tool = [];
 
-			var stamps = [];
+			var stampTypes = [];
 
 			var background = null;
-
-			var pastMessages = 0;
 
 			var displayMessage = function (username, imageData, date, immediate) {
 				$messagesContainer.append('<div class="message">'
@@ -94,7 +95,7 @@ block scripts
 				clickColor = [];
 				clickSize = [];
 				tool = [];
-				stamps = [];
+				stampTypes = [];
 				if (backgroundClear) {
 					background = null;
 				}
@@ -149,13 +150,13 @@ block scripts
 						ctx.closePath();
 						ctx.stroke();
 					} else {
-						if (stamps[i]) {
+						if (stampTypes[i]) {
 							var size = clickSize[i] * 1.5;
-							if (stamps[i] == 'hotswap') {
-								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - Math.round(size / 2),
+							if (stampTypes[i] == 'hotswap') {
+								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - Math.round(size / 2),
 										clickY[i] - Math.round(size / 3), size, size / 1.5);
 							} else {
-								ctx.drawImage($('#' + stamps[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
+								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
 										clickY[i] - (clickSize[i] / 2), clickSize[i], clickSize[i]);
 							}
 						}
@@ -173,9 +174,9 @@ block scripts
 				tool.push(toolType);
 
 				if (toolType == 'brush') {
-					stamps.push(null);
+					stampTypes.push(null);
 				} else {
-					stamps.push(stamp);
+					stampTypes.push(stamp);
 				}
 			};
 
@@ -323,6 +324,7 @@ block scripts
 
 				clearAllCanvasData(true);
 				socket.emit('newMessage', messageData);
+				pastMessages += 1;
 
 				if (window.innerWidth <= 1040) {
 					if ($drawPanel.css('left') != '0px') {
