@@ -13,7 +13,7 @@ module.exports.controller = function (objects) {
 	objects.router.post('/conversations/', function (req, res) {
 		//TODO: Handle errors properly
 		if (!req.isAuthenticated()) {
-			return appError.generate(req, res, 403, {});
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
 		if (!req.body) {
 			return res.send('error no body');
@@ -83,8 +83,7 @@ module.exports.controller = function (objects) {
 
     objects.router.get('/conversation/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
-			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
-			return appError.generate(req, res, 403, {});
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversation/' + req.params.id));
 		}
 
 		objects.models.Conversation.findOne({where: {
@@ -109,7 +108,7 @@ module.exports.controller = function (objects) {
 					} else {
 						res.render('conversation', {
 							user: req.user,
-							conversationID: req.params.id,
+							conversationID: req.params.id
 						});
 					}
 				});

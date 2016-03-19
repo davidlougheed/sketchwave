@@ -10,5 +10,7 @@ block content
             autocapitalize='off', autocorrect='off', placeholder='Username')
         input(type='password', name='password', id='password', placeholder='Password')
 
+        input(type='hidden', name='redirect', value='#{redirect}')
+
         button(type='submit')
             i.material-icons exit_to_app

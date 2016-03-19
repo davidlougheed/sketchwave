@@ -11,11 +11,15 @@ module.exports.controller = function (objects) {
 			return res.send({ success: false, error: 'no_body' });
 		}
 
+		// TODO: Authenticate user for stamp creation!!!
+
 		objects.models.Stamp.create({
 			imageData: req.body.imageData,
 			UserId: parseInt(req.user.id),
 			ConversationId: parseInt(req.body.conversationID)
-		}).then(function (message) {
+		}).then(function (stamp) {
+			socket.broadcast.to('conversation' + req.body.conversationID.toString())
+				.emit('addStamp', stamp.toJSON());
 			res.send({ success: true });
 		});
 	});
@@ -42,6 +46,8 @@ module.exports.controller = function (objects) {
 			}
 
 			stamp.destroy();
+
+			// TODO: emit a stamp destroy socket message
 
 			return res.send({ success: true });
 		});

@@ -75,13 +75,22 @@ module.exports.controller = function (objects) {
 			return res.redirect('/conversations/');
 		}
 
-		res.render('login', { error: req.flash('error') });
+		if(req.query.redirect) {
+			return res.render('login', { error: req.flash('error'), redirect: req.query.redirect });
+		}
+
+		return res.render('login', { error: req.flash('error'), redirect: '/' });
 	});
 	objects.router.post('/login/', objects.passport.authenticate('local', {
-		successRedirect: '/conversations/',
 		failureRedirect: '/login/',
         failureFlash: true
-	}));
+	}), function (req, res) {
+		if (req.body.redirect) {
+			res.redirect(req.body.redirect);
+		} else {
+			res.redirect('/conversations/');
+		}
+	});
 
 	objects.router.get('/logout/', function (req, res) {
 		req.logout();
