@@ -18,8 +18,9 @@ module.exports.controller = function (objects) {
 			UserId: parseInt(req.user.id),
 			ConversationId: parseInt(req.body.conversationID)
 		}).then(function (stamp) {
-			socket.broadcast.to('conversation' + req.body.conversationID.toString())
-				.emit('addStamp', stamp.toJSON());
+			// TODO: make this work...
+			// objects.io.of('conversation' + req.body.conversationID.toString())
+			//	.emit('addStamp', stamp.toJSON());
 			res.send({ success: true });
 		});
 	});

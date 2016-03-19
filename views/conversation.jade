@@ -344,7 +344,7 @@ block scripts
 					$body.append('<div id="modal"><h1>Stamp was added!</h1>'
 							+ '<button id="okay">Okay</button>'
 							+ '</div>');
-					$('#okay').click(function () {
+					$('#okay, #modalBackground').click(function () {
 						$('#modal').fadeOut('fast', function () {
 							$(this).remove();
 						});
@@ -390,7 +390,7 @@ block scripts
 					});
 				});
 
-				$('#closeModal').click(function () {
+				$('#closeModal, #modalBackground').click(function () {
 					$('#modal').fadeOut('fast', function () {
 						$(this).remove();
 					});
@@ -520,7 +520,7 @@ block scripts
 					});
 				});
 
-				$('#closeModal').click(function () {
+				$('#closeModal, #modalBackground').click(function () {
 					$('#modal').fadeOut('fast', function () {
 						$(this).remove();
 					});
@@ -533,7 +533,7 @@ block scripts
 			$('#toggleCanvas').click(function () {
 				if ($drawPanel.css('left') != '0px') {
 					$drawPanel.animate({left: 0});
-					$(this).text('View Messages');
+					$(this).text('Messages');
 					$drawPanel.focus();
 				} else {
 					$drawPanel.animate({left: '100%'});
@@ -593,6 +593,10 @@ block scripts
 						}
 					}
 				}
+			});
+
+			socket.on('changeName', function (name) {
+				// TODO: Incorporate whether or not it's being edited...
 			});
 
 			socket.on('addUser', function (data) {
