@@ -80,10 +80,9 @@ header nav ul li {
 header nav ul li a {
 	color: #cceeff;
 	text-decoration: none;
-	text-transform: uppercase;
 	font-family: "Open Sans", sans-serif;
 	font-size: 0.9em;
-	font-weight: bold;
+	font-weight: 600;
 	transition: color 0.1s;
 }
 header nav ul li a:hover {
@@ -109,7 +108,8 @@ section#main h1 {
 	margin-top: 0;
 	padding-bottom: 5px;
 	font-family: "Open Sans", sans-serif;
-	color: #333;
+	font-weight: 600;
+	color: #444;
 	border-bottom: 2px solid #6f9fce;
 }
 section#main h1 > span {
@@ -338,6 +338,7 @@ div#conversation section#messages header h1 {
 	line-height: 24px;
 	top: 0;
 	color: #505055;
+	font-weight: 600;
 }
 div#conversation section#messages header h1 span#convName {
 	position: relative;
@@ -561,6 +562,19 @@ div#conversation section#drawPanel div#tools ul li#green { background-color: #0F
 
 div#conversation section#drawPanel div#tools div#brushSize input[type="range"] {
 	width: 100%;
+}
+
+div#profile {
+	text-align: center;
+}
+div#profile img#avatar {
+	height: 384px; width: 384px;
+	border-radius: 100%;
+}
+div#profile h1 {
+	border: none;
+	font-size: 3rem;
+	margin-top: 20px;
 }
 
 div#modalBackground {
@@ -1040,6 +1054,10 @@ form#formSignUp {
 	}
 	div#conversation section#messages section#messagesContainer div.message div.image {
 		margin: 0;
+	}
+
+	#logOutUsername {
+		display: none;
 	}
 
 	div#conversation section#drawPanel div#scrollIt {

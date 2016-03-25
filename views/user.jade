@@ -1,0 +1,9 @@
+extends base.jade
+
+block vars
+	- var sidebar = false
+
+block content
+	div#profile
+		img#avatar(src='http://placehold.it/384x384')
+		h1#name #{profile.username}

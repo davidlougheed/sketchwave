@@ -1,5 +1,6 @@
 doctype html
 html
+	block vars
 	head
 		title SketchWave
 
@@ -30,8 +31,12 @@ html
 							a(href='/conversations')
 								i.material-icons forum
 								span Conversations
+						li
+							a(href='/user/#{user.id}/')
+								i.material-icons account_circle
+								span My Profile
 						li(style='float: right')
-							a(href='/logout') Log Out (#{user.username})
+							a(href='/logout') Log Out #[span#logOutUsername (#{user.username})]
 					else
 						li
 							a(href='/')
@@ -39,3 +44,18 @@ html
 								span Home
 		section#main
 			block content
+
+		if sidebar
+			footer
+				nav
+					ul
+						li
+							a Home
+						li
+							a About
+						li
+							a Blog
+						li
+							a Privacy Policy
+						li
+							a Contact

@@ -19,4 +19,22 @@ module.exports.controller = function (objects) {
 			return res.send({ success: true, users: usersData });
 		});
 	});
+
+	objects.router.get('/user/:id/', function (req, res) {
+		if (!req.isAuthenticated()) {
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/user/' + req.params.id));
+		}
+
+		objects.models.User.findOne({where: {
+			id: req.params.id
+		}
+		}).then(function (user) {
+			var userJSON = user.toJSON();
+			delete userJSON['password'];
+			res.render('user', {
+				user: req.user, // The currently signed-in user
+				profile: userJSON // User who's profile someone is viewing
+			});
+		});
+	});
 };
