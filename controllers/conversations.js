@@ -5,7 +5,7 @@ module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
 		if (!req.isAuthenticated()) {
 			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
-			return appError.generate(req, res, 403, {});
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
 
 		res.render('conversations', { user: req.user });
