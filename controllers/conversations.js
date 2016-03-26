@@ -1,3 +1,5 @@
+'use strict';
+
 var async = require('async');
 var appError = require('../modules/app-error');
 

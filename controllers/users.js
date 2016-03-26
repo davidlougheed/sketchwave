@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.controller = function (objects) {
 	objects.router.get('/users_data/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');

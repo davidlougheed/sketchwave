@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.errors = {
     403: 'forbidden',
     404: 'notFound'

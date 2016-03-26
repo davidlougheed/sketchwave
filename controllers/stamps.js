@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports.controller = function (objects) {
 	objects.router.post('/stamp/', function (req, res) {
 		//TODO: Handle errors properly
