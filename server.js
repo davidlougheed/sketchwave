@@ -1,3 +1,5 @@
+'use strict';
+
 var http = require('http');
 var fs = require('fs');
 
@@ -102,6 +104,7 @@ fs.readdirSync(controllerDir).filter(function (file) {
 	route.controller({
 		router: appRouter,
 		io: io,
+		redis: redisClient,
 		passport: passport,
 		models: models,
 		config: config

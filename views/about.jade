@@ -1,0 +1,51 @@
+extends base.jade
+
+block vars
+	- var footer = true
+
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			$('#gabe img').hover(function () {
+				$(this).attr('src', '/images/gabe_glitched.png');
+			}, function () {
+				$(this).attr('src', '/images/gabe.png');
+			});
+
+			$('#aidon img').hover(function () {
+				$(this).attr('src', '/images/aidon_glitched.png');
+			}, function () {
+				$(this).attr('src', '/images/aidon.png');
+			});
+
+			$('#david img').hover(function () {
+				$(this).attr('src', '/images/david_glitched.png');
+			}, function () {
+				$(this).attr('src', '/images/david.png');
+			});
+		});
+
+block content
+	h1
+		span About
+
+	p Lorem ipsum.
+
+	div.aboutProfile#gabe
+		img(src='/images/gabe.png')
+		h2 Gabe
+
+	div.aboutProfile#aidon
+		img(src='/images/aidon.png')
+		h2 Aidon
+		p.
+			Forged by the almighty Killawattz 20,000 years ago, Aidon has since be credited with the invention of the
+			clock and discovery of Moscow, and is ranked as the world's foremost hand model. Here at Sketchwave he is
+			known as the master of masters, the deliverer of dankness and the shogun of sorrows.
+
+	div.aboutProfile#david
+		img(src='/images/david.png', onhover='')
+		h2 David
+		p(style='font-family: monospace;').
+			01000011 00100000 01101111 00100000 01100100 00100000 01100101 00100000 01110011 00100000 01101100 00100000
+			01100001 00100000 01110110 00100000 01100101

@@ -46,17 +46,18 @@ html
 		section#main
 			block content
 
-		if sidebar
-			footer
+		if footer
+			footer#pageFooter
 				nav
 					ul
 						li
-							a Home
+							a(href='/') Home
 						li
-							a About
+							a(href='/about/') About
+						//li
+						//	a(href='/blog/') Blog
+						//li
+						//	a(href='/privacy/') Privacy Policy
 						li
-							a Blog
-						li
-							a Privacy Policy
-						li
-							a Contact
+							a(href='/contact/') Contact
+				img#footerLogo(src='/images/dolphin_transparent.png', height='40')

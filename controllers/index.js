@@ -1,3 +1,5 @@
+'use strict';
+
 var bcrypt = require('bcrypt');
 var request = require('request');
 
@@ -8,6 +10,12 @@ module.exports.controller = function (objects) {
 		}
 
 		res.render('index');
+	});
+	objects.router.get('/about/', function (req, res) {
+		res.render('about');
+	});
+	objects.router.get('/contact/', function (req, res) {
+		res.render('contact');
 	});
 
 	objects.router.get('/signup/', function (req, res) {

@@ -1,16 +1,19 @@
 extends base.jade
 
+block vars
+	- var footer = true
+
 block content
-    h1#bigForm  Log In
-    form#formLogIn(method='post')
-        if error != ''
-            div.siteMessage.error #{error}
+	h1#bigForm  Log In
+	form#formLogIn(method='post')
+		if error != ''
+			div.siteMessage.error #{error}
 
-        input(type='text', name='username', id='username'
-            autocapitalize='off', autocorrect='off', placeholder='Username')
-        input(type='password', name='password', id='password', placeholder='Password')
+		input(type='text', name='username', id='username'
+			autocapitalize='off', autocorrect='off', placeholder='Username')
+		input(type='password', name='password', id='password', placeholder='Password')
 
-        input(type='hidden', name='redirect', value='#{redirect}')
+		input(type='hidden', name='redirect', value='#{redirect}')
 
-        button(type='submit')
-            i.material-icons exit_to_app
+		button(type='submit')
+			i.material-icons exit_to_app

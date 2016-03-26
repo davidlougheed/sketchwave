@@ -1,5 +1,8 @@
 extends base.jade
 
+block vars
+	- var footer = false
+
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
@@ -36,9 +39,9 @@ block scripts
 								+ '" id="conversation-'
 								+ conversationID + '"><div class="link"><a href="/conversation/'
 								+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
+								+ '<div class="date">Last message posted: ' + formattedDate + '</div>'
 								+ '<div class="memberList"><strong>Members:</strong> '
-								+ '<span class="members">' + userList + '</span></div> '
-								+ '<div class="date">Last message posted: ' + formattedDate + '</div>';
+								+ '<span class="members">' + userList + '</span></div> ';
 
 
 						if(data['users'][c].length == 1) {
