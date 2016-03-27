@@ -134,66 +134,10 @@ module.exports.controller = function (objects) {
 			conversation.name = req.body.name;
 			conversation.save();
 
+			objects.io.of('conversation' + conversation.id.toString())
+				.emit('changeName', conversation.name);
+
 			return res.send({ success: true });
-		});
-	});
-	objects.router.put('/conversation_users/:id/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if (!req.isAuthenticated()) {
-			return appError.generate(req, res, 403, {});
-		}
-		if (!req.body) {
-			return res.send({error: 'no-body'});
-		}
-
-		objects.models.Conversation.findOne({where: {
-			id: req.params.id
-		}
-		}).then(function (conversation) {
-			objects.models.User.findOne({
-				where: {
-					username: req.body.username
-				}
-			}).then(function (user) {
-				if(user) {
-					conversation.addUser(user);
-
-					return res.send({success: true});
-				} else {
-					return res.send({success: false});
-				}
-			});
-		});
-	});
-	objects.router.delete('/conversation_users/:id/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if (!req.isAuthenticated()) {
-			return res.send({error: 'not_authenticated'}); // TODO: Handle non authentication
-		}
-		if (!req.body) {
-			return res.send({error: 'no_body'});
-		}
-
-		objects.models.Conversation.findOne({
-			where: {
-				id: req.params.id
-			}
-		}).then(function (conversation) {
-			objects.models.User.findOne({
-				where: {
-					username: req.body.username
-				}
-			}).then(function (user) {
-				if(user) {
-					conversation.removeUser(user);
-
-					return res.send({ success: true });
-				} else {
-					return res.send({ success: false });
-				}
-			});
 		});
 	});
 	objects.router.delete('/conversation/:id/', function (req, res) {
@@ -297,7 +241,8 @@ module.exports.controller = function (objects) {
 					objects.models.Message.findAll({
 						where: {
 							ConversationId: conversation.id
-						}
+						},
+						order: '"createdAt" ASC'
 					}).then(function (messages) {
 						return res.send({ success: true, conversation: conversation, messages: messages });
 					});
@@ -309,15 +254,91 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	// TODO: HANDLE 403 / AUTHENTICATION EXPIRY HERE!!!!!!!!!
+
 	objects.io.on('connection', function (socket) {
 		socket.on('userOnline', function (data) {
-
+			objects.redis.sadd(['swUsersOnline', data], function(err, reply) {
+				if (err) {
+					throw err;
+				}
+			});
 		});
 		socket.on('userOffline', function (data) {
-
+			objects.redis.srem(['swUsersOnline', data], function(err, reply) {
+				if (err) {
+					throw err;
+				}
+			});
 		});
 
-		socket.on('addUser', function (data) {
+		socket.on('userAdd', function (data) {
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						objects.models.User.findOne({
+							where: {
+								username: data.username
+							}
+						}).then(function (user) {
+							if(user) {
+								conversation.addUser(user);
+								conversation.save();
+
+								var userJSON = user.toJSON();
+								delete userJSON['password'];
+
+								// TODO: Add meta message to database
+
+								objects.io.to('conversation' + data.conversationID.toString())
+									.emit('userAdd', userJSON);
+							}
+						});
+					}
+				});
+			});
+		});
+		socket.on('userRemove', function (data) {
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						objects.models.User.findOne({
+							where: {
+								username: data.username
+							}
+						}).then(function (user) {
+							if (user) {
+								var userID = user.id;
+								conversation.removeUser(user);
+
+								// TODO: Add meta message to database
+
+								objects.io.to('conversation' + data.conversationID.toString())
+									.emit('userRemove', { id: userID, username: data.username });
+							}
+						});
+					}
+				});
+			});
+		});
+
+		socket.on('userJoin', function (data) {
 			// TODO: Send user connect message, handle online/offline stuff...
 			// TODO: Cache conversation data FOR ALL APP!!! SO THAT NOT SO MANY DB REQUESTS ARE MADE
 
@@ -335,12 +356,12 @@ module.exports.controller = function (objects) {
 						socket.join('conversation' + data.conversationID.toString());
 
 						socket.broadcast.to('conversation' + data.conversationID.toString())
-							.emit('addUser', users[0].username);
+							.emit('userJoin', users[0].username);
 					}
 				});
 			});
 		});
-		socket.on('removeUser', function (data) {
+		socket.on('userLeave', function (data) {
 			// TODO: Send user disconnect message, handle online/offline stuff...
 
 			socket.leave('conversation' + data.conversationID.toString());
@@ -357,7 +378,7 @@ module.exports.controller = function (objects) {
 				}).then(function (users) {
 					if (users != null && users.length > 0) {
 						socket.broadcast.to('conversation' + data.conversationID.toString())
-							.emit('removeUser', users[0].username);
+							.emit('userLeave', users[0].username);
 					}
 				});
 			});

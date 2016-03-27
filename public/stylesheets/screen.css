@@ -190,6 +190,7 @@ footer#pageFooter {
 	left: 30px; right: 30px;
 	bottom: 0;
 	height: 60px;
+	z-index: 10;
 
 	border-top: 2px solid #6f9fce;
 	background-color: #f9f9f5;
@@ -256,8 +257,8 @@ button#toggleCanvas {
 }
 
 section#main div.aboutProfile {
-	margin-bottom: 40px;
 	width: 33.3%;
+	margin-bottom: 40px;
 	display: inline-block;
 	text-align: center;
 	vertical-align: top;
@@ -350,6 +351,8 @@ ul#conversations li.conversation div.date {
 	padding-right: 15px;
 
 	background-color: #fefefd;
+	border-top-right-radius: 3px;
+	border-top-left-radius: 3px;
 
 	font-size: 0.8rem;
 	line-height: 48px;
@@ -420,6 +423,10 @@ div#conversation section#messages header h1 span#convName {
 	position: relative;
 	top: 4px;
 }
+div#conversation section#messages header h1 div#nameChangeControls {
+	display: inline-block;
+	overflow: hidden;
+}
 div#conversation section#messages section#messagesContainer {
 	overflow-y: auto;
 	position: absolute;
@@ -429,7 +436,7 @@ div#conversation section#messages section#messagesContainer {
 	padding-top: 54px;
 }
 div#conversation section#messages section#messagesContainer div.metaMessage {
-	margin: 40px auto 0 auto;
+	margin: 40px auto;
 	max-width: 480px;
 	width: 100%;
 
@@ -447,18 +454,31 @@ div#conversation section#messages section#messagesContainer div.message:last-chi
 div#conversation section#messages section#messagesContainer div.message div.topBar {
 	overflow: hidden;
 	margin: auto;
-	margin-bottom: 5px;
+	margin-bottom: 8px;
 	max-width: 480px;
 	width: 100%;
+	height: 36px;
 	font-family: "Open Sans", sans-serif;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar div.author {
 	float: left;
 	color: #555;
 }
+div#conversation section#messages section#messagesContainer div.message div.topBar div.author img {
+	margin-right: 10px;
+	height: 36px; width: 36px;
+	border-radius: 100%;
+	vertical-align: top;
+}
+div#conversation section#messages section#messagesContainer div.message div.topBar div.author span {
+	position: relative;
+	top: 7px;
+}
 div#conversation section#messages section#messagesContainer div.message div.topBar div.date {
 	float: right;
 	color: #888;
+	font-size: 0.9rem;
+	margin-top: 9px;
 }
 div#conversation section#messages section#messagesContainer div.message div.image {
 	clear: both;
@@ -645,7 +665,11 @@ div#profile {
 }
 div#profile img#avatar {
 	height: 384px; width: 384px;
+
+	background-color: white;
+	border: 1px solid #bdbdbd;
 	border-radius: 100%;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
 }
 div#profile h1 {
 	border: none;
@@ -714,7 +738,6 @@ div#modal h1 div.controls {
 
 #stamps {
 	margin-bottom: 15px;
-	max-height: 400px;
 	overflow-y: auto;
 }
 #stamps .stamp {
@@ -737,10 +760,17 @@ div#modal h1 div.controls {
 }
 #stamps .stamp button.stampDelete {
 	position: absolute;
-	bottom: 5px;
-	right: 5px;
-	padding: 3px 5px;
-	font-size: 0.7rem;
+	bottom: 2px;
+	right: 4px;
+
+	text-shadow: 0 1px 0 #f9f9f5,
+		0 -1px 0 #f9f9f5,
+		1px 0 0 #f9f9f5,
+		-1px 0 0 #f9f9f5,
+		1px 1px 0 #f9f9f5,
+		-1px 1px 0 #f9f9f5,
+		1px -1px 0 #f9f9f5,
+		-1px -1px 0 #f9f9f5;
 }
 
 #members {
@@ -1016,13 +1046,164 @@ form#formSignUp {
 
 	max-width: 500px;
 	width: 100%;
-	margin: auto;
+	margin: 0 auto 60px auto;
 }
+form#formSignUp h2 {
+	font-family: "Open Sans", sans-serif;
+	font-weight: 600;
+	text-align: center;
+	color: #444;
+}
+form#formSignUp div#avatarContainer canvas#avatarCanvas {
+	display: block;
+	margin: 20px auto;
+	box-sizing: border-box;
+
+	background-color: white;
+	border: 1px solid #bdbdbd;
+	border-radius: 100%;
+
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+	cursor: none;
+
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+
+	max-width: 100%;
+}
+
+form#formSignUp div#avatarContainer div#tools {
+	position: relative;
+	z-index: 2;
+
+	box-sizing: border-box;
+	display: inline-block;
+	width: 100%;
+	max-width: 482px;
+	padding: 15px;
+
+	background-color: #f1f1ef;
+	border: 1px solid #bdbdbd;
+	border-radius: 3px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+form#formSignUp div#avatarContainer div#tools h3 {
+	color: #666;
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.95rem;
+	font-weight: normal;
+	margin: 0;
+}
+form#formSignUp div#avatarContainer div#tools ul {
+	list-style: none;
+	padding: 0;
+	width: 100%;
+	margin: 0 auto 10px auto;
+	font-size: 0;
+}
+form#formSignUp div#avatarContainer div#tools ul li {
+	position: relative;
+	box-sizing: border-box;
+	width: 10.5%;
+	margin-right: 2%;
+	padding: 4px;
+	height: 36px;
+	display: inline-block;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	background-color: #f9f9f5;
+}
+form#formSignUp div#avatarContainer div#tools ul li:last-child {
+	margin-right: 0;
+}
+form#formSignUp div#avatarContainer div#tools ul li.active {
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+	border-color: orange;
+}
+form#formSignUp div#avatarContainer div#tools ul li:active {
+	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
+}
+form#formSignUp div#avatarContainer div#tools ul li.big {
+	width: 23%;
+	margin: 0 1%;
+	vertical-align: top;
+	text-align: center;
+}
+form#formSignUp div#avatarContainer div#tools ul li.big img {
+	max-width: 100%;
+	max-height: 26px;
+}
+form#formSignUp div#avatarContainer div#tools ul li i {
+	margin-top: 4px;
+	vertical-align: top;
+	font-size: 18px;
+	width: 18px;
+	color: #666;
+}
+form#formSignUp div#avatarContainer div#tools ul li#white { background-color: #FFF; }
+form#formSignUp div#avatarContainer div#tools ul li#grey { background-color: #808080; }
+form#formSignUp div#avatarContainer div#tools ul li#black { background-color: #000; }
+form#formSignUp div#avatarContainer div#tools ul li#red { background-color: #F00; }
+form#formSignUp div#avatarContainer div#tools ul li#hotPink { background-color: #FF69B4; }
+form#formSignUp div#avatarContainer div#tools ul li#yellow { background-color: #FFFF00; }
+form#formSignUp div#avatarContainer div#tools ul li#blue { background-color: #00F; }
+form#formSignUp div#avatarContainer div#tools ul li#green { background-color: #0F0; }
+
+form#formSignUp div#avatarContainer div#tools div#brushSize input[type="range"] { width: 100%; }
 
 /*** SELECT2 OVERRIDES ***/
 
 .select2-container--default {
 	max-width: 100%;
+	min-width: 200px;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+	-webkit-appearance: none;
+
+	border: 1px solid #4f5f6e;
+	padding: 5px;
+	height: 32px;
+	width: 100%;
+	box-sizing: border-box;
+
+	border-radius: 3px;
+	box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.12);
+
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.85rem;
+	color: #555;
+	line-height: 20px;
+
+	vertical-align: top;
+
+	outline: none;
+}
+.select2-container--default .select2-selection--single {
+	box-sizing: border-box;
+	border: 1px solid #4f5f6e;
+	min-height: 32px;
+	width: 250px;
+	max-width: 100%;
+
+	border-radius: 3px;
+	outline: none;
+
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.8rem;
+	color: #555;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	vertical-align: top;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 30px;
 }
 .select2-container--default .select2-selection--multiple {
 	box-sizing: border-box;

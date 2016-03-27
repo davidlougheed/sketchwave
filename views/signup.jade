@@ -3,15 +3,263 @@ extends base.jade
 block vars
 	- var footer = true
 
+// TODO: Remove massive amounts of duplicated code with sign-up avatar drawing
+
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
 			$('#btnLogIn').on('click touchstart', function () {
 				window.location.replace('/login');
 			});
+
+			var $body = $('body');
+			var $cursor = $('#cursor');
+			var $brushSizeRange = $('#brushSizeRange');
+
+			$cursor.hide();
+
+			var drawCanvas = document.getElementById('avatarCanvas');
+			var ctx = drawCanvas.getContext('2d');
+			ctx.mozImageSmoothingEnabled = false;
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.msImageSmoothingEnabled = false;
+			ctx.imageSmoothingEnabled = false;
+			var paint = false;
+			var hover = false;
+
+			var brushColor = '#ff0000';
+			var brushSize = 5;
+			var toolType = 'brush';
+			var stamp = 'dolphin';
+
+			var clickX = [];
+			var clickY = [];
+			var clickDrag = [];
+			var clickColor = [];
+			var clickSize = [];
+			var tool = [];
+
+			var stampTypes = [];
+
+			var background = null;
+
+			var clearAllCanvasData = function (backgroundClear) {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				clickX = [];
+				clickY = [];
+				clickDrag = [];
+				clickColor = [];
+				clickSize = [];
+				tool = [];
+				stampTypes = [];
+				if (backgroundClear) {
+					background = null;
+				}
+			};
+
+			var moveImageDataToBg = function () {
+				background = drawCanvas.toDataURL();
+			};
+
+			var redraw = function () {
+				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+				if (background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					ctx.drawImage(bgImage, 0, 0, 384, 384);
+				}
+				ctx.lineJoin = 'round';
+
+				for (var i = 0; i < clickX.length; i++) {
+					if (tool[i] == 'brush') {
+						// make brush size feel more natural
+						ctx.lineWidth = (Math.pow(clickSize[i] / 384, 1.75) * 192) + 1;
+						ctx.strokeStyle = clickColor[i];
+
+						ctx.beginPath();
+
+						if (clickDrag[i] && i != 0) {
+							ctx.moveTo(clickX[i - 1], clickY[i - 1]);
+						} else {
+							ctx.moveTo(clickX[i] - 1, clickY[i]);
+						}
+
+						ctx.lineTo(clickX[i], clickY[i]);
+						ctx.closePath();
+						ctx.stroke();
+					} else {
+						if (stampTypes[i]) {
+							var size = clickSize[i] * 1.5;
+							if (stampTypes[i] == 'hotswap') {
+								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - Math.round(size / 2),
+										clickY[i] - Math.round(size / 3), size, size / 1.5);
+							} else {
+								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
+										clickY[i] - (clickSize[i] / 2), clickSize[i], clickSize[i]);
+							}
+						}
+					}
+				}
+			};
+
+			var addPoint = function (x, y, dragging) {
+				clickX.push(x);
+				clickY.push(y);
+				clickDrag.push(dragging);
+				clickColor.push(brushColor);
+				clickSize.push(brushSize);
+
+				tool.push(toolType);
+
+				if (toolType == 'brush') {
+					stampTypes.push(null);
+				} else {
+					stampTypes.push(stamp);
+				}
+			};
+
+			var drawCursor = function (x, y) {
+				$cursor.css({'top': (y - 112 + $('#main').scrollTop()).toString() + 'px', 'left': x.toString() + 'px'});
+			};
+
+			$(drawCanvas).on('mousedown', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
+				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 384.0));
+				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 384.0));
+
+				paint = true;
+
+				addPoint(scaledMouseX, scaledMouseY, false);
+				redraw();
+			});
+			$(drawCanvas).on('touchstart', function (event) {
+				var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+
+				var mouseX = touch.pageX - $(this).offset().left;
+				var mouseY = touch.pageY - $(this).offset().top;
+
+				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 384.0));
+				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 384.0));
+
+				paint = true;
+
+				addPoint(scaledMouseX, scaledMouseY, false);
+				redraw();
+			});
+			$(drawCanvas).on('mousemove', function (event) {
+				if (paint) {
+					var mouseX = event.pageX - $(this).offset().left;
+					var mouseY = event.pageY - $(this).offset().top;
+
+					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 384.0));
+					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 384.0));
+
+					addPoint(scaledMouseX, scaledMouseY, true);
+					redraw();
+				}
+
+				if (hover) {
+					drawCursor(event.pageX, event.pageY + $(this).scrollTop());
+				}
+			});
+			$(drawCanvas).on('touchmove', function (event) {
+				event.preventDefault();
+
+				if (paint) {
+					var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+
+					var mouseX = touch.pageX - $(this).offset().left;
+					var mouseY = touch.pageY - $(this).offset().top;
+
+					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 384.0));
+					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 384.0));
+
+					addPoint(scaledMouseX, scaledMouseY, true);
+					redraw();
+				}
+			});
+
+			var onMouseUp = function (event) {
+				paint = false;
+				moveImageDataToBg();
+				if (background) {
+					var bgImage = document.createElement('img');
+					bgImage.setAttribute('src', background);
+					bgImage.onload = function () {
+						clearAllCanvasData(false);
+						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+						ctx.drawImage(bgImage, 0, 0, 384, 384);
+					};
+				}
+
+				$('#avatar').val(drawCanvas.toDataURL());
+			};
+
+			$(drawCanvas).on('mouseup', onMouseUp);
+			$(drawCanvas).on('touchend', function (event) {
+				event.preventDefault();
+
+				onMouseUp(event);
+			});
+			$(drawCanvas).on('mouseleave', function (event) {
+				paint = false;
+				hover = false;
+				$cursor.hide();
+			});
+
+			$(drawCanvas).on('mouseenter', function (event) {
+				var mouseX = event.pageX - $(this).offset().left;
+				var mouseY = event.pageY - $(this).offset().top;
+
+				hover = true;
+				$cursor.show();
+				drawCursor(event.pageX, event.pageY);
+			});
+
+			$('.colorTool').click(function () {
+				toolType = 'brush';
+				brushColor = $(this).css('backgroundColor');
+
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#images').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+			$('.stampTool').click(function () {
+				toolType = 'stamp';
+				stamp = $(this).attr('id');
+
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#colors').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+
+			$brushSizeRange.on('input change', function () {
+				brushSize = Math.round(($(this).val() / 100.0) * 384);
+			});
+
+			$(window).on('beforeunload', function (event) {
+				onMouseUp(event);
+			});
 		});
 
 block content
+	img#cursor(width='100', height='57', src='/images/cursor.png')
 	h1#bigForm.wider
 		span Sign Up
 		div#controls
@@ -36,6 +284,39 @@ block content
 			span Password Again
 		input(type='password', name='password2', id='password2'
 			pattern='.{8,}', required='required', title='8 characters minimum')
+
+		h2 Draw Your Avatar
+
+		// TODO: FIX XSS VULNERABILITY WITH AVATAR (ELSEWHERE TOO!!!)
+		input(type='hidden', id='avatar', name='avatar')
+
+		div#avatarContainer
+			canvas#avatarCanvas(height='384', width='384')
+
+			div#tools
+				ul#colors
+					li#white.colorTool
+					li#grey.colorTool
+					li#black.colorTool
+					li#red.colorTool.active
+					li#hotPink.colorTool
+					li#yellow.colorTool
+					li#blue.colorTool
+					li#green.colorTool
+
+				ul#images
+					li#dolphin.big.stampTool
+						img(src='/images/dolphin.png')
+					li#hand.big.stampTool
+						img(src='/images/hand.png')
+					li#pizza.big.stampTool
+						img(src='/images/pizza.png')
+					li#gabe.big.stampTool
+						img(src='/images/gabe.png')
+
+				div#brushSize
+					h3 Brush Size
+					input#brushSizeRange(type='range', min='1', max='100', value='10')
 
 		div.g-recaptcha(data-sitekey='6LcU6hkTAAAAAIAlMCEAA6gEMzYWbcyY3M2l2opa')
 

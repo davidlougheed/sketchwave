@@ -25,22 +25,14 @@ block scripts
 			var $brushSizeRange = $('#brushSizeRange');
 			var $hotSwapButton = $('#hotswap');
 
-			$messagesContainer.append('<div class="loader"'
+			$messagesContainer.append('<div class="loader" '
 				+ 'style="position: absolute; left: 50%; margin-left: -23px; margin-top: 50px;"></div>');
-
-			// TODO: Make authors specific to convo and handle add/remove with sockets
-			$.get('/users_data/').done(function (data) {
-				authors = data['users'];
-			});
 
 			$.post('/stamps/', {conversationID: convID}).done(function (data) {
 				for (var s in data['stamps']) {
 					stamps = data['stamps'];
 				}
 			});
-
-			// Done loading, get rid of the loading animation thing
-			$messagesContainer.children('.loader').first().remove();
 
 			$cursor.hide();
 
@@ -71,7 +63,8 @@ block scripts
 
 			var displayMessage = function (username, imageData, date, immediate) {
 				$messagesContainer.append('<div class="message">'
-						+ '<div class="topBar"><div class="author">' + username + '</div><div class="date">'
+						+ '<div class="topBar"><div class="author"><img src="http://placehold.it/36x36"><span>'
+						+ username + '</span></div><div class="date">'
 						+ date + '</div></div>'
 						+ '<div class="image">'
 						+ '<img src="' + imageData + '">'
@@ -88,6 +81,7 @@ block scripts
 
 			var displayMetaMessage = function (message) {
 				$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
+				$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
 			};
 
 			var clearAllCanvasData = function (backgroundClear) {
@@ -123,6 +117,9 @@ block scripts
 
 						pastMessages = data['messages'].length;
 					}
+
+					// Done loading, get rid of the loading animation thing
+					$messagesContainer.children('.loader').first().remove();
 				});
 			};
 
@@ -367,7 +364,7 @@ block scripts
 							var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
 									+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
 							if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
-								stampHTML += '<button class="stampDelete"><i class="material-icons">clear</i></button>';
+								stampHTML += '<button class="stampDelete transparent noMargin big iconOnly"><i class="material-icons">delete</i></button>';
 							}
 							stampHTML += '</div>';
 							$('#stamps').append(stampHTML);
@@ -427,8 +424,8 @@ block scripts
 			$('#changeName').click(function () {
 				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
 						+ $('#convName').text() + '">');
-				$('#changeNameText').after(' <button id="saveName"><i class="material-icons">done</i><span>Save</span></button> '
-						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i><span>Cancel</span></button>');
+				$('#changeNameText').after(' <div id="nameChangeControls"><button id="saveName"><i class="material-icons">done</i><span>Save</span></button>'
+						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i><span>Cancel</span></button></div>');
 				$('#saveName').click(function () {
 					// TODO: Socket send a message that name has changed
 
@@ -454,20 +451,33 @@ block scripts
 					$('#changeNameText').replaceWith('<span id="convName">'
 							+ $('#changeNameText').val() + '</span>');
 					$('#changeName').removeAttr('disabled');
+					$('#changeName').show();
 				});
 				$(this).attr('disabled', 'disabled');
+				$(this).hide();
 			});
 
 			$editMembersButton.click(function () {
 				$body.append('<div id="modalBackground"></div>');
-				$body.append('<div id="modal"><h1><span>Edit Members</span><div class="controls">'
+				var modalHTML = '<div id="modal"><h1><span>Edit Members</span><div class="controls">'
 						+ '<button id="closeModal" class="transparent iconOnly big noMargin"><i class="material-icons">clear</i>'
 						+ '</button></div></h1><div id="members"></div>'
-						+ '<input type="text" id="addMemberBox"> <button id="addMember">'
+						+ '<select id="addMemberBox">';
+
+				// TODO: Figure out a better way to deal with authorship...
+				for(var a in authors) {
+					modalHTML += '<option value="' + authors[a]['username'] + '">'
+							+ authors[a]['username'] + '</option>';
+				}
+
+				modalHTML += '</select> <button id="addMember">'
 						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
-						+ '</div>');
+						+ '</div>';
+
+				$body.append(modalHTML);
 
 				var $membersList = $('#members');
+				$('#addMemberBox').select2();
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
 					for (var u in data['users']) {
@@ -480,49 +490,18 @@ block scripts
 
 				$('#addMember').click(function () {
 					var usernameToAdd = $('#addMemberBox').val();
+					socket.emit('userAdd', { username: usernameToAdd, conversationID: convID });
 
-					$.ajax({
-						url: '/conversation_users/' + convID + '/',
-						method: 'PUT',
-						data: {
-							username: usernameToAdd
-						}
-					}).done(function (data) {
-						$.get('/conversation_users/' + convID + '/').done(function (data) {
-							$membersList.html('');
-							for (var u in data['users']) {
-								$membersList.append('<div class="member" data-username="'
-										+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-										+ ' <button class="deleteMember iconOnly transparent">'
-										+ '<i class="material-icons">clear</i></button></div>');
-							}
-						});
-					});
+					$membersList.append('<div class="member" data-username="'
+							+ usernameToAdd + '">' + usernameToAdd
+							+ ' <button class="deleteMember iconOnly transparent">'
+							+ '<i class="material-icons">clear</i></button></div>');
 				});
 
 				$body.on('click', '.deleteMember', function () {
-					$.ajax({
-						url: '/conversation_users/' + convID + '/',
-						method: 'DELETE',
-						data: {
-							username: $(this).parent().data('username')
-						}
-					}).done(function (data) {
-						$.get('/conversation_users/' + convID + '/').done(function (data) {
-							$membersList.html('');
-							for (var u in data['users']) {
-								if (data['users'].length > 1) {
-									$membersList.append('<div class="member" data-username="'
-											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-											+ ' <button class="deleteMember">Delete</button></div>');
-								} else {
-									$membersList.append('<div class="member" data-username="'
-											+ data['users'][u]['username'] + '">' + data['users'][u]['username']
-											+ '</div>');
-								}
-							}
-						});
-					});
+					var usernameToRemove = $(this).parent().data('username');
+					socket.emit('userRemove', { username: usernameToRemove, conversationID: convID });
+					$(this).parent().remove();
 				});
 
 				$('#closeModal, #modalBackground').click(function () {
@@ -557,6 +536,7 @@ block scripts
 			});
 
 			$(window).on('beforeunload', function (event) {
+				onMouseUp(event);
 				socket.emit('removeUser', {user: #{user.id}, conversationID: convID});
 				socket.disconnect();
 			});
@@ -572,9 +552,13 @@ block scripts
 
 			$brushSizeRange.change();
 
-			socket.emit('addUser', { user: #{user.id}, conversationID: convID});
+			socket.emit('userJoin', { user: #{user.id}, conversationID: convID});
 
-			refreshMessages(true);
+			// TODO: Handle add/remove with sockets
+			$.get('/users_data/').done(function (data) {
+				authors = data['users'];
+				refreshMessages(true);
+			});
 
 			if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
 				Notification.requestPermission();
@@ -602,13 +586,24 @@ block scripts
 
 			socket.on('changeName', function (name) {
 				// TODO: Incorporate whether or not it's being edited...
+
+				displayMetaMessage('The conversation name was changed to "' + name + '"');
 			});
 
-			socket.on('addUser', function (data) {
-				console.log(data + ' joined');
+			socket.on('userAdd', function (data) {
+				authors[data.id] = data;
+				displayMetaMessage(data.username + ' was added to the conversation.');
 			});
-			socket.on('removeUser', function (data) {
-				console.log(data + ' left');
+			socket.on('userRemove', function (data) {
+				delete authors[data.id];
+				displayMetaMessage(data.username + ' was removed from the conversation.');
+			});
+
+			socket.on('userJoin', function (data) {
+				// TODO: Some form of indication that the user is viewing the chat
+			});
+			socket.on('userLeave', function (data) {
+				// TODO: Some form of indication that the user is no longer viewing the chat
 			});
 		});
 

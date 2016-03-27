@@ -5,5 +5,9 @@ block vars
 
 block content
 	div#profile
-		img#avatar(src='http://placehold.it/384x384')
+		if profile.avatar
+			img#avatar(src='#{profile.avatar}')
+		else
+			img#avatar
+			// TODO: No avatar, want to create one?
 		h1#name #{profile.username}
