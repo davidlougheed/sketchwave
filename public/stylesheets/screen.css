@@ -532,15 +532,13 @@ div#conversation section#drawPanel div#scrollIt {
 	padding-bottom: 20px;
 }
 
-div#conversation section#drawPanel canvas#drawCanvas {
+div#conversation section#drawPanel canvas#drawCanvas,
+form#formSignUp div#avatarContainer canvas#avatarCanvas {
 	display: block;
-	margin: 20px auto 0 auto;
 	box-sizing: border-box;
 
 	background-color: white;
-	border: 1px solid #bbb;
-	border-radius: 4px;
-	border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+	border: 1px solid #bdbdbd;
 
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	cursor: none;
@@ -556,6 +554,16 @@ div#conversation section#drawPanel canvas#drawCanvas {
 	user-select: none;
 
 	max-width: 100%;
+}
+div#conversation section#drawPanel canvas#drawCanvas {
+	margin: 20px auto 0 auto;
+
+	border-radius: 4px;
+	border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+}
+form#formSignUp div#avatarContainer canvas#avatarCanvas {
+	margin: 20px auto;
+	border-radius: 100%;
 }
 
 div#conversation section#drawPanel div#commands {
@@ -574,37 +582,49 @@ div#conversation section#drawPanel div#commands {
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
 }
 
-div#conversation section#drawPanel div#tools {
+div#conversation section#drawPanel div#tools,
+form#formSignUp div#avatarContainer div#tools {
 	position: relative;
 	z-index: 2;
 
 	box-sizing: border-box;
 	display: inline-block;
 	width: 100%;
+
+	background-color: #f1f1ef;
+	border: 1px solid #bdbdbd;
+	border-radius: 3px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+div#conversation section#drawPanel div#tools {
 	max-width: 482px;
 	padding: 15px 15px 10px 15px;
 
-	background-color: #e9e9e7;
-	border: 1px solid #bbb;
 	border-top: none;
-	border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+	border-top-left-radius: 0; border-top-right-radius: 0;
 }
-div#conversation section#drawPanel div#tools h3 {
+form#formSignUp div#avatarContainer div#tools {
+	max-width: 482px;
+	padding: 15px;
+}
+div#conversation section#drawPanel div#tools h3,
+form#formSignUp div#avatarContainer div#tools h3 {
 	color: #666;
 	font-family: "Open Sans", sans-serif;
 	font-size: 0.95rem;
 	font-weight: normal;
 	margin: 0;
 }
-div#conversation section#drawPanel div#tools ul {
+div#conversation section#drawPanel div#tools ul,
+form#formSignUp div#avatarContainer div#tools ul {
 	list-style: none;
 	padding: 0;
 	width: 100%;
 	margin: 0 auto 10px auto;
 	font-size: 0;
 }
-div#conversation section#drawPanel div#tools ul li {
+div#conversation section#drawPanel div#tools ul li,
+form#formSignUp div#avatarContainer div#tools ul li {
 	position: relative;
 	box-sizing: border-box;
 	width: 10.5%;
@@ -616,47 +636,63 @@ div#conversation section#drawPanel div#tools ul li {
 	border-radius: 3px;
 	background-color: #f9f9f5;
 }
-div#conversation section#drawPanel div#tools ul li:last-child {
+div#conversation section#drawPanel div#tools ul li:last-child,
+form#formSignUp div#avatarContainer div#tools ul li:last-child {
 	margin-right: 0;
 }
-div#conversation section#drawPanel div#tools ul li.active {
+div#conversation section#drawPanel div#tools ul li.active,
+form#formSignUp div#avatarContainer div#tools ul li.active {
 	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
 	border-color: orange;
 }
-div#conversation section#drawPanel div#tools ul li:active {
+div#conversation section#drawPanel div#tools ul li:active,
+form#formSignUp div#avatarContainer div#tools ul li:active {
 	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
 }
-div#conversation section#drawPanel div#tools ul li.big {
-	width: 14.65%;
+div#conversation section#drawPanel div#tools ul li.big,
+form#formSignUp div#avatarContainer div#tools ul li.big {
 	margin: 0 1%;
 	vertical-align: top;
 }
+div#conversation section#drawPanel div#tools ul li.big { width: 14.65%; }
+form#formSignUp div#avatarContainer div#tools ul li.big { width: 23%; text-align: center; }
 div#conversation section#drawPanel div#tools ul li#hotkey {
 	font-size: 24px;
 	line-height: 37px;
 	color: black;
 }
-div#conversation section#drawPanel div#tools ul li.big img {
+div#conversation section#drawPanel div#tools ul li.big img,
+form#formSignUp div#avatarContainer div#tools ul li.big img {
 	max-width: 100%;
 	max-height: 26px;
 }
-div#conversation section#drawPanel div#tools ul li i {
+div#conversation section#drawPanel div#tools ul li i,
+form#formSignUp div#avatarContainer div#tools ul li i {
 	margin-top: 4px;
 	vertical-align: top;
 	font-size: 18px;
 	width: 18px;
 	color: #666;
 }
-div#conversation section#drawPanel div#tools ul li#white { background-color: #FFF; }
-div#conversation section#drawPanel div#tools ul li#grey { background-color: #808080; }
-div#conversation section#drawPanel div#tools ul li#black { background-color: #000; }
-div#conversation section#drawPanel div#tools ul li#red { background-color: #F00; }
-div#conversation section#drawPanel div#tools ul li#hotPink { background-color: #FF69B4; }
-div#conversation section#drawPanel div#tools ul li#yellow { background-color: #FFFF00; }
-div#conversation section#drawPanel div#tools ul li#blue { background-color: #00F; }
-div#conversation section#drawPanel div#tools ul li#green { background-color: #0F0; }
+div#conversation section#drawPanel div#tools ul li#white,
+form#formSignUp div#avatarContainer div#tools ul li#white { background-color: #FFF; }
+div#conversation section#drawPanel div#tools ul li#grey,
+form#formSignUp div#avatarContainer div#tools ul li#grey { background-color: #808080; }
+div#conversation section#drawPanel div#tools ul li#black,
+form#formSignUp div#avatarContainer div#tools ul li#black { background-color: #000; }
+div#conversation section#drawPanel div#tools ul li#red,
+form#formSignUp div#avatarContainer div#tools ul li#red { background-color: #F00; }
+div#conversation section#drawPanel div#tools ul li#hotPink,
+form#formSignUp div#avatarContainer div#tools ul li#hotPink { background-color: #FF69B4; }
+div#conversation section#drawPanel div#tools ul li#yellow,
+form#formSignUp div#avatarContainer div#tools ul li#yellow { background-color: #FFFF00; }
+div#conversation section#drawPanel div#tools ul li#blue,
+form#formSignUp div#avatarContainer div#tools ul li#blue { background-color: #00F; }
+div#conversation section#drawPanel div#tools ul li#green,
+form#formSignUp div#avatarContainer div#tools ul li#green { background-color: #0F0; }
 
-div#conversation section#drawPanel div#tools div#brushSize input[type="range"] {
+div#conversation section#drawPanel div#tools div#brushSize input[type="range"],
+form#formSignUp div#avatarContainer div#tools div#brushSize input[type="range"] {
 	width: 100%;
 }
 
@@ -1054,109 +1090,6 @@ form#formSignUp h2 {
 	text-align: center;
 	color: #444;
 }
-form#formSignUp div#avatarContainer canvas#avatarCanvas {
-	display: block;
-	margin: 20px auto;
-	box-sizing: border-box;
-
-	background-color: white;
-	border: 1px solid #bdbdbd;
-	border-radius: 100%;
-
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-	cursor: none;
-
-	-ms-interpolation-mode: nearest-neighbor;
-	image-rendering: optimizeSpeed;
-	image-rendering: -moz-crisp-edges;
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: optimize-contrast;
-
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	user-select: none;
-
-	max-width: 100%;
-}
-
-form#formSignUp div#avatarContainer div#tools {
-	position: relative;
-	z-index: 2;
-
-	box-sizing: border-box;
-	display: inline-block;
-	width: 100%;
-	max-width: 482px;
-	padding: 15px;
-
-	background-color: #f1f1ef;
-	border: 1px solid #bdbdbd;
-	border-radius: 3px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-form#formSignUp div#avatarContainer div#tools h3 {
-	color: #666;
-	font-family: "Open Sans", sans-serif;
-	font-size: 0.95rem;
-	font-weight: normal;
-	margin: 0;
-}
-form#formSignUp div#avatarContainer div#tools ul {
-	list-style: none;
-	padding: 0;
-	width: 100%;
-	margin: 0 auto 10px auto;
-	font-size: 0;
-}
-form#formSignUp div#avatarContainer div#tools ul li {
-	position: relative;
-	box-sizing: border-box;
-	width: 10.5%;
-	margin-right: 2%;
-	padding: 4px;
-	height: 36px;
-	display: inline-block;
-	border: 1px solid #bbb;
-	border-radius: 3px;
-	background-color: #f9f9f5;
-}
-form#formSignUp div#avatarContainer div#tools ul li:last-child {
-	margin-right: 0;
-}
-form#formSignUp div#avatarContainer div#tools ul li.active {
-	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
-	border-color: orange;
-}
-form#formSignUp div#avatarContainer div#tools ul li:active {
-	box-shadow: inset 0px 1px 5px rgba(0, 0, 0, 0.4);
-}
-form#formSignUp div#avatarContainer div#tools ul li.big {
-	width: 23%;
-	margin: 0 1%;
-	vertical-align: top;
-	text-align: center;
-}
-form#formSignUp div#avatarContainer div#tools ul li.big img {
-	max-width: 100%;
-	max-height: 26px;
-}
-form#formSignUp div#avatarContainer div#tools ul li i {
-	margin-top: 4px;
-	vertical-align: top;
-	font-size: 18px;
-	width: 18px;
-	color: #666;
-}
-form#formSignUp div#avatarContainer div#tools ul li#white { background-color: #FFF; }
-form#formSignUp div#avatarContainer div#tools ul li#grey { background-color: #808080; }
-form#formSignUp div#avatarContainer div#tools ul li#black { background-color: #000; }
-form#formSignUp div#avatarContainer div#tools ul li#red { background-color: #F00; }
-form#formSignUp div#avatarContainer div#tools ul li#hotPink { background-color: #FF69B4; }
-form#formSignUp div#avatarContainer div#tools ul li#yellow { background-color: #FFFF00; }
-form#formSignUp div#avatarContainer div#tools ul li#blue { background-color: #00F; }
-form#formSignUp div#avatarContainer div#tools ul li#green { background-color: #0F0; }
-
-form#formSignUp div#avatarContainer div#tools div#brushSize input[type="range"] { width: 100%; }
 
 /*** SELECT2 OVERRIDES ***/
 
