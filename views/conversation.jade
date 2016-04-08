@@ -28,49 +28,37 @@ block scripts
 			$messagesContainer.append('<div class="loader" '
 				+ 'style="position: absolute; left: 50%; margin-left: -23px; margin-top: 50px;"></div>');
 
-			$.post('/stamps/', {conversationID: convID}).done(function (data) {
-				for (var s in data['stamps']) {
-					stamps = data['stamps'];
+			$.get('/conversation/' + convID + '/stamps/').done(function (data) {
+				for(var s in data['stamps']) {
+					stamps[data['stamps'][s]['id']] = data['stamps'][s];
 				}
 			});
 
 			$cursor.hide();
 
-			var drawCanvas = document.getElementById('drawCanvas');
-			var ctx = drawCanvas.getContext('2d');
-			ctx.mozImageSmoothingEnabled = false;
-			ctx.webkitImageSmoothingEnabled = false;
-			ctx.msImageSmoothingEnabled = false;
-			ctx.imageSmoothingEnabled = false;
-			var paint = false;
+			var $canvas = $('#drawCanvas');
+			var drawCanvas = new SWCanvas('drawCanvas');
+			
 			var hover = false;
 
-			var brushColor = '#ff0000';
-			var brushSize = 5;
-			var toolType = 'brush';
-			var stamp = 'dolphin';
+			// TODO: Optimize small avatars
+			var displayMessage = function (userID, imageData, date, immediate) {
+				var messageHTML = '<div class="message"><div class="topBar"><div class="author">';
 
-			var clickX = [];
-			var clickY = [];
-			var clickDrag = [];
-			var clickColor = [];
-			var clickSize = [];
-			var tool = [];
+				if(authors[userID]['avatar']) {
+					messageHTML += '<img src="' + authors[userID]['avatar'] + '">';
+				}
 
-			var stampTypes = [];
-
-			var background = null;
-
-			var displayMessage = function (username, imageData, date, immediate) {
-				$messagesContainer.append('<div class="message">'
-						+ '<div class="topBar"><div class="author"><img src="http://placehold.it/36x36"><span>'
-						+ username + '</span></div><div class="date">'
+				messageHTML += '<span>'
+						+ authors[userID]['username'] + '</span></div><div class="date">'
 						+ date + '</div></div>'
 						+ '<div class="image">'
 						+ '<img src="' + imageData + '">'
 						+ '</div><div class="controls"><button class="importToCanvas transparent noMargin">'
 						+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>'
-						+ '</div>');
+						+ '</div>';
+
+				$messagesContainer.append(messageHTML);
 
 				if (immediate) {
 					$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
@@ -84,24 +72,6 @@ block scripts
 				$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
 			};
 
-			var clearAllCanvasData = function (backgroundClear) {
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				clickX = [];
-				clickY = [];
-				clickDrag = [];
-				clickColor = [];
-				clickSize = [];
-				tool = [];
-				stampTypes = [];
-				if (backgroundClear) {
-					background = null;
-				}
-			};
-
-			var moveImageDataToBg = function () {
-				background = drawCanvas.toDataURL();
-			};
-
 			var refreshMessages = function (immediate) {
 				$.get('/conversation_data/' + convID.toString()).then(function (data) {
 					// TODO: If not editing
@@ -111,182 +81,107 @@ block scripts
 						for (var m = pastMessages; m < data['messages'].length; m++) {
 							var rawDate = data['messages'][m]['createdAt'];
 							var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
-							displayMessage(authors[data['messages'][m]['UserId']]['username'],
-									data['messages'][m]['imageData'], formattedDate, immediate);
+							displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+									formattedDate, immediate);
 						}
 
 						pastMessages = data['messages'].length;
 					}
+
+					// TODO: This is a temporary hack for images being done loading
+
+					window.setTimeout(function () {
+						$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+					}, 100);
 
 					// Done loading, get rid of the loading animation thing
 					$messagesContainer.children('.loader').first().remove();
 				});
 			};
 
-			var redraw = function () {
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				if (background) {
-					var bgImage = document.createElement('img');
-					bgImage.setAttribute('src', background);
-					ctx.drawImage(bgImage, 0, 0, 480, 320);
-				}
-				ctx.lineJoin = 'round';
-
-				for (var i = 0; i < clickX.length; i++) {
-					if (tool[i] == 'brush') {
-						// make brush size feel more natural
-						ctx.lineWidth = (Math.pow(clickSize[i] / 320, 1.75) * 160) + 1;
-						ctx.strokeStyle = clickColor[i];
-
-						ctx.beginPath();
-
-						if (clickDrag[i] && i != 0) {
-							ctx.moveTo(clickX[i - 1], clickY[i - 1]);
-						} else {
-							ctx.moveTo(clickX[i] - 1, clickY[i]);
-						}
-
-						ctx.lineTo(clickX[i], clickY[i]);
-						ctx.closePath();
-						ctx.stroke();
-					} else {
-						if (stampTypes[i]) {
-							var size = clickSize[i] * 1.5;
-							if (stampTypes[i] == 'hotswap') {
-								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - Math.round(size / 2),
-										clickY[i] - Math.round(size / 3), size, size / 1.5);
-							} else {
-								ctx.drawImage($('#' + stampTypes[i] + ' img')[0], clickX[i] - (clickSize[i] / 2),
-										clickY[i] - (clickSize[i] / 2), clickSize[i], clickSize[i]);
-							}
-						}
-					}
-				}
-			};
-
-			var addPoint = function (x, y, dragging) {
-				clickX.push(x);
-				clickY.push(y);
-				clickDrag.push(dragging);
-				clickColor.push(brushColor);
-				clickSize.push(brushSize);
-
-				tool.push(toolType);
-
-				if (toolType == 'brush') {
-					stampTypes.push(null);
-				} else {
-					stampTypes.push(stamp);
-				}
-			};
-
 			var drawCursor = function (x, y) {
 				$cursor.css({'top': (y - 112).toString() + 'px', 'left': x.toString() + 'px'});
 			};
 
-			$(drawCanvas).on('mousedown', function (event) {
-				var mouseX = event.pageX - $(this).offset().left;
-				var mouseY = event.pageY - $(this).offset().top;
+			$canvas.on('mousedown', function (event) {
+				var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
 
-				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
-				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+				drawCanvas.startPainting();
 
-				paint = true;
-
-				addPoint(scaledMouseX, scaledMouseY, false);
-				redraw();
+				drawCanvas.addPoint(mCoords.x, mCoords.y, false);
+				drawCanvas.redraw();
 			});
-			$(drawCanvas).on('touchstart', function (event) {
+			$canvas.on('touchstart', function (event) {
 				var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+				var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
 
-				var mouseX = touch.pageX - $(this).offset().left;
-				var mouseY = touch.pageY - $(this).offset().top;
+				drawCanvas.startPainting();
 
-				var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
-				var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
-
-				paint = true;
-
-				addPoint(scaledMouseX, scaledMouseY, false);
-				redraw();
+				drawCanvas.addPoint(mCoords.x, mCoords.y, false);
+				drawCanvas.redraw();
 			});
-			$(drawCanvas).on('mousemove', function (event) {
-				if (paint) {
-					var mouseX = event.pageX - $(this).offset().left;
-					var mouseY = event.pageY - $(this).offset().top;
+			$canvas.on('mousemove', function (event) {
+				if (drawCanvas.paint) {
+					var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
 
-					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
-					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
+					drawCanvas.addPoint(mCoords.x, mCoords.y, true);
 
-					addPoint(scaledMouseX, scaledMouseY, true);
-					redraw();
+					// FOR THE FUTURE
+					/*if(points.length > 100) {
+						imageToBg();
+						clearPoints();
+					}*/
+
+					drawCanvas.redraw();
 				}
 
 				if (hover) {
 					drawCursor(event.pageX, event.pageY);
 				}
 			});
-			$(drawCanvas).on('touchmove', function (event) {
+			$canvas.on('touchmove', function (event) {
 				event.preventDefault();
 
-				if (paint) {
+				if (drawCanvas.paint) {
 					var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+					var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
 
-					var mouseX = touch.pageX - $(this).offset().left;
-					var mouseY = touch.pageY - $(this).offset().top;
-
-					var scaledMouseX = Math.round(mouseX / ($(drawCanvas).width() / 480.0));
-					var scaledMouseY = Math.round(mouseY / ($(drawCanvas).height() / 320.0));
-
-					addPoint(scaledMouseX, scaledMouseY, true);
-					redraw();
+					drawCanvas.addPoint(mCoords.x, mCoords.y, true);
+					drawCanvas.redraw();
 				}
 			});
 
 			var onMouseUp = function (event) {
-				paint = false;
-				moveImageDataToBg();
-				if (background) {
-					var bgImage = document.createElement('img');
-					bgImage.setAttribute('src', background);
-					bgImage.onload = function () {
-						clearAllCanvasData(false);
-						ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-						ctx.drawImage(bgImage, 0, 0, 480, 320);
-					};
-				}
+				drawCanvas.stopPainting();
+				drawCanvas.imageToBg();
 			};
 
-			$(drawCanvas).on('mouseup', onMouseUp);
-			$(drawCanvas).on('touchend', function (event) {
+			$canvas.on('mouseup', onMouseUp);
+			$canvas.on('touchend', function (event) {
 				event.preventDefault();
-
 				onMouseUp(event);
 			});
-			$(drawCanvas).on('mouseleave', function (event) {
-				paint = false;
+			$canvas.on('mouseleave', function (event) {
+				drawCanvas.stopPainting();
 				hover = false;
 				$cursor.hide();
 			});
 
-			$(drawCanvas).on('mouseenter', function (event) {
-				var mouseX = event.pageX - $(this).offset().left;
-				var mouseY = event.pageY - $(this).offset().top;
-
+			$canvas.on('mouseenter', function (event) {
 				hover = true;
 				$cursor.show();
 				drawCursor(event.pageX, event.pageY);
 			});
 
 			$('.colorTool').click(function () {
-				toolType = 'brush';
-				brushColor = $(this).css('backgroundColor');
+				drawCanvas.updateBrush({
+					tool: 'brush',
+					color: $(this).css('backgroundColor')
+				});
 
 				$brushSizeRange.change(); // Refresh size, make sure it's correct
 
-				$(this).parent().children('li').each(function () {
-					$(this).removeClass('active');
-				});
+				$(this).parent().children('li').each(function () { $(this).removeClass('active'); });
 				$(this).addClass('active');
 
 				$(this).parent().parent().children('#images').children('li').each(function () {
@@ -294,14 +189,14 @@ block scripts
 				});
 			});
 			$('.stampTool').click(function () {
-				toolType = 'stamp';
-				stamp = $(this).attr('id');
+				drawCanvas.updateBrush({
+					tool: 'stamp',
+					stamp: $(this).attr('id')
+				});
 
 				$brushSizeRange.change(); // Refresh size, make sure it's correct
 
-				$(this).parent().children('li').each(function () {
-					$(this).removeClass('active');
-				});
+				$(this).parent().children('li').each(function () { $(this).removeClass('active'); });
 				$(this).addClass('active');
 
 				$(this).parent().parent().children('#colors').children('li').each(function () {
@@ -309,20 +204,16 @@ block scripts
 				});
 			});
 
-			$brushSizeRange.on('input change', function () {
-				brushSize = Math.round(($(this).val() / 100.0) * 320);
-			});
+			$brushSizeRange.on('input change', function () { drawCanvas.setBrushSize($(this).val()); });
 
-			$('#clear').click(function () {
-				clearAllCanvasData(true);
-			});
+			$('#clear').click(function () { drawCanvas.clearAllCanvasData(true); });
 			$('#send').click(function () {
 				var messageData = {
-					'imageData': drawCanvas.toDataURL(),
-					'conversationID': convID
+					imageData: drawCanvas.canvas.toDataURL(),
+					conversationID: convID
 				};
 
-				clearAllCanvasData(true);
+				drawCanvas.clearAllCanvasData(true);
 				socket.emit('newMessage', messageData);
 				pastMessages += 1;
 
@@ -332,44 +223,40 @@ block scripts
 					}
 				}
 
-				displayMessage('#{user.username}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"));
+				displayMessage('#{user.id}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"));
 			});
 
 			$('#stampIt').click(function () {
-				var messageData = {
-					'imageData': drawCanvas.toDataURL(),
-					'conversationID': convID
-				};
+				socket.emit('stampAdd', {
+					imageData: drawCanvas.canvas.toDataURL(),
+					conversationID: convID
+				});
 
-				$.post('/stamp/', messageData).done(function (data) {
-					$body.append('<div id="modalBackground"></div>');
-					$body.append('<div id="modal"><h1>Stamp was added!</h1>'
-							+ '<button id="okay">Okay</button>'
-							+ '</div>');
-					$('#okay, #modalBackground').click(function () {
-						$('#modal').fadeOut('fast', function () {
-							$(this).remove();
-						});
-						$('#modalBackground').fadeOut('fast', function () {
-							$(this).remove();
-						});
+				$body.append('<div id="modalBackground"></div>');
+				$body.append('<div id="modal"><h1>Stamp was added!</h1>'
+						+ '<button id="okay">Okay</button>'
+						+ '</div>');
+				$('#okay, #modalBackground').click(function () {
+					$('#modal').fadeOut('fast', function () {
+						$(this).remove();
+					});
+					$('#modalBackground').fadeOut('fast', function () {
+						$(this).remove();
 					});
 				});
 			});
 
 			$('#hotkey').click(function () {
 				var refreshStamps = function () {
-					$.post('/stamps/', {conversationID: convID}).done(function (data) {
-						for (var s in data['stamps']) {
-							var stampHTML = '<div class="stamp" data-id="' + data['stamps'][s]['id']
-									+ '"><img src="' + data['stamps'][s]['imageData'] + '">';
-							if (data['stamps'][s]['UserId'] == (#{user.id}).toString()) {
-								stampHTML += '<button class="stampDelete transparent noMargin big iconOnly"><i class="material-icons">delete</i></button>';
-							}
-							stampHTML += '</div>';
-							$('#stamps').append(stampHTML);
+					for (var s in stamps) {
+						var stampHTML = '<div class="stamp" data-id="' + stamps[s]['id']
+								+ '"><img src="' + stamps[s]['imageData'] + '">';
+						if (stamps[s]['UserId'] == (#{user.id}).toString()) {
+							stampHTML += '<button class="stampDelete transparent noMargin big iconOnly"><i class="material-icons">delete</i></button>';
 						}
-					});
+						stampHTML += '</div>';
+						$('#stamps').append(stampHTML);
+					}
 				};
 
 				$body.append('<div id="modalBackground"></div>');
@@ -383,13 +270,14 @@ block scripts
 
 				$body.on('click', '.stampDelete', function (event) {
 					event.stopPropagation();
-					$.ajax({
-						url: '/stamp/' + $(this).parent().data('id') + '/',
-						method: 'DELETE'
-					}).done(function (data) {
-						$('#stamps').html('<div class="stamp"><img src="/images/sciencerules.png"></div>');
-						refreshStamps();
+
+					// TODO: Are you sure???
+
+					socket.emit('stampRemove', {
+						conversationID: convID,
+						stampID: $(this).parent().data('id')
 					});
+					$(this).parent().remove();
 				});
 
 				$('#closeModal, #modalBackground').click(function () {
@@ -415,10 +303,10 @@ block scripts
 			});
 
 			$body.on('click', '.importToCanvas', function (event) {
-				background = $(this).parent().parent()
+				drawCanvas.background = $(this).parent().parent()
 						.children('div.image').first().children('img').first().attr('src');
-				clearAllCanvasData(false);
-				redraw();
+				drawCanvas.clearAllCanvasData(false);
+				drawCanvas.redraw();
 			});
 
 			$('#changeName').click(function () {
@@ -569,7 +457,7 @@ block scripts
 					var rawDate = data['createdAt'];
 					var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 
-					displayMessage(authors[data['UserId']]['username'], data['imageData'], formattedDate);
+					displayMessage(data['UserId'], data['imageData'], formattedDate);
 
 					if (!document.hasFocus() && authors[data['UserId']] != #{user.id}) {
 						if (Notification.permission === 'granted') {
@@ -582,6 +470,13 @@ block scripts
 						}
 					}
 				}
+			});
+
+			socket.on('stampAdd', function (stamp) {
+				stamps[stamp['id']] = stamp;
+			});
+			socket.on('stampRemove', function (stamp) {
+				delete stamps[stamp];
 			});
 
 			socket.on('changeName', function (name) {
@@ -628,7 +523,7 @@ block content
 
 		section#drawPanel
 			div#scrollIt
-				canvas#drawCanvas(height='320', width='480')
+				canvas#drawCanvas(height='320', width='480', style='width: 480px; height: 320px;')
 
 				div#tools
 					ul#colors

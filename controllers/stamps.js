@@ -1,77 +1,78 @@
 'use strict';
 
 module.exports.controller = function (objects) {
-	objects.router.post('/stamp/', function (req, res) {
-		//TODO: Handle errors properly
-
+	objects.router.get('/conversation/:id/stamps/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
-		if (!req.body) {
-			return res.send({ success: false, error: 'no_body' });
-		}
-
-		// TODO: Authenticate user for stamp creation!!!
-
-		objects.models.Stamp.create({
-			imageData: req.body.imageData,
-			UserId: parseInt(req.user.id),
-			ConversationId: parseInt(req.body.conversationID)
-		}).then(function (stamp) {
-			// TODO: make this work...
-			// objects.io.of('conversation' + req.body.conversationID.toString())
-			//	.emit('addStamp', stamp.toJSON());
-			res.send({ success: true });
-		});
-	});
-	objects.router.delete('/stamp/:id/', function (req, res) {
-		//TODO: Handle errors properly
-		//TODO: DONT LET YOU DELETE UNLESS YOU HAVE PERMISSION!!!!!!
-
-		res.setHeader('Content-Type', 'application/json');
-
-		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
-		}
-		if (!req.body) {
-			return res.send({ success: false, error: 'no_body' });
-		}
-
-		objects.models.Stamp.findOne({
-			where: {
-				id: parseInt(req.params.id)
-			}
-		}).then(function (stamp) {
-			if(stamp.UserId != req.user.id) {
-				return res.send({ success: false, error: 'wrong person' });
-			}
-
-			stamp.destroy();
-
-			// TODO: emit a stamp destroy socket message
-
-			return res.send({ success: true });
-		});
-	});
-
-	objects.router.post('/stamps/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
-		}
-		if (!req.body) {
-			return res.send({ success: false, error: 'no_body' });
+		if (!req.params.id) {
+			return res.send({ success: false, error: 'no_params' });
 		}
 
 		objects.models.Stamp.findAll({
 			where: {
-				ConversationId: req.body.conversationID
+				ConversationId: req.params.id
 			}
 		}).then(function (stamps) {
 			return res.send({ success: true, stamps: stamps });
 		})
+	});
+
+	objects.io.on('connection', function (socket) {
+		socket.on('stampAdd', function (data) {
+			if (socket.request.session.passport.user) {
+				objects.models.Conversation.findOne({
+					where: {
+						id: parseInt(data.conversationID)
+					}
+				}).then(function (conversation) {
+					conversation.getUsers({
+						where: {
+							id: socket.request.session.passport.user
+						}
+					}).then(function (users) {
+						if (users != null && users.length > 0) {
+							objects.models.Stamp.create({
+								imageData: data.imageData,
+								UserId: parseInt(users[0].id),
+								ConversationId: conversation.id
+							}).then(function (stamp) {
+								objects.io.to('conversation' + conversation.id.toString())
+									.emit('stampAdd', stamp.toJSON());
+							});
+						}
+					});
+				});
+			}
+		});
+		socket.on('stampRemove', function (data) {
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						objects.models.Stamp.findOne({
+							where: {
+								id: parseInt(data.stampID)
+							}
+						}).then(function (stamp) {
+							if(stamp.UserId === users[0].id) {
+								objects.io.to('conversation' + conversation.id.toString())
+									.emit('stampRemove', stamp.id);
+								stamp.destroy();
+							}
+						});
+					}
+				});
+			});
+		});
 	});
 };

@@ -16,43 +16,47 @@ block scripts
 				$.get('/conversations_data/').done(function (data) {
 					$conversations.html('');
 					for (var c in data['conversations']) {
-						var rawDate = data['conversations'][c]['lastMessage'];
-						var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
-						if(rawDate == null) {
-							formattedDate = 'No posts yet.';
-						}
-						var users = data['users'][c];
-						var userList = '';
-
-						for (var u in data['users'][c]) {
-							userList += data['users'][c][u]['username'];
-							if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
-								userList += ', ';
+						if(data['conversations'].hasOwnProperty(c)) {
+							var rawDate = data['conversations'][c]['lastMessage'];
+							var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
+							if (rawDate == null) {
+								formattedDate = 'No posts yet.';
 							}
+							var users = data['users'][c];
+							var userList = '';
+
+							for (var u in data['users'][c]) {
+								if(data['users'][c].hasOwnProperty(u)) {
+									userList += data['users'][c][u]['username'];
+									if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
+										userList += ', ';
+									}
+								}
+							}
+
+							var conversationID = data['conversations'][c]['id'];
+
+							var conversationHTML = '<li class="conversation'
+									+ ((data['users'][c].length == 1) ? ' deletable' : '')
+									+ '" data-id="' + conversationID
+									+ '" id="conversation-'
+									+ conversationID + '"><div class="link"><a href="/conversation/'
+									+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
+									+ '<div class="date">Last message posted: ' + formattedDate + '</div>'
+									+ '<div class="memberList"><strong>Members:</strong> '
+									+ '<span class="members">' + userList + '</span></div> ';
+
+
+							if (data['users'][c].length == 1) {
+								conversationHTML += '<div class="controls">'
+										+ '<button class="delete transparent iconOnly noMargin">'
+										+ '<i class="material-icons">clear</i></button></div>';
+							}
+
+							conversationHTML += '</li>';
+
+							$conversations.append(conversationHTML);
 						}
-
-						var conversationID = data['conversations'][c]['id'];
-
-						var conversationHTML = '<li class="conversation'
-								+ ((data['users'][c].length == 1) ? ' deletable' : '')
-								+ '" data-id="' + conversationID
-								+ '" id="conversation-'
-								+ conversationID + '"><div class="link"><a href="/conversation/'
-								+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
-								+ '<div class="date">Last message posted: ' + formattedDate + '</div>'
-								+ '<div class="memberList"><strong>Members:</strong> '
-								+ '<span class="members">' + userList + '</span></div> ';
-
-
-						if(data['users'][c].length == 1) {
-							conversationHTML += '<div class="controls">'
-									+ '<button class="delete transparent iconOnly noMargin">'
-									+ '<i class="material-icons">clear</i></button></div>';
-						}
-
-						conversationHTML += '</li>';
-
-						$conversations.append(conversationHTML);
 					}
 				});
 			};
@@ -61,9 +65,11 @@ block scripts
 				$names.html('');
 
 				for(var u in data['users']) {
-					if(data['users'][u]['id'] != #{user.id})
-						$names.append('<option value="' + data['users'][u]['username'] + '">'
-								+ data['users'][u]['username'] + '</option>');
+					if(data['users'].hasOwnProperty(u)) {
+						if (data['users'][u]['id'] != #{user.id})
+							$names.append('<option value="' + data['users'][u]['username'] + '">'
+									+ data['users'][u]['username'] + '</option>');
+					}
 				}
 
 				$names.select2();
