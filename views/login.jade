@@ -3,8 +3,21 @@ extends base.jade
 block vars
 	- var footer = true
 
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			$('#btnSignUp').on('click touchstart', function () {
+				window.location.replace('/signup/');
+			});
+		});
+
 block content
-	h1#bigForm  Log In
+	h1#bigForm
+		span Log In
+		div#controls
+			button#btnSignUp.transparent
+				i.material-icons person_add
+				span Sign Up
 	form#formLogIn(method='post')
 		if error != ''
 			div.siteMessage.error #{error}
