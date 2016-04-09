@@ -14,6 +14,7 @@ module.exports.controller = function (objects) {
 
             for(var u in users) {
                 var userData = users[u].toJSON();
+				if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 				delete userData['password'];
                 usersData[userData['id']] = userData;
             }
@@ -37,6 +38,26 @@ module.exports.controller = function (objects) {
 				user: req.user, // The currently signed-in user
 				profile: userJSON // User who's profile someone is viewing
 			});
+		});
+	});
+
+	objects.router.post('/user/:id/avatar/', function (req, res) {
+		if(!req.isAuthenticated()) {
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		}
+
+		objects.models.User.findOne({where: {
+			id: parseInt(req.params.id)
+		}
+		}).then(function (user) {
+			if(req.user.id == req.params.id) {
+				user.avatar = req.body.imageData;
+				user.save();
+
+				return res.send({ success: true });
+			}
+
+			return res.send({ success: false });
 		});
 	});
 };

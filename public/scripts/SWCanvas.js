@@ -193,10 +193,9 @@ SWCanvas.prototype.moveImageDataToBackground = function () {
 };
 
 /**
- * Moves image date to background, then starts drawing the image on the canvas as part of the GabeSave process.
+ * Draws background from variable.
  */
-SWCanvas.prototype.imageToBg = function () {
-	this.moveImageDataToBackground();
+SWCanvas.prototype.drawBackground = function () {
 	if (this.background) {
 		var imageLoad = function (bg) {
 			this.clearAllCanvasData(false);
@@ -208,4 +207,12 @@ SWCanvas.prototype.imageToBg = function () {
 		bgImage.setAttribute('src', this.background);
 		bgImage.onload = imageLoad.bind(this, bgImage);
 	}
+};
+
+/**
+ * Moves image date to background, then starts drawing the image on the canvas as part of the GabeSave process.
+ */
+SWCanvas.prototype.imageToBg = function () {
+	this.moveImageDataToBackground();
+	this.drawBackground();
 };

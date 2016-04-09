@@ -465,10 +465,13 @@ div#conversation section#messages section#messagesContainer div.message div.topB
 	color: #555;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar div.author img {
+	box-sizing: border-box;
 	margin-right: 10px;
 	height: 36px; width: 36px;
 	border-radius: 100%;
 	vertical-align: top;
+	background-color: white;
+	border: 1px solid #e0e0e0;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar div.author span {
 	position: relative;

@@ -69,6 +69,7 @@ module.exports.controller = function (objects) {
 						for(var u in users) {
 							if (users.hasOwnProperty(u)) {
 								var userJSON = users[u].toJSON();
+								if(userJSON['avatar'] !== null) userJSON['avatar'] = users[u].avatar.toString();
 								delete userJSON['password'];
 								userList.push(userJSON);
 							}
@@ -206,6 +207,7 @@ module.exports.controller = function (objects) {
 
 						for(var u in users) {
 							var userData = users[u].toJSON();
+							if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 							delete userData['password'];
 							usersData.push(userData);
 						}
