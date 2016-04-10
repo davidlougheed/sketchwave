@@ -485,6 +485,9 @@ div#conversation section#messages section#messagesContainer div.message div.topB
 	color: #555;
 	text-decoration: none;
 }
+div#conversation section#messages section#messagesContainer div.message div.topBar div.author a:hover {
+	text-decoration: underline;
+}
 div#conversation section#messages section#messagesContainer div.message div.topBar div.date {
 	float: right;
 	color: #888;
@@ -840,19 +843,38 @@ div#modal h1 div.controls {
 	box-sizing: border-box;
 	padding: 10px 5px 10px 10px;
 	margin-bottom: 5px;
-	min-height: 44px;
+	min-height: 60px;
 
 	background-color: #fefefd;
+	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05);
 	border: 1px solid #bbb;
 	border-radius: 4px;
 
 	font-family: "Open Sans", sans-serif;
 	color: #333;
 }
+#members .member img.avatar {
+	vertical-align: top;
+	max-height: 36px;
+	max-width: 36px;
+
+	border-radius: 100%;
+	border: 1px solid #e0e0e0;
+}
+#members .member a.name {
+	display: inline-block;
+	margin-top: 7px;
+	margin-left: 10px;
+	color: #555;
+	text-decoration: none;
+}
+#members .member a.name:hover {
+	text-decoration: underline;
+}
 #members .member button {
 	float: right;
 	position: relative;
-	top: -5px;
+	top: 2px;
 }
 
 .loader {

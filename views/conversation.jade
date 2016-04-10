@@ -390,10 +390,20 @@ block scripts
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
 					for (var u in data['users']) {
-						$('#members').append('<div class="member" data-username="'
-								+ data['users'][u]['username'] + '">' + data['users'][u]['username']
+						var memberHTML = '<div class="member" data-username="'
+								+ data['users'][u]['username'] + '">';
+
+						if (data['users'][u]['avatar']) {
+							memberHTML += '<img class="avatar" src="'
+									+ data['users'][u]['avatar'] + '">';
+						}
+
+						memberHTML += '<a class="name" href="/user/' + data['users'][u]['id'] + '/">'
+								+ data['users'][u]['username'] + '</a>'
 								+ ' <button class="deleteMember iconOnly transparent">'
-								+ '<i class="material-icons">clear</i></button></div>');
+								+ '<i class="material-icons">clear</i></button></div>';
+
+						$('#members').append(memberHTML);
 					}
 				});
 
