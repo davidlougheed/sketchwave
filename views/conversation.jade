@@ -244,7 +244,7 @@ block scripts
 					}
 				}
 
-				displayMessage('#{user.id}', messageData, moment(Date.now()).format("h:mm A; MMMM D"));
+				displayMessage('#{user.id}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"), false);
 			});
 
 			$('#stampIt').click(function () {
