@@ -12,6 +12,15 @@ block scripts
 			var $conversations = $('#conversations');
 			var $names = $('#names');
 
+			var active = true;
+
+			window.setInterval(function () {
+				if (active) {
+					// Keep session alive
+					$.get('/keepalive/');
+				}
+			}, 10000);
+
 			var reloadConversations = function () {
 				$.get('/conversations_data/').done(function (data) {
 					$conversations.html('');
