@@ -221,7 +221,7 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
-	objects.router.get('/conversation_data/:id/', function (req, res) {
+	objects.router.get('/conversation_data/:id/from/:from/count/:count/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
@@ -231,7 +231,7 @@ module.exports.controller = function (objects) {
 		//TODO: Fetch conversations from database
 		objects.models.Conversation.findOne({
 			where: {
-				id: req.params.id
+				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
 			conversation.getUsers({
@@ -244,7 +244,9 @@ module.exports.controller = function (objects) {
 						where: {
 							ConversationId: conversation.id
 						},
-						order: '"createdAt" ASC'
+						order: '"createdAt" DESC',
+						offset: parseInt(req.params.from),
+						limit: parseInt(req.params.count)
 					}).then(function (messages) {
 						return res.send({ success: true, conversation: conversation, messages: messages });
 					});

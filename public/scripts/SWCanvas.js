@@ -52,7 +52,8 @@ SWCanvas.prototype.colors = {
  */
 SWCanvas.prototype.clearAllCanvasData = function (backgroundClear) {
 	this.context.clearRect(0, 0, this.cw, this.ch);
-	this.points = this.points.slice(this.points.length - 6, this.points.length);
+	// this.points = this.points.slice(this.points.length - 6, this.points.length);
+	this.points = [];
 	if (backgroundClear) {
 		this.background = null;
 	}

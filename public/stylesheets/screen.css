@@ -428,12 +428,18 @@ div#conversation section#messages header h1 div#nameChangeControls {
 	overflow: hidden;
 }
 div#conversation section#messages section#messagesContainer {
+	box-sizing: border-box;
+
 	overflow-y: auto;
 	position: absolute;
 	bottom: 0; top: 0;
 	left: 0; right: 0;
 
 	padding-top: 54px;
+}
+div#conversation section#messages section#messagesContainer button#loadMore {
+	width: calc(100% - 20px);
+	margin-top: 10px; margin-left: 10px;
 }
 div#conversation section#messages section#messagesContainer div.metaMessage {
 	margin: 40px auto;
@@ -503,8 +509,8 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: optimizeSpeed;
 	image-rendering: -moz-crisp-edges;
-	image-rendering: -webkit-pixelated;
-	image-rendering: pixelated;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: crisp-edges;
 }
 div#conversation section#messages section#messagesContainer div.message div.controls {
 	margin: auto;
@@ -551,8 +557,8 @@ div#avatarContainer canvas#avatarCanvas {
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: optimizeSpeed;
 	image-rendering: -moz-crisp-edges;
-	image-rendering: -webkit-pixelated;
-	image-rendering: pixelated;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: crisp-edges;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -587,6 +593,11 @@ div#conversation section#drawPanel div#commands {
 	padding: 10px;
 
 	box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+}
+
+div#avatarContainer div#avatarControls {
+	margin-top: 10px;
+	text-align: center;
 }
 
 div#conversation section#drawPanel div#tools,
@@ -722,6 +733,7 @@ div#profile h1 {
 	font-size: 3rem;
 	font-weight: 300;
 	margin-top: 20px;
+	margin-bottom: 10px;
 }
 
 div#modalBackground {

@@ -14,7 +14,6 @@ block scripts
 			var authors = {};
 			var stamps = {};
 
-			var pastMessages = 0;
 			var messagesLoaded = 0;
 
 			var $body = $('body');
@@ -26,7 +25,7 @@ block scripts
 			var $hotSwapButton = $('#hotswap');
 
 			$messagesContainer.append('<div class="loader" '
-				+ 'style="position: absolute; left: 50%; margin-left: -23px; margin-top: 50px;"></div>');
+				+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
 			$.get('/conversation/' + convID + '/stamps/').done(function (data) {
 				for(var s in data['stamps']) {
@@ -35,6 +34,7 @@ block scripts
 			});
 
 			$cursor.hide();
+			$('#loadMore').hide();
 
 			var $canvas = $('#drawCanvas');
 			var drawCanvas = new SWCanvas('drawCanvas');
@@ -42,8 +42,8 @@ block scripts
 			var hover = false;
 
 			// TODO: Optimize small avatars
-			var displayMessage = function (userID, imageData, date, immediate) {
-				var messageHTML = '<div class="message"><div class="topBar"><div class="author">';
+			var displayMessage = function (userID, imageData, date, immediate, top) {
+				var messageHTML = '<div class="message" id="message-' + '"><div class="topBar"><div class="author">';
 
 				if(authors[userID]['avatar']) {
 					messageHTML += '<img src="' + authors[userID]['avatar'] + '">';
@@ -58,12 +58,18 @@ block scripts
 						+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>'
 						+ '</div>';
 
-				$messagesContainer.append(messageHTML);
-
-				if (immediate) {
-					$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+				if (top) {
+					$messagesContainer.children('#loadMore').first().after(messageHTML);
 				} else {
-					$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
+					$messagesContainer.append(messageHTML);
+				}
+
+				if(!top) {
+					if (immediate) {
+						$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+					} else {
+						$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
+					}
 				}
 			};
 
@@ -72,30 +78,45 @@ block scripts
 				$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
 			};
 
-			var refreshMessages = function (immediate) {
-				$.get('/conversation_data/' + convID.toString()).then(function (data) {
+			var refreshMessages = function (immediate, from, count, top) {
+				$.get('/conversation_data/' + convID.toString() + '/from/' + from.toString()
+						+ '/count/' + count.toString()).then(function (data) {
 					// TODO: If not editing
 					$('#convName').text(data['conversation']['name']);
 
-					if (data['messages'].length > pastMessages) {
-						for (var m = pastMessages; m < data['messages'].length; m++) {
-							var rawDate = data['messages'][m]['createdAt'];
-							var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
-							displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
-									formattedDate, immediate);
-						}
-
-						pastMessages = data['messages'].length;
+					if (!top) {
+						data['messages'].reverse();
 					}
+
+					if(data['messages'].length < 10) {
+						$('#loadMore').attr('disabled', 'disabled');
+						$('#loadMore').addClass('disabled');
+					}
+
+					var currentScrollTop = $('.message').first();
+
+					for (var m = 0; m < data['messages'].length; m++) {
+						var rawDate = data['messages'][m]['createdAt'];
+						var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
+						displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+								formattedDate, immediate, top);
+					}
+
+					messagesLoaded += data['messages'].length;
+
+					if (top) $messagesContainer.scrollTop(currentScrollTop.offset().top - 240);
 
 					// TODO: This is a temporary hack for images being done loading
 
-					window.setTimeout(function () {
-						$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
-					}, 100);
+					if (!top) {
+						window.setTimeout(function () {
+							$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+						}, 100);
+					}
 
 					// Done loading, get rid of the loading animation thing
 					$messagesContainer.children('.loader').first().remove();
+					$('#loadMore').show();
 				});
 			};
 
@@ -215,7 +236,7 @@ block scripts
 
 				drawCanvas.clearAllCanvasData(true);
 				socket.emit('newMessage', messageData);
-				pastMessages += 1;
+				messagesLoaded++;
 
 				if (window.innerWidth <= 1040) {
 					if ($drawPanel.css('left') != '0px') {
@@ -223,7 +244,7 @@ block scripts
 					}
 				}
 
-				displayMessage('#{user.id}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"));
+				displayMessage('#{user.id}', messageData, moment(Date.now()).format("h:mm A; MMMM D"));
 			});
 
 			$('#stampIt').click(function () {
@@ -413,6 +434,10 @@ block scripts
 				}
 			});
 
+			$('#loadMore').click(function () {
+				refreshMessages(true, messagesLoaded, 10, true);
+			});
+
 			$(window).resize(function () {
 				if (window.innerWidth > 1040) {
 					$drawPanel.css({left: '50%'});
@@ -445,7 +470,7 @@ block scripts
 			// TODO: Handle add/remove with sockets
 			$.get('/users_data/').done(function (data) {
 				authors = data['users'];
-				refreshMessages(true);
+				refreshMessages(true, 0, 50, false);
 			});
 
 			if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
@@ -520,6 +545,7 @@ block content
 							i.material-icons people
 							span Members
 			section#messagesContainer
+				button#loadMore Load More
 
 		section#drawPanel
 			div#scrollIt
