@@ -3,11 +3,219 @@ extends base.jade
 block vars
 	- var footer = false
 
+block scripts
+	script(type='text/javascript').
+		$(document).ready(function () {
+			var $avatar = $('#avatar');
+			var $avatarCanvas = $('#avatarCanvas');
+			var $cursor = $('#cursor');
+
+			var $brushSizeRange = $('#brushSizeRange');
+
+			var editing = false;
+			var hover = false;
+
+			$cursor.hide();
+			$('#avatarContainer').hide();
+
+			$('#editAvatar').click(function () {
+				editing = !editing;
+
+				if(editing) {
+					$(this).text('Save Changes');
+
+					$('#avatarContainer').show();
+					$avatar.hide();
+
+					var drawCanvas = new SWCanvas('avatarCanvas');
+					drawCanvas.background = $avatar.attr('src');
+					drawCanvas.drawBackground();
+
+					var drawCursor = function (x, y) {
+						$cursor.css({
+							'top': (y - 112 + $('#main').scrollTop()).toString() + 'px',
+							'left': x.toString() + 'px'
+						});
+					};
+
+					$avatarCanvas.on('mousedown', function (event) {
+						var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
+
+						drawCanvas.startPainting();
+
+						drawCanvas.addPoint(mCoords.x, mCoords.y, false);
+						drawCanvas.redraw();
+					});
+					$avatarCanvas.on('touchstart', function (event) {
+						var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+						var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
+
+						drawCanvas.startPainting();
+
+						drawCanvas.addPoint(mCoords.x, mCoords.y, false);
+						drawCanvas.redraw();
+					});
+					$avatarCanvas.on('mousemove', function (event) {
+						if (drawCanvas.paint) {
+							var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
+
+							drawCanvas.addPoint(mCoords.x, mCoords.y, true);
+							drawCanvas.redraw();
+						}
+
+						if (hover) {
+							drawCursor(event.pageX, event.pageY + $(this).scrollTop());
+						}
+					});
+					$avatarCanvas.on('touchmove', function (event) {
+						event.preventDefault();
+
+						if (drawCanvas.paint) {
+							var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+							var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
+
+							drawCanvas.startPainting();
+
+							drawCanvas.addPoint(mCoords.x, mCoords.y, true);
+							drawCanvas.redraw();
+						}
+					});
+
+					var onMouseUp = function (event) {
+						drawCanvas.stopPainting();
+						drawCanvas.imageToBg();
+					};
+
+					$avatarCanvas.on('mouseup', onMouseUp);
+					$avatarCanvas.on('touchend', function (event) {
+						event.preventDefault();
+						onMouseUp(event);
+					});
+					$avatarCanvas.on('mouseleave', function (event) {
+						drawCanvas.stopPainting();
+						hover = false;
+						$cursor.hide();
+					});
+
+					$avatarCanvas.on('mouseenter', function (event) {
+						hover = true;
+						$cursor.show();
+						drawCursor(event.pageX, event.pageY);
+					});
+
+					$('.colorTool').click(function () {
+						drawCanvas.updateBrush({
+							tool: 'brush',
+							color: $(this).css('backgroundColor')
+						});
+
+						$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+						$(this).parent().children('li').each(function () { $(this).removeClass('active'); });
+						$(this).addClass('active');
+
+						$(this).parent().parent().children('#images').children('li').each(function () {
+							$(this).removeClass('active');
+						});
+					});
+					$('.stampTool').click(function () {
+						drawCanvas.updateBrush({
+							tool: 'stamp',
+							stamp: $(this).attr('id')
+						});
+
+						$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+						$(this).parent().children('li').each(function () { $(this).removeClass('active'); });
+						$(this).addClass('active');
+
+						$(this).parent().parent().children('#colors').children('li').each(function () {
+							$(this).removeClass('active');
+						});
+					});
+
+					$('#clear').click(function () {
+						drawCanvas.clearAllCanvasData(true);
+					});
+
+					$brushSizeRange.on('input change', function () {
+						drawCanvas.setBrushSize($(this).val());
+					});
+
+					$brushSizeRange.change();
+
+					$(window).on('beforeunload', function (event) {
+						onMouseUp(event);
+					});
+				} else {
+					$.post('/user/#{profile.id}/avatar/', {
+						imageData: $avatarCanvas[0].toDataURL()
+					}, function (data) {
+						// TODO: If success, update avatar + canvas
+						$avatar.attr('src', $avatarCanvas[0].toDataURL());
+					});
+					$(this).text('Edit Avatar');
+					$('#avatar').show();
+					$('#avatarContainer').hide();
+				}
+			});
+			$('#cancel').click(function () {
+				editing = false;
+				$('#editAvatar').text('Edit Avatar');
+				$('#avatar').show();
+				$('#avatarContainer').hide();
+			});
+		});
+
 block content
+	img#cursor(width='100', height='57', src='/images/cursor.png')
 	div#profile
 		if profile.avatar
 			img#avatar(src='#{profile.avatar}')
 		else
 			img#avatar
-			// TODO: No avatar, want to create one?
+
+		div#avatarContainer
+			form#formAvatar(style='display: none;')
+				input#avatarData(type='hidden')
+
+			canvas#avatarCanvas(height='768', width='768', style='width: 384px; height: 384px; margin-top: 0;')
+
+			div#tools
+				ul#colors
+					li#white.colorTool
+					li#grey.colorTool
+					li#black.colorTool
+					li#red.colorTool.active
+					li#hotPink.colorTool
+					li#yellow.colorTool
+					li#blue.colorTool
+					li#green.colorTool
+
+				ul#images
+					li#dolphin.big.stampTool
+						img(src='/images/dolphin.png')
+					li#hand.big.stampTool
+						img(src='/images/hand.png')
+					li#pizza.big.stampTool
+						img(src='/images/pizza.png')
+					li#gabe.big.stampTool
+						img(src='/images/gabe.png')
+
+				div#brushSize
+					h3 Brush Size
+					input#brushSizeRange(type='range', min='1', max='100', value='10')
+
+			div#avatarControls
+				button#clear.transparent.big
+					i.material-icons clear
+					span Clear
+				button#cancel.transparent.big
+					i.material-icons cancel
+					span Cancel
+
+		-if(profile.id == user.id)
+			br
+			button#editAvatar Edit Avatar
+
 		h1#name #{profile.username}
