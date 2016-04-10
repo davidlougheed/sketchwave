@@ -49,8 +49,8 @@ block scripts
 					messageHTML += '<img src="' + authors[userID]['avatar'] + '">';
 				}
 
-				messageHTML += '<span>'
-						+ authors[userID]['username'] + '</span></div><div class="date">'
+				messageHTML += '<a href="/user/' + userID + '/">'
+						+ authors[userID]['username'] + '</a></div><div class="date">'
 						+ date + '</div></div>'
 						+ '<div class="image">'
 						+ '<img src="' + imageData + '">'
@@ -482,7 +482,7 @@ block scripts
 					var rawDate = data['createdAt'];
 					var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 
-					displayMessage(data['UserId'], data['imageData'], formattedDate);
+					displayMessage(data['UserId'], data['imageData'], formattedDate, false);
 
 					if (!document.hasFocus() && authors[data['UserId']] != #{user.id}) {
 						if (Notification.permission === 'granted') {
