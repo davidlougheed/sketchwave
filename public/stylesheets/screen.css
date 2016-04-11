@@ -73,7 +73,7 @@ header nav ul {
 }
 header nav ul li {
 	display: inline-block;
-	margin: 0 0.5em;
+	margin: 0 10px;
 	height: 40px;
 	line-height: 38px;
 }

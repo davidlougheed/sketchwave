@@ -79,6 +79,9 @@ block scripts
 			};
 
 			var refreshMessages = function (immediate, from, count, top) {
+				$('#loadMore').attr('disabled', 'disabled');
+				$('#loadMore').addClass('disabled');
+
 				$.get('/conversation_data/' + convID.toString() + '/from/' + from.toString()
 						+ '/count/' + count.toString()).then(function (data) {
 					// TODO: If not editing
@@ -88,11 +91,6 @@ block scripts
 						data['messages'].reverse();
 					}
 
-					if(data['messages'].length < 10) {
-						$('#loadMore').attr('disabled', 'disabled');
-						$('#loadMore').addClass('disabled');
-					}
-
 					var currentScrollTop = $('.message').first();
 
 					for (var m = 0; m < data['messages'].length; m++) {
@@ -100,6 +98,11 @@ block scripts
 						var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 						displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
 								formattedDate, immediate, top);
+					}
+
+					if (data['messages'].length >= 10) {
+						$('#loadMore').removeAttr('disabled');
+						$('#loadMore').removeClass('disabled');
 					}
 
 					messagesLoaded += data['messages'].length;
