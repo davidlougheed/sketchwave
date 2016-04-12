@@ -382,6 +382,15 @@ ul#conversations li.conversation div.controls button {
 	right: 15px;
 }
 
+div#conversationsMessage {
+	padding: 20px 0;
+
+	color: #999;
+	font-family: "Open Sans", sans-serif;
+	font-size: 1.3rem;
+	text-align: center;
+}
+
 div#conversation {
 	position: absolute;
 	z-index: 49;

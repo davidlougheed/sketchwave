@@ -14,6 +14,8 @@ block scripts
 
 			var active = true;
 
+			$('#conversationsMessage').hide();
+
 			window.setInterval(function () {
 				if (active) {
 					// Keep session alive
@@ -66,6 +68,13 @@ block scripts
 
 							$conversations.append(conversationHTML);
 						}
+					}
+
+					if(data['conversations'].length == 0) {
+						$('#conversationsMessage').show();
+						$('#conversationsMessage').text('You are not currently in any conversations.');
+					} else {
+						$('#conversationsMessage').hide();
 					}
 				});
 			};
@@ -129,6 +138,7 @@ block scripts
 
 			reloadConversations();
 
+			// TODO: Fix this, it doesn't work
 			socket.on('newMessage', function (data) {
 				reloadConversations();
 			});
@@ -156,3 +166,4 @@ block content
 		button(type='button', id='cancelConversation').transparent Cancel
 
 	ul#conversations
+	div#conversationsMessage
