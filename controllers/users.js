@@ -1,5 +1,7 @@
 'use strict';
 
+var sanitizeHtml = require('sanitize-html');
+
 module.exports.controller = function (objects) {
 	objects.router.get('/users_data/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
@@ -14,8 +16,20 @@ module.exports.controller = function (objects) {
 
             for(var u in users) {
                 var userData = users[u].toJSON();
+
+				// TODO: Convert this to a shared function
+				// Convert avatar from buffer to string
 				if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+
+				// Delete password
 				delete userData['password'];
+
+				// Prevent XSS from username
+				userData['username'] = sanitizeHtml(userData['username'], {
+					allowedTags: [],
+					allowedAttributes: []
+				});
+
                 usersData[userData['id']] = userData;
             }
 
@@ -32,11 +46,20 @@ module.exports.controller = function (objects) {
 			id: req.params.id
 		}
 		}).then(function (user) {
-			var userJSON = user.toJSON();
-			delete userJSON['password'];
+			var userData = user.toJSON();
+
+			// Delete password
+			delete userData['password'];
+
+			// Prevent XSS from username
+			userData['username'] = sanitizeHtml(userData['username'], {
+				allowedTags: [],
+				allowedAttributes: []
+			});
+
 			res.render('user', {
 				user: req.user, // The currently signed-in user
-				profile: userJSON // User who's profile someone is viewing
+				profile: userData // User who's profile someone is viewing
 			});
 		});
 	});
@@ -50,8 +73,13 @@ module.exports.controller = function (objects) {
 			id: parseInt(req.params.id)
 		}
 		}).then(function (user) {
-			if(req.user.id == req.params.id) {
-				user.avatar = req.body.imageData;
+			if(req.user.id === parseInt(req.params.id)) {
+				// Prevent XSS
+				user.avatar = sanitizeHtml(req.body.imageData, {
+					allowedTags: [],
+					allowedAttributes: []
+				});
+
 				user.save();
 
 				return res.send({ success: true });

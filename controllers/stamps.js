@@ -1,5 +1,7 @@
 'use strict';
 
+var sanitizeHtml = require('sanitize-html');
+
 module.exports.controller = function (objects) {
 	objects.router.get('/conversation/:id/stamps/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
@@ -16,6 +18,8 @@ module.exports.controller = function (objects) {
 				ConversationId: req.params.id
 			}
 		}).then(function (stamps) {
+			// TODO: Sanitize stamps !!!
+
 			return res.send({ success: true, stamps: stamps });
 		})
 	});

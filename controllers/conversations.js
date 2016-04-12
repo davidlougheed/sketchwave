@@ -1,5 +1,6 @@
 'use strict';
 
+var sanitizeHtml = require('sanitize-html');
 var async = require('async');
 var appError = require('../modules/app-error');
 
@@ -207,8 +208,19 @@ module.exports.controller = function (objects) {
 
 						for(var u in users) {
 							var userData = users[u].toJSON();
+
+							// Convert avatar from buffer to string
 							if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+
+							// Delete password
 							delete userData['password'];
+
+							// Prevent XSS from username
+							userData['username'] = sanitizeHtml(userData['username'], {
+								allowedTags: [],
+								allowedAttributes: []
+							});
+
 							usersData.push(userData);
 						}
 
@@ -248,7 +260,20 @@ module.exports.controller = function (objects) {
 						offset: parseInt(req.params.from),
 						limit: parseInt(req.params.count)
 					}).then(function (messages) {
-						return res.send({ success: true, conversation: conversation, messages: messages });
+						var messagesData = [];
+
+						for(var m in messages) {
+							if (messages.hasOwnProperty(m)) {
+								var messageData = messages[m].toJSON();
+								messageData['imageData'] = sanitizeHtml(messageData['imageData'], {
+									allowedTags: [],
+									allowedAttributes: []
+								});
+								messagesData.push(messageData);
+							}
+						}
+
+						return res.send({ success: true, conversation: conversation, messages: messagesData });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data

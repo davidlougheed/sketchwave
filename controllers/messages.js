@@ -1,5 +1,7 @@
 'use strict';
 
+var sanitizeHtml = require('sanitize-html');
+
 module.exports.controller = function (objects) {
 	objects.io.on('connection', function (socket) {
 		socket.on('newMessage', function (data) {
@@ -25,8 +27,14 @@ module.exports.controller = function (objects) {
 								conversation.lastMessage = Date.now();
 								conversation.save();
 
+								var messageData = message.toJSON();
+								messageData['imageData'] = sanitizeHtml(messageData['imageData'], {
+									allowedTags: [],
+									allowedAttributes: []
+								});
+
 								socket.broadcast.to('conversation' + data.conversationID.toString())
-									.emit('newMessage', message.toJSON());
+									.emit('newMessage', messageData);
 							});
 						}
 					});
