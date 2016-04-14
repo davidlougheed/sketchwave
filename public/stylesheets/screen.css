@@ -461,10 +461,10 @@ div#conversation section#messages section#messagesContainer div.metaMessage {
 	text-align: center;
 }
 div#conversation section#messages section#messagesContainer div.message {
-	margin-top: 40px;
+	margin-top: 36px;
 }
 div#conversation section#messages section#messagesContainer div.message:last-child {
-	margin-bottom: 60px;
+	margin-bottom: 56px;
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar {
 	overflow: hidden;
