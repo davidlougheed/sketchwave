@@ -4,6 +4,9 @@ var sanitizeHtml = require('sanitize-html');
 var async = require('async');
 var appError = require('../modules/app-error');
 
+var HtmlEntities = require('html-entities').AllHtmlEntities;
+var entities = new HtmlEntities();
+
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/', function (req, res) {
 		if (!req.isAuthenticated()) {
@@ -65,14 +68,19 @@ module.exports.controller = function (objects) {
 				var usersList = [];
 
 				async.eachSeries(conversations, function(conversation, callback) {
-					conversation.getUsers().then(function (users) {
+					conversation.getUsers({
+						attributes: { exclude: ['password'] }
+					}).then(function (users) {
 						var userList = [];
 						for(var u in users) {
 							if (users.hasOwnProperty(u)) {
-								var userJSON = users[u].toJSON();
-								if(userJSON['avatar'] !== null) userJSON['avatar'] = users[u].avatar.toString();
-								delete userJSON['password'];
-								userList.push(userJSON);
+								var userData = users[u].toJSON();
+								if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+
+								// Prevent XSS from username
+								userData['username'] = entities.encode(userData['username']);
+
+								userList.push(userData);
 							}
 						}
 						usersList.push(userList);
@@ -216,10 +224,7 @@ module.exports.controller = function (objects) {
 							delete userData['password'];
 
 							// Prevent XSS from username
-							userData['username'] = sanitizeHtml(userData['username'], {
-								allowedTags: [],
-								allowedAttributes: []
-							});
+							userData['username'] = entities.encode(userData['username']);
 
 							usersData.push(userData);
 						}
@@ -260,20 +265,7 @@ module.exports.controller = function (objects) {
 						offset: parseInt(req.params.from),
 						limit: parseInt(req.params.count)
 					}).then(function (messages) {
-						var messagesData = [];
-
-						for(var m in messages) {
-							if (messages.hasOwnProperty(m)) {
-								var messageData = messages[m].toJSON();
-								messageData['imageData'] = sanitizeHtml(messageData['imageData'], {
-									allowedTags: [],
-									allowedAttributes: []
-								});
-								messagesData.push(messageData);
-							}
-						}
-
-						return res.send({ success: true, conversation: conversation, messages: messagesData });
+						return res.send({ success: true, conversation: conversation, messages: messages });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
@@ -316,19 +308,22 @@ module.exports.controller = function (objects) {
 						objects.models.User.findOne({
 							where: {
 								username: data.username
-							}
+							},
+							attributes: { exclude: ['password'] }
 						}).then(function (user) {
 							if(user) {
 								conversation.addUser(user);
 								conversation.save();
 
-								var userJSON = user.toJSON();
-								delete userJSON['password'];
+								var userData = user.toJSON();
+
+								// Prevent XSS from username
+								userData['username'] = entities.encode(userData['username']);
 
 								// TODO: Add meta message to database
 
 								objects.io.to('conversation' + data.conversationID.toString())
-									.emit('userAdd', userJSON);
+									.emit('userAdd', userData);
 							}
 						});
 					}
@@ -350,7 +345,8 @@ module.exports.controller = function (objects) {
 						objects.models.User.findOne({
 							where: {
 								username: data.username
-							}
+							},
+							attributes: { exclude: ['password', 'avatar'] }
 						}).then(function (user) {
 							if (user) {
 								var userID = user.id;

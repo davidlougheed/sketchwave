@@ -24,7 +24,10 @@ var models = require('./models');
 
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({ usernameField: 'username' }, function (username, password, done) {
-	models.User.findOne({where: {username: username}}).then(function (user) {
+	models.User.findOne({
+		where: { username: username },
+		attributes: { exclude: ['avatar'] }
+	}).then(function (user) {
 		if (user === null) {
 			return done(null, false, { success: false, message: 'No user with that name' });
 		}
@@ -66,15 +69,17 @@ var io = socketIO.listen(appServer).use(function (socket, next) {
 app.set('view engine', 'jade');
 app.set('views', APP_BASE_PATH + '/views');
 
+// Keep these above passport and session initialization to prevent reload of user data
+app.use('/bower_components', express.static(APP_BASE_PATH + '/bower_components'));
+app.use(express.static(APP_BASE_PATH + '/public'));
+
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(sessionMiddleware);
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/bower_components', express.static(APP_BASE_PATH + '/bower_components'));
-app.use(express.static(APP_BASE_PATH + '/public'));
 app.use('/', appRouter);
 
 app.use(function (req, res) {
@@ -90,7 +95,7 @@ passport.serializeUser(function(user, done) {
 	done(null, user.id);
 });
 passport.deserializeUser(function(id, done) {
-	models.User.findById(id).then(function (user) {
+	models.User.findOne({ where: { id: id }, attributes: { exclude: ['avatar'] } }).then(function (user) {
 		done(null, user);
 	});
 });

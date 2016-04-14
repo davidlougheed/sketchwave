@@ -18,8 +18,6 @@ module.exports.controller = function (objects) {
 				ConversationId: req.params.id
 			}
 		}).then(function (stamps) {
-			// TODO: Sanitize stamps !!!
-
 			return res.send({ success: true, stamps: stamps });
 		})
 	});
@@ -39,7 +37,10 @@ module.exports.controller = function (objects) {
 					}).then(function (users) {
 						if (users != null && users.length > 0) {
 							objects.models.Stamp.create({
-								imageData: data.imageData,
+								imageData: sanitizeHtml(data.imageData, {
+									allowedTags: [],
+									allowedAttributes: []
+								}),
 								UserId: parseInt(users[0].id),
 								ConversationId: conversation.id
 							}).then(function (stamp) {

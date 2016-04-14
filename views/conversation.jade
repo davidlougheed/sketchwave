@@ -415,7 +415,7 @@ block scripts
 					socket.emit('userAdd', { username: usernameToAdd, conversationID: convID });
 
 					$membersList.append('<div class="member" data-username="'
-							+ usernameToAdd + '">' + usernameToAdd
+							+ usernameToAdd + '"><a class="name">' + usernameToAdd + '</a>'
 							+ ' <button class="deleteMember iconOnly transparent">'
 							+ '<i class="material-icons">clear</i></button></div>');
 				});

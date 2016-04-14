@@ -20,21 +20,19 @@ module.exports.controller = function (objects) {
 					}).then(function (users) {
 						if (users != null && users.length > 0) {
 							objects.models.Message.create({
-								imageData: [data.imageData],
+								type: 'image',
+								imageData: [sanitizeHtml(data.imageData, {
+									allowedTags: [],
+									allowedAttributes: []
+								})],
 								ConversationId: parseInt(data.conversationID),
 								UserId: parseInt(socket.request.session.passport.user)
 							}).then(function (message) {
 								conversation.lastMessage = Date.now();
 								conversation.save();
 
-								var messageData = message.toJSON();
-								messageData['imageData'] = sanitizeHtml(messageData['imageData'], {
-									allowedTags: [],
-									allowedAttributes: []
-								});
-
 								socket.broadcast.to('conversation' + data.conversationID.toString())
-									.emit('newMessage', messageData);
+									.emit('newMessage', message);
 							});
 						}
 					});
