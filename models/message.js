@@ -2,7 +2,9 @@
 
 module.exports = function (sequelize, dataTypes) {
 	var Message = sequelize.define('Message', {
-		imageData: {type: dataTypes.ARRAY(dataTypes.TEXT)},
+		type: dataTypes.STRING(10),
+		textData: dataTypes.TEXT,
+		imageData: {type: dataTypes.ARRAY(dataTypes.TEXT)}
 	}, {
 		classMethods: {
 			associate: function (models) {
