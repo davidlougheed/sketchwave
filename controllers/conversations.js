@@ -1,6 +1,5 @@
 'use strict';
 
-var sanitizeHtml = require('sanitize-html');
 var async = require('async');
 var appError = require('../modules/app-error');
 
@@ -97,10 +96,14 @@ module.exports.controller = function (objects) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversation/' + req.params.id));
 		}
-
-		objects.models.Conversation.findOne({where: {
-			id: req.params.id
+		if(!parseInt(req.params.id)) {
+			return res.send('invalid id');
 		}
+
+		objects.models.Conversation.findOne({
+			where: {
+				id: parseInt(req.params.id)
+			}
 		}).then(function (conversation) {
 			objects.models.User.findOne({
 				where: {
@@ -109,13 +112,15 @@ module.exports.controller = function (objects) {
 			}).then(function (user) {
 				conversation.getUsers().then(function (users) {
 					var permission = false;
-					for(var u in users) {
-						if(user.id == (users[u].toJSON())['id']) {
-							permission = true;
+					for (var u in users) {
+						if(users.hasOwnProperty(u)) {
+							if (user.id == (users[u].toJSON())['id']) {
+								permission = true;
+							}
 						}
 					}
 
-					if(!permission) {
+					if (!permission) {
 						return res.send('no permission');
 					} else {
 						res.render('conversation', {
@@ -136,9 +141,12 @@ module.exports.controller = function (objects) {
 		if (!req.body) {
 			return res.send('error no body');
 		}
+		if(!parseInt(req.params.id)) {
+			return res.send({ error: 'invalid id' });
+		}
 
 		objects.models.Conversation.findOne({where: {
-				id: req.params.id
+				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
 			conversation.name = req.body.name;
@@ -156,10 +164,13 @@ module.exports.controller = function (objects) {
 		if (!req.isAuthenticated()) {
 			return appError.generate(req, res, 403, {});
 		}
+		if(!parseInt(req.params.id)) {
+			return res.send({ error: 'invalid id' });
+		}
 
 		objects.models.Conversation.findOne({
 			where: {
-				id: req.params.id
+				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
 			if(conversation == null) {
@@ -178,7 +189,9 @@ module.exports.controller = function (objects) {
 						}
 					}).then(function (messages) {
 						for(var m in messages) {
-							messages[m].destroy();
+							if(messages.hasOwnProperty(m)) {
+								messages[m].destroy();
+							}
 						}
 					});
 
@@ -198,10 +211,13 @@ module.exports.controller = function (objects) {
 		if (!req.isAuthenticated()) {
 			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
+		if(!parseInt(req.params.id)) {
+			return res.send({ error: 'invalid id' });
+		}
 
 		objects.models.Conversation.findOne({
 			where: {
-				id: req.params.id
+				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
 			// TODO: Optimize this so it's not making 2 queries to DB?
@@ -215,18 +231,20 @@ module.exports.controller = function (objects) {
 						var usersData = [];
 
 						for(var u in users) {
-							var userData = users[u].toJSON();
+							if(users.hasOwnProperty(u)) {
+								var userData = users[u].toJSON();
 
-							// Convert avatar from buffer to string
-							if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+								// Convert avatar from buffer to string
+								if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 
-							// Delete password
-							delete userData['password'];
+								// Delete password
+								delete userData['password'];
 
-							// Prevent XSS from username
-							userData['username'] = entities.encode(userData['username']);
+								// Prevent XSS from username
+								userData['username'] = entities.encode(userData['username']);
 
-							usersData.push(userData);
+								usersData.push(userData);
+							}
 						}
 
 						return res.send({ success: true, conversationID: req.params.id, users: usersData });
@@ -243,6 +261,9 @@ module.exports.controller = function (objects) {
 
 		if(!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle more gracefully
+		}
+		if(!parseInt(req.params.id)) {
+			return res.send({ error: 'invalid id' });
 		}
 
 		//TODO: Fetch conversations from database
@@ -278,21 +299,6 @@ module.exports.controller = function (objects) {
 	// TODO: HANDLE 403 / AUTHENTICATION EXPIRY HERE!!!!!!!!!
 
 	objects.io.on('connection', function (socket) {
-		socket.on('userOnline', function (data) {
-			objects.redis.sadd(['swUsersOnline', data], function(err, reply) {
-				if (err) {
-					throw err;
-				}
-			});
-		});
-		socket.on('userOffline', function (data) {
-			objects.redis.srem(['swUsersOnline', data], function(err, reply) {
-				if (err) {
-					throw err;
-				}
-			});
-		});
-
 		socket.on('userAdd', function (data) {
 			objects.models.Conversation.findOne({
 				where: {
