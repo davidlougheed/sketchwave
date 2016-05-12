@@ -49,11 +49,14 @@ SWCanvas.prototype.colors = {
 /**
  * Clears canvas data to free up some memory (as part of the GabeSave process).
  * @param backgroundClear {boolean}
+ * @param keepPoints {boolean}
  */
-SWCanvas.prototype.clearAllCanvasData = function (backgroundClear) {
+SWCanvas.prototype.clearAllCanvasData = function (backgroundClear, keepPoints) {
 	this.context.clearRect(0, 0, this.cw, this.ch);
 	// this.points = this.points.slice(this.points.length - 6, this.points.length);
-	this.points = [];
+	if (keepPoints !== true) {
+		this.points = [];
+	}
 	if (backgroundClear) {
 		this.background = null;
 	}
@@ -133,6 +136,16 @@ SWCanvas.prototype.addPoint = function (x, y, dragging) {
 		tool: this.brush.tool,
 		stamp: (this.brush.tool === 'brush') ? null : this.brush.stamp
 	});
+
+	if(this.points.length > 50) {
+		this.redraw();
+		this.imageToBg(true);
+		if (dragging) {
+			this.points = this.points.slice(this.points.length - 1, this.points.length);
+		} else {
+			this.points = this.points.splice(0, this.points.length);
+		}
+	}
 };
 
 /**
@@ -195,11 +208,12 @@ SWCanvas.prototype.moveImageDataToBackground = function () {
 
 /**
  * Draws background from variable.
+ * @param keepPoints {boolean}
  */
-SWCanvas.prototype.drawBackground = function () {
+SWCanvas.prototype.drawBackground = function (keepPoints) {
 	if (this.background) {
 		var imageLoad = function (bg) {
-			this.clearAllCanvasData(false);
+			this.clearAllCanvasData(false, keepPoints);
 			this.context.clearRect(0, 0, this.cw, this.ch);
 			this.context.drawImage(bg, 0, 0, this.cw, this.ch);
 		};
@@ -211,9 +225,10 @@ SWCanvas.prototype.drawBackground = function () {
 };
 
 /**
- * Moves image date to background, then starts drawing the image on the canvas as part of the GabeSave process.
+ * Moves image data to background, then starts drawing the image on the canvas as part of the GabeSave process.
+ * @param keepPoints {boolean}
  */
-SWCanvas.prototype.imageToBg = function () {
+SWCanvas.prototype.imageToBg = function (keepPoints) {
 	this.moveImageDataToBackground();
-	this.drawBackground();
+	this.drawBackground(keepPoints);
 };
