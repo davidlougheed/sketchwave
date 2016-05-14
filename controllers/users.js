@@ -143,4 +143,37 @@ module.exports.controller = function (objects) {
 			return res.send({ success: true });
 		});
 	});
+
+	objects.router.get('/user/:id/status/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		}
+
+		objects.redis.sismember(['swUsersOnline', parseInt(req.params.id)], function (err, reply) {
+			if (reply === 1) {
+				return res.send({ 'online': true });
+			} else {
+				return res.send({ 'online': false });
+			}
+		});
+	});
+
+	objects.io.on('connection', function (socket) {
+		socket.on('userOnline', function () {
+			objects.redis.sadd(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+				if (err) {
+					throw err;
+				}
+			});
+		});
+		socket.on('disconnect', function () {
+			objects.redis.srem(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+				if (err) {
+					throw err;
+				}
+			});
+		});
+	});
 };
