@@ -416,7 +416,7 @@ div#conversation section#messages header {
 	background-color: rgba(254, 254, 253, 0.9);
 	-webkit-backdrop-filter: blur(5px);
 	backdrop-filter: blur(10px);
-	box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 div#conversation section#messages header h1 {
 	border: none;
@@ -504,14 +504,48 @@ div#conversation section#messages section#messagesContainer div.message div.topB
 	margin-top: 9px;
 }
 div#conversation section#messages section#messagesContainer div.message div.image {
+	position: relative;
 	clear: both;
-	background-color: white;
 	width: 100%;
 	max-width: 480px;
+	margin: auto;
+
+	background-color: white;
+	box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
 	border: 1px solid #bbb;
 	border-radius: 4px;
+}
+div#conversation section#messages section#messagesContainer div.message div.text {
+	position: relative;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 480px;
 	margin: auto;
-	box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+	margin-top: 11px;
+	padding: 8px 12px;
+
+	background-color: #1e90ff;
+	box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1), inset 1px 1px 2px rgba(255, 255, 255, 0.15);;
+	border: 1px solid #1d77e0;
+	border-radius: 4px;
+
+	color: #eef9ff;
+	font-family: "Open Sans", sans-serif;
+	font-size: 0.9rem;
+	line-height: 1.4em;
+}
+div#conversation section#messages section#messagesContainer div.message div.text:before {
+	content: "";
+	position: absolute;
+	top: -5px;
+	left: 12px;
+	height: 8px; width: 8px;
+
+	background-color: #1e90ff;
+	border-left: 1px solid #1d77e0;
+	border-top: 1px solid #1d77e0;
+
+	transform: rotate(45deg);
 }
 div#conversation section#messages section#messagesContainer div.message div.image img {
 	width: 100%;
@@ -566,7 +600,7 @@ div#avatarContainer canvas#avatarCanvas {
 	border: 1px solid #bdbdbd;
 
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-	cursor: none;
+	cursor: crosshair;
 
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: optimizeSpeed;
