@@ -20,17 +20,57 @@ module.exports.controller = function (objects) {
             var usersData = {};
 
             for(var u in users) {
-                var userData = users[u].toJSON();
+				if(users.hasOwnProperty(u)) {
+					var userData = users[u].toJSON();
 
-				// TODO: Convert this to a shared function
-				// Convert avatar from buffer to string
-				if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+					// TODO: Convert this to a shared function
+					// Convert avatar from buffer to string
+					if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 
-				// Prevent XSS from username
-				userData['username'] = entities.encode(userData['username']);
+					// Prevent XSS from username
+					userData['username'] = entities.encode(userData['username']);
 
-                usersData[userData['id']] = userData;
+					usersData[userData['id']] = userData;
+				}
             }
+
+			return res.send({ success: true, users: usersData });
+		});
+	});
+	objects.router.get('/users_search/', function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+
+		if(!req.isAuthenticated()) {
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		}
+
+		var searchTerm = req.query.q;
+
+		objects.models.User.findAll({
+			attributes: { exclude: ['password'] },
+			where: {
+				username: {
+					$like: '%' + searchTerm + '%'
+				}
+			}
+		}).then(function (users) {
+			// TODO: Only include data that is needed for searching
+			var usersData = [];
+
+			for(var u in users) {
+				if(users.hasOwnProperty(u)) {
+					var userData = users[u].toJSON();
+
+					// TODO: Convert this to a shared function
+					// Convert avatar from buffer to string
+					if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+
+					// Prevent XSS from username
+					userData['username'] = entities.encode(userData['username']);
+
+					usersData.push(userData);
+				}
+			}
 
 			return res.send({ success: true, users: usersData });
 		});
