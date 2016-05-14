@@ -34,14 +34,14 @@ module.exports.controller = function (objects) {
 
 		if (!req.body.username) { return res.send({ success: false, error: 'noUsername' }); }
 		if (!req.body.password) { return res.send({ success: false, error: 'noPassword' }); }
-        if (!req.body.password2) { return res.send({ success: false, error: 'noPassword2' }); }
+		if (!req.body.password2) { return res.send({ success: false, error: 'noPassword2' }); }
 
 		if (req.body.password !== req.body.password2) {
-            return res.send({ success: false, error: 'passwordMismatch' });
+			return res.send({ success: false, error: 'passwordMismatch' });
 		}
 
 		if (req.body.username.length < 3) { return res.send({ success: false, error: 'usernameTooShort' }); }
-        if (req.body.password.length < 8) { return res.send({ success: false, error: 'passwordTooShort' }); }
+		if (req.body.password.length < 8) { return res.send({ success: false, error: 'passwordTooShort' }); }
 
 		// Check CAPTCHA
 		request.post('https://www.google.com/recaptcha/api/siteverify', {
@@ -93,7 +93,7 @@ module.exports.controller = function (objects) {
 	});
 	objects.router.post('/login/', objects.passport.authenticate('local', {
 		failureRedirect: '/login/',
-        failureFlash: true
+		failureFlash: true
 	}), function (req, res) {
 		if (req.body.redirect) {
 			res.redirect(req.body.redirect);
