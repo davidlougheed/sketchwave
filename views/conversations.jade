@@ -138,6 +138,7 @@ block scripts
 
 			reloadConversations();
 
+			socket.emit('userOnline');
 			// TODO: Fix this, it doesn't work
 			socket.on('newMessage', function (data) {
 				reloadConversations();

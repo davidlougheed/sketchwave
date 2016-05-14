@@ -898,13 +898,18 @@ div#modal h1 div.controls {
 	font-family: "Open Sans", sans-serif;
 	color: #333;
 }
-#members .member img.avatar {
+#members .member div.avatar {
 	vertical-align: top;
-	max-height: 36px;
-	max-width: 36px;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 38px; width: 38px;
 
 	border-radius: 100%;
 	border: 1px solid #e0e0e0;
+}
+#members .member div.avatar img {
+	max-height: 36px; max-width: 36px;
+	border-radius: 100%;
 }
 #members .member a.name {
 	display: inline-block;

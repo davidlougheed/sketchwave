@@ -19,15 +19,32 @@ module.exports.controller = function (objects) {
 						}
 					}).then(function (users) {
 						if (users != null && users.length > 0) {
-							objects.models.Message.create({
-								type: 'image',
-								imageData: [sanitizeHtml(data.imageData, {
-									allowedTags: [],
-									allowedAttributes: []
-								})],
-								ConversationId: parseInt(data.conversationID),
-								UserId: parseInt(socket.request.session.passport.user)
-							}).then(function (message) {
+							var messageCreationData = {};
+
+							switch(data.type) {
+								case 'image':
+									messageCreationData = {
+										type: 'image',
+										imageData: [sanitizeHtml(data.imageData, {
+											allowedTags: [],
+											allowedAttributes: []
+										})],
+										ConversationId: parseInt(data.conversationID),
+										UserId: parseInt(socket.request.session.passport.user)
+									};
+									break;
+								case 'text':
+								case 'meta':
+									messageCreationData = {
+										type: data.type,
+										textData: sanitizeHtml(data.textData),
+										ConversationId: parseInt(data.conversationID),
+										UserId: parseInt(socket.request.session.passport.user)
+									};
+									break;
+							}
+
+							objects.models.Message.create(messageCreationData).then(function (message) {
 								conversation.lastMessage = Date.now();
 								conversation.save();
 

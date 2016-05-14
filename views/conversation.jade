@@ -10,6 +10,8 @@ block scripts
 
 			var active = true;
 
+			var useCursor = false;
+
 			var socket = io();
 			var authors = {};
 			var stamps = {};
@@ -23,18 +25,21 @@ block scripts
 			var $drawPanel = $('#drawPanel');
 			var $brushSizeRange = $('#brushSizeRange');
 			var $hotSwapButton = $('#hotswap');
+			var $loadMoreButton = $('#loadMore');
 
 			$messagesContainer.append('<div class="loader" '
 				+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
 			$.get('/conversation/' + convID + '/stamps/').done(function (data) {
 				for(var s in data['stamps']) {
-					stamps[data['stamps'][s]['id']] = data['stamps'][s];
+					if(data['stamps'].hasOwnProperty(s)) {
+						stamps[data['stamps'][s]['id']] = data['stamps'][s];
+					}
 				}
 			});
 
 			$cursor.hide();
-			$('#loadMore').hide();
+			$loadMoreButton.hide();
 
 			var $canvas = $('#drawCanvas');
 			var drawCanvas = new SWCanvas('drawCanvas');
@@ -42,8 +47,9 @@ block scripts
 			var hover = false;
 
 			// TODO: Optimize small avatars
-			var displayMessage = function (userID, imageData, date, immediate, top) {
-				var messageHTML = '<div class="message" id="message-' + '"><div class="topBar"><div class="author">';
+			var displayMessage = function (userID, messageData, messageType, date, immediate, top) {
+				var messageHTML = '<div class="message ' + messageType + '-message" id="message-' + '">'
+						+ '<div class="topBar"><div class="author">';
 
 				if(authors[userID]['avatar']) {
 					messageHTML += '<img src="' + authors[userID]['avatar'] + '">';
@@ -51,12 +57,21 @@ block scripts
 
 				messageHTML += '<a href="/user/' + userID + '/">'
 						+ authors[userID]['username'] + '</a></div><div class="date">'
-						+ date + '</div></div>'
-						+ '<div class="image">'
-						+ '<img src="' + imageData + '">'
-						+ '</div><div class="controls"><button class="importToCanvas transparent noMargin">'
-						+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>'
-						+ '</div>';
+						+ date + '</div></div>';
+
+				switch(messageType) {
+					case 'image':
+						messageHTML += '<div class="image">'
+								+ '<img src="' + messageData + '"></div>'
+								+ '<div class="controls"><button class="importToCanvas transparent noMargin">'
+								+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
+						break;
+					case 'text':
+						messageHTML += '<div class="text">' + messageData + '</div>';
+						break;
+				}
+
+				messageHTML += '</div>';
 
 				if (top) {
 					$messagesContainer.children('#loadMore').first().after(messageHTML);
@@ -68,19 +83,24 @@ block scripts
 					if (immediate) {
 						$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
 					} else {
-						$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
+						$messagesContainer.animate({ scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px' });
 					}
 				}
 			};
 
-			var displayMetaMessage = function (message) {
+			var displayMetaMessage = function (message, immediate) {
 				$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
-				$messagesContainer.animate({scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px'});
+				if (immediate) {
+					$messagesContainer.scrollTop($messagesContainer[0].scrollHeight);
+
+				} else {
+					$messagesContainer.animate({ scrollTop: $messagesContainer[0].scrollHeight.toString() + 'px' });
+				}
 			};
 
 			var refreshMessages = function (immediate, from, count, top) {
-				$('#loadMore').attr('disabled', 'disabled');
-				$('#loadMore').addClass('disabled');
+				$loadMoreButton.attr('disabled', 'disabled');
+				$loadMoreButton.addClass('disabled');
 
 				$.get('/conversation_data/' + convID.toString() + '/from/' + from.toString()
 						+ '/count/' + count.toString()).then(function (data) {
@@ -96,13 +116,25 @@ block scripts
 					for (var m = 0; m < data['messages'].length; m++) {
 						var rawDate = data['messages'][m]['createdAt'];
 						var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
-						displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
-								formattedDate, immediate, top);
+
+						switch(data['messages'][m]['type']) {
+							case 'image':
+								displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+										data['messages'][m]['type'], formattedDate, immediate, top);
+								break;
+							case 'text':
+								displayMessage(data['messages'][m]['UserId'], data['messages'][m]['textData'],
+										data['messages'][m]['type'], formattedDate, immediate, top);
+								break;
+							case 'meta':
+								displayMetaMessage(data['messages'][m]['textData'], immediate);
+								break;
+						}
 					}
 
 					if (data['messages'].length >= 10) {
-						$('#loadMore').removeAttr('disabled');
-						$('#loadMore').removeClass('disabled');
+						$loadMoreButton.removeAttr('disabled');
+						$loadMoreButton.removeClass('disabled');
 					}
 
 					messagesLoaded += data['messages'].length;
@@ -119,12 +151,12 @@ block scripts
 
 					// Done loading, get rid of the loading animation thing
 					$messagesContainer.children('.loader').first().remove();
-					$('#loadMore').show();
+					$loadMoreButton.show();
 				});
 			};
 
 			var drawCursor = function (x, y) {
-				$cursor.css({'top': (y - 112).toString() + 'px', 'left': x.toString() + 'px'});
+				$cursor.css({'top': (y - 114).toString() + 'px', 'left': x.toString() + 'px'});
 			};
 
 			$canvas.on('mousedown', function (event) {
@@ -160,7 +192,7 @@ block scripts
 				}
 
 				if (hover) {
-					drawCursor(event.pageX, event.pageY);
+					if(useCursor) drawCursor(event.pageX, event.pageY);
 				}
 			});
 			$canvas.on('touchmove', function (event) {
@@ -188,13 +220,15 @@ block scripts
 			$canvas.on('mouseleave', function (event) {
 				drawCanvas.stopPainting();
 				hover = false;
-				$cursor.hide();
+				if(useCursor) $cursor.hide();
 			});
 
 			$canvas.on('mouseenter', function (event) {
 				hover = true;
-				$cursor.show();
-				drawCursor(event.pageX, event.pageY);
+				if(useCursor) {
+					$cursor.show();
+					drawCursor(event.pageX, event.pageY);
+				}
 			});
 
 			$('.colorTool').click(function () {
@@ -234,7 +268,8 @@ block scripts
 			$('#send').click(function () {
 				var messageData = {
 					imageData: drawCanvas.canvas.toDataURL(),
-					conversationID: convID
+					conversationID: convID,
+					type: 'image'
 				};
 
 				drawCanvas.clearAllCanvasData(true);
@@ -247,7 +282,8 @@ block scripts
 					}
 				}
 
-				displayMessage('#{user.id}', messageData.imageData, moment(Date.now()).format("h:mm A; MMMM D"), false);
+				displayMessage('#{user.id}', messageData.imageData, messageData.type,
+						moment(Date.now()).format("h:mm A; MMMM D"), false);
 			});
 
 			$('#stampIt').click(function () {
@@ -273,13 +309,16 @@ block scripts
 			$('#hotkey').click(function () {
 				var refreshStamps = function () {
 					for (var s in stamps) {
-						var stampHTML = '<div class="stamp" data-id="' + stamps[s]['id']
-								+ '"><img src="' + stamps[s]['imageData'] + '">';
-						if (stamps[s]['UserId'] == (#{user.id}).toString()) {
-							stampHTML += '<button class="stampDelete transparent noMargin big iconOnly"><i class="material-icons">delete</i></button>';
+						if(stamps.hasOwnProperty(s)) {
+							var stampHTML = '<div class="stamp" data-id="' + stamps[s]['id']
+									+ '"><img src="' + stamps[s]['imageData'] + '">';
+							if (stamps[s]['UserId'] == (#{user.id}).toString()) {
+								stampHTML += '<button class="stampDelete transparent noMargin big iconOnly">'
+										+ '<i class="material-icons">delete</i></button>';
+							}
+							stampHTML += '</div>';
+							$('#stamps').append(stampHTML);
 						}
-						stampHTML += '</div>';
-						$('#stamps').append(stampHTML);
 					}
 				};
 
@@ -336,8 +375,10 @@ block scripts
 			$('#changeName').click(function () {
 				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
 						+ $('#convName').text() + '">');
-				$('#changeNameText').after(' <div id="nameChangeControls"><button id="saveName"><i class="material-icons">done</i><span>Save</span></button>'
-						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i><span>Cancel</span></button></div>');
+				$('#changeNameText').after(' <div id="nameChangeControls"><button id="saveName">'
+						+ '<i class="material-icons">done</i><span>Save</span></button>'
+						+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i>'
+						+ '<span>Cancel</span></button></div>');
 				$('#saveName').click(function () {
 					// TODO: Socket send a message that name has changed
 
@@ -358,7 +399,7 @@ block scripts
 				});
 				$('#cancelChange').click(function () {
 					$('#saveName').remove();
-					$('#cancelChange').remove();
+					$(this).remove();
 
 					$('#changeNameText').replaceWith('<span id="convName">'
 							+ $('#changeNameText').val() + '</span>');
@@ -372,57 +413,112 @@ block scripts
 			$editMembersButton.click(function () {
 				$body.append('<div id="modalBackground"></div>');
 				var modalHTML = '<div id="modal"><h1><span>Edit Members</span><div class="controls">'
-						+ '<button id="closeModal" class="transparent iconOnly big noMargin"><i class="material-icons">clear</i>'
-						+ '</button></div></h1><div id="members"></div>'
-						+ '<select id="addMemberBox">';
+						+ '<button id="closeModal" class="transparent iconOnly big noMargin">'
+						+ '<i class="material-icons">clear</i>'
+						+ '</button></div></h1><div id="members"></div><select id="addMemberBox"></select>';
 
-				// TODO: Figure out a better way to deal with authorship...
-				for(var a in authors) {
-					modalHTML += '<option value="' + authors[a]['username'] + '">'
-							+ authors[a]['username'] + '</option>';
-				}
-
-				modalHTML += '</select> <button id="addMember">'
+				modalHTML += ' <button id="addMember">'
 						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
 						+ '</div>';
 
 				$body.append(modalHTML);
 
 				var $membersList = $('#members');
-				$('#addMemberBox').select2();
+				$('#addMemberBox').select2({
+					placeholder: {
+						id: '-1', // the value of the option
+						text: 'Select an option'
+					},
+
+					ajax: {
+						url: '/users_search/',
+						dataType: 'json',
+						delay: 250,
+						type: 'GET',
+						data: function (params) {
+							return {
+								q: params.term
+							}
+						},
+						/*data: function (params) {
+							return {
+								q: params.term, // search term
+								page: params.page
+							};
+						},*/
+						processResults: function (data, params) {
+							// parse the results into the format expected by Select2
+							// since we are using custom formatting functions we do not need to
+							// alter the remote JSON data, except to indicate that infinite
+							// scrolling can be used
+							//params.page = params.page || 1;
+
+							return {
+								results: $.map(data.users, function(user) {
+									return {
+										text: user.username,
+										id: user.id
+									}
+								})
+								/*pagination: {
+									more: (params.page * 30) < data.total_count
+								}*/
+							};
+						},
+						cache: true
+					},
+					minimumInputLength: 1
+				});
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
 					for (var u in data['users']) {
-						var memberHTML = '<div class="member" data-username="'
-								+ data['users'][u]['username'] + '">';
+						if(data['users'].hasOwnProperty(u)) {
+							var memberHTML = '<div class="member" data-username="'
+									+ data['users'][u]['username'] + '"><div class="avatar">';
 
-						if (data['users'][u]['avatar']) {
-							memberHTML += '<img class="avatar" src="'
-									+ data['users'][u]['avatar'] + '">';
+							if (data['users'][u]['avatar']) {
+								memberHTML += '<img src="' + data['users'][u]['avatar'] + '">';
+							}
+
+							memberHTML += '</div><a class="name" href="/user/' + data['users'][u]['id'] + '/">'
+									+ data['users'][u]['username'] + '</a>'
+									+ ' <button class="deleteMember iconOnly transparent">'
+									+ '<i class="material-icons">clear</i></button></div>';
+
+							$('#members').append(memberHTML);
 						}
-
-						memberHTML += '<a class="name" href="/user/' + data['users'][u]['id'] + '/">'
-								+ data['users'][u]['username'] + '</a>'
-								+ ' <button class="deleteMember iconOnly transparent">'
-								+ '<i class="material-icons">clear</i></button></div>';
-
-						$('#members').append(memberHTML);
 					}
 				});
 
 				$('#addMember').click(function () {
-					var usernameToAdd = $('#addMemberBox').val();
-					socket.emit('userAdd', { username: usernameToAdd, conversationID: convID });
+					var userToAdd = $('#addMemberBox').val();
+					if(userToAdd) {
+						// TODO: We should probably only use one method of IDing users rather than DB ID + username
+						// (in other places...)
+						socket.emit('userAdd', { username: authors[userToAdd]['username'], conversationID: convID });
+						socket.emit('newMessage', {
+							textData: authors[userToAdd]['username'] + ' was added to the conversation.',
+							conversationID: convID,
+							type: 'meta'
+						});
+						displayMetaMessage(authors[userToAdd]['username'] + ' was added to the conversation.', false);
 
-					$membersList.append('<div class="member" data-username="'
-							+ usernameToAdd + '"><a class="name">' + usernameToAdd + '</a>'
-							+ ' <button class="deleteMember iconOnly transparent">'
-							+ '<i class="material-icons">clear</i></button></div>');
+						$membersList.append('<div class="member" data-username="'
+								+ authors[userToAdd]['username'] + '"><a class="name">' + authors[userToAdd]['username']
+								+ '</a> <button class="deleteMember iconOnly transparent">'
+								+ '<i class="material-icons">clear</i></button></div>');
+					}
 				});
 
 				$body.on('click', '.deleteMember', function () {
 					var usernameToRemove = $(this).parent().data('username');
 					socket.emit('userRemove', { username: usernameToRemove, conversationID: convID });
+					socket.emit('newMessage', {
+						textData: usernameToRemove + ' was removed from conversation.',
+						conversationID: convID,
+						type: 'meta'
+					});
+					displayMetaMessage(usernameToRemove + ' was removed from conversation.', false);
 					$(this).parent().remove();
 				});
 
@@ -447,7 +543,7 @@ block scripts
 				}
 			});
 
-			$('#loadMore').click(function () {
+			$loadMoreButton.click(function () {
 				refreshMessages(true, messagesLoaded, 10, true);
 			});
 
@@ -465,7 +561,7 @@ block scripts
 
 			$(window).on('beforeunload', function (event) {
 				onMouseUp(event);
-				socket.emit('removeUser', {user: #{user.id}, conversationID: convID});
+				socket.emit('userRemove', {user: #{user.id}, conversationID: convID}); // used to be removeUser
 				socket.disconnect();
 			});
 
@@ -481,6 +577,7 @@ block scripts
 			$brushSizeRange.change();
 			$(window).resize();
 
+			socket.emit('userOnline');
 			socket.emit('userJoin', { user: #{user.id}, conversationID: convID});
 
 			// TODO: Handle add/remove with sockets
@@ -500,16 +597,32 @@ block scripts
 					var rawDate = data['createdAt'];
 					var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
 
-					displayMessage(data['UserId'], data['imageData'], formattedDate, false);
+					var notificationToCreate = '';
 
-					if ('Notification' in window) {
+					switch(data['type']) {
+						case 'image':
+							notificationToCreate = authors[data['UserId']]['username'] + ' sent a sketch!';
+							displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+							break;
+						case 'text':
+							notificationToCreate = authors[data['UserId']]['username'] + ' sent a message!';
+							displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
+							break;
+						case 'meta':
+							displayMetaMessage(data['textData'], false);
+					}
+
+					if ('Notification' in window && notificationToCreate != '') {
 						if (!document.hasFocus() && authors[data['UserId']] != #{user.id}) {
 							if (Notification.permission === 'granted') {
 								// TODO: Notification toggle
-								var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
+								var notification = new Notification(notificationToCreate);
 							} else if (Notification.permission !== 'denied') {
+								// TODO: This version of requestPermission (callback rather than promise) is deprecated
 								Notification.requestPermission(function (permission) {
-									var notification = new Notification(authors[data['UserId']]['username'] + ' sent a sketch!');
+									if(permission === 'granted') {
+										var notification = new Notification(notificationToCreate);
+									}
 								});
 							}
 						}
@@ -527,16 +640,16 @@ block scripts
 			socket.on('changeName', function (name) {
 				// TODO: Incorporate whether or not it's being edited...
 
-				displayMetaMessage('The conversation name was changed to "' + name + '"');
+				//displayMetaMessage('The conversation name was changed to "' + name + '"');
 			});
 
 			socket.on('userAdd', function (data) {
 				authors[data.id] = data;
-				displayMetaMessage(data.username + ' was added to the conversation.');
+				//displayMetaMessage(data.username + ' was added to the conversation.');
 			});
 			socket.on('userRemove', function (data) {
-				delete authors[data.id];
-				displayMetaMessage(data.username + ' was removed from the conversation.');
+				//delete authors[data.id]; // DON'T ACTUALLY DELETE
+				//displayMetaMessage(data.username + ' was removed from the conversation.');
 			});
 
 			socket.on('userJoin', function (data) {
@@ -549,7 +662,7 @@ block scripts
 
 
 block content
-	img#cursor(width='100', height='57', src='/images/cursor.png')
+	img#cursor(width='100', height='57', src='/images/cursor-scaled.png')
 	button#toggleCanvas Draw
 
 	div#conversation
@@ -569,7 +682,7 @@ block content
 
 		section#drawPanel
 			div#scrollIt
-				canvas#drawCanvas(height='320', width='480', style='width: 480px; height: 320px;')
+				canvas#drawCanvas(height='640', width='960', style='width: 480px; height: 320px;')
 
 				div#tools
 					ul#colors
