@@ -46,7 +46,7 @@ module.exports.controller = function (objects) {
 		// Check CAPTCHA
 		request.post('https://www.google.com/recaptcha/api/siteverify', {
 			form: {
-				secret: objects.config.captchaSecret,
+				secret: objects.siteConfig.captchaSecret,
 				response: req.body['g-recaptcha-response'],
 				remoteip: req.headers['x-forwarded-for'] // IP Address of client
 			}

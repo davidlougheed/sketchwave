@@ -46,16 +46,17 @@ var app = express();
 var appServer = http.createServer(app);
 var appRouter = express.Router();
 
-var config = require('./config.json');
+var dbConfig = require('./config/config.json')[process.env.NODE_ENV];
+var siteConfig = require('./config/site.json');
 
 var sessionMiddleware = session({
 	store: new redisStore({
-		host: config.redis.host,
-		port: config.redis.port,
+		host: dbConfig.redis.host,
+		port: dbConfig.redis.port,
 		client: redisClient,
-		ttl: config.redis.ttl
+		ttl: dbConfig.redis.ttl
 	}),
-	secret: config.sessionSecret,
+	secret: siteConfig.sessionSecret,
 	resave: false,
 	saveUninitialized: false,
 
@@ -112,12 +113,13 @@ fs.readdirSync(controllerDir).filter(function (file) {
 		redis: redisClient,
 		passport: passport,
 		models: models,
-		config: config
+		dbConfig: dbConfig,
+		siteConfig: siteConfig
 	});
 });
 
 models.sequelize.sync().then(function () {
-	var server = appServer.listen(config.port, config.host, function () {
+	var server = appServer.listen(siteConfig.port, siteConfig.host, function () {
 		console.log('Server running on ' + server.address().port);
 	});
 });

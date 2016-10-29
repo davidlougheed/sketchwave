@@ -4,12 +4,14 @@ var fs = require('fs');
 var path = require('path');
 var Sequelize = require('sequelize');
 
-var config = require('../config.json');
-var sequelize = new Sequelize(config.database.name, config.database.username, config.database.password, {
-	host: config.database.host,
-	port: config.database.port,
-	dialect: 'postgres'
-});
+var config = require('../config/config.json');
+var sequelize = new Sequelize(config[process.env.NODE_ENV].database,
+	config[process.env.NODE_ENV].username, config[process.env.NODE_ENV].password,
+	{
+		host: config[process.env.NODE_ENV].host,
+		port: config[process.env.NODE_ENV].port,
+		dialect: 'postgres'
+	});
 var db = {};
 
 fs.readdirSync(__dirname).filter(function (file) {
