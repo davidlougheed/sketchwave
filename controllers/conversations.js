@@ -269,11 +269,26 @@ module.exports.controller = function (objects) {
 						offset: parseInt(req.params.from),
 						limit: parseInt(req.params.count)
 					}).then(function (messages) {
-						return res.send({ success: true, conversation: conversation, messages: messages });
+						var expandedMessages = [];
+						for (var m in messages) {
+							if (messages.hasOwnProperty(m)) {
+								var expandedMessage = messages[m];
+								expandedMessage.imageData = [];
+								delete expandedMessage.imageData2;
+								for (var i in messages[m].imageData2) {
+									if (messages[m].imageData2.hasOwnProperty(i)) {
+										expandedMessage.imageData.push('data:image/png;base64,' +
+											messages[m].imageData2[i].toString('base64'));
+									}
+								}
+								expandedMessages.push(expandedMessage);
+							}
+						}
+						return res.send({ success: true, conversation: conversation, messages: expandedMessages });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
+					return res.send({ success: false, error: 'not_allowed' }); // TODO: appError format
 				}
 			});
 		});
@@ -323,7 +338,7 @@ module.exports.controller = function (objects) {
 							},
 							attributes: { exclude: ['password'] }
 						}).then(function (user) {
-							if(user) {
+							if (user) {
 								conversation.addUser(user);
 								conversation.save();
 
@@ -394,10 +409,12 @@ module.exports.controller = function (objects) {
 					}
 				}).then(function (users) {
 					if (users != null && users.length > 0) {
-						socket.join('conversation' + data.conversationID.toString());
+						socket.join('conversation' + conversationID.toString());
 
-						socket.broadcast.to('conversation' + data.conversationID.toString())
+						socket.broadcast.to('conversation' + conversationID.toString())
 							.emit('userJoin', users[0].username);
+					} else {
+						// TODO: Throw a forbidden-esque error
 					}
 				});
 			});
