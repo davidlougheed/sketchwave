@@ -141,32 +141,6 @@ module.exports.controller = function (objects) {
 			});
 		});
     });
-	objects.router.put('/conversation/:id/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if (!req.isAuthenticated()) {
-			return appError.generate(req, res, 403, {});
-		}
-		if (!req.body) {
-			return res.send('error no body');
-		}
-		if(!parseInt(req.params.id)) {
-			return res.send({ error: 'invalid id' });
-		}
-
-		objects.models.Conversation.findOne({where: {
-				id: parseInt(req.params.id)
-			}
-		}).then(function (conversation) {
-			conversation.name = req.body.name;
-			conversation.save();
-
-			objects.io.of('conversation' + conversation.id.toString())
-				.emit('changeName', conversation.name);
-
-			return res.send({ success: true });
-		});
-	});
 	objects.router.delete('/conversations/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
@@ -308,6 +282,29 @@ module.exports.controller = function (objects) {
 	// TODO: HANDLE 403 / AUTHENTICATION EXPIRY HERE!!!!!!!!!
 
 	objects.io.on('connection', function (socket) {
+		socket.on('changeName', function (data) {
+			objects.models.Conversation.findOne({where: {
+				id: parseInt(data.conversationID)
+			}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						conversation.name = entities.encode(data.newName);
+						conversation.save();
+
+						objects.io.to('conversation' + conversation.id.toString())
+							.emit('changeName', conversation.name);
+					} else {
+						// TODO: Throw a forbidden-esque error
+					}
+				});
+			});
+		});
+
 		socket.on('userAdd', function (data) {
 			objects.models.Conversation.findOne({
 				where: {
