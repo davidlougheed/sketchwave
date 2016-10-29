@@ -244,6 +244,10 @@ footer#pageFooter #footerLogo {
 	pointer-events: none;
 }
 
+button#claimConv {
+	margin-left: 1em;
+}
+
 button#toggleCanvas {
 	position: fixed;
 	width: 86px;
@@ -920,6 +924,32 @@ div#modal h1 div.controls {
 }
 #members .member a.name:hover {
 	text-decoration: underline;
+}
+#members .member div.onlineIndicator {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 0.5em; margin-top: 13px;
+	width: 11px; height: 11px;
+
+	border-radius: 100%;
+	background-color: #ececec;
+}
+#members .member div.onlineIndicator.online {
+	background-color: #2ecc71;
+}
+#members .member div.ownerBadge {
+	float: right;
+	padding: 0.1em 0.3em;
+	vertical-align: top;
+	margin-top: 8px;
+
+	background-color: #ff5562;
+	border-radius: 3px;
+
+	color: #fff8fc;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 0.75rem;
 }
 #members .member button {
 	float: right;
