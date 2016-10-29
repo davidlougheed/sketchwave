@@ -446,6 +446,38 @@ module.exports.controller = function (objects) {
 					if (users != null && users.length > 0) {
 						socket.broadcast.to('conversation' + data.conversationID.toString())
 							.emit('userLeave', users[0].username);
+					} else {
+						// TODO: Throw a forbidden-esque error
+					}
+				});
+			});
+		});
+
+		socket.on('claimConversation', function (conversationID) {
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(conversationID)
+				}
+			}).then(function (conversation) {
+				conversation.getUsers({
+					where: {
+						id: socket.request.session.passport.user
+					}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
+						conversation.getOwner().then(function (owner) {
+							if (owner == null) {
+								// Conversation is OK to claim, since there is no set owner.
+								conversation.setOwner(users[0]).then(function () {
+									socket.broadcast.to('conversation' + conversationID.toString())
+										.emit('claimConversation', users[0].id);
+								});
+							} else {
+								// TODO: Send bad req error
+							}
+						});
+					} else {
+						// TODO: Throw a forbidden-esque error
 					}
 				});
 			});
