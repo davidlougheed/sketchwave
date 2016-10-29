@@ -92,10 +92,10 @@ app.use(function (req, res) {
 	res.render('errors/403.jade', {});
 });
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
 	done(null, user.id);
 });
-passport.deserializeUser(function(id, done) {
+passport.deserializeUser(function (id, done) {
 	models.User.findOne({ where: { id: id }, attributes: { exclude: ['avatar'] } }).then(function (user) {
 		done(null, user);
 	});
