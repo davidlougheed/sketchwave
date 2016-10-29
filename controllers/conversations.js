@@ -92,7 +92,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-    objects.router.get('/conversation/:id/', function (req, res) {
+    objects.router.get('/conversations/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversation/' + req.params.id));
 		}
@@ -205,7 +205,7 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
-	objects.router.get('/conversation_users/:id/', function (req, res) {
+	objects.router.get('/conversations/:id/users/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if (!req.isAuthenticated()) {
@@ -256,7 +256,7 @@ module.exports.controller = function (objects) {
 			});
 		});
 	});
-	objects.router.get('/conversation_data/:id/from/:from/count/:count/', function (req, res) {
+	objects.router.get('/conversations/:id/data/from/:from/count/:count/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {

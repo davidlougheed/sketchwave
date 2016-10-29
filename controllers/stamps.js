@@ -3,7 +3,7 @@
 var sanitizeHtml = require('sanitize-html');
 
 module.exports.controller = function (objects) {
-	objects.router.get('/conversation/:id/stamps/', function (req, res) {
+	objects.router.get('/conversations/:id/stamps/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {

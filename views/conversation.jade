@@ -30,9 +30,9 @@ block scripts
 			$messagesContainer.append('<div class="loader" '
 				+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
-			$.get('/conversation/' + convID + '/stamps/').done(function (data) {
-				for(var s in data['stamps']) {
-					if(data['stamps'].hasOwnProperty(s)) {
+			$.get('/conversations/' + convID + '/stamps/').done(function (data) {
+				for (var s in data['stamps']) {
+					if (data['stamps'].hasOwnProperty(s)) {
 						stamps[data['stamps'][s]['id']] = data['stamps'][s];
 					}
 				}
@@ -103,6 +103,7 @@ block scripts
 				$loadMoreButton.addClass('disabled');
 
 				$.get('/conversation_data/' + convID.toString() + '/from/' + from.toString()
+				$.get('/conversations/' + convID.toString() + '/data/from/' + from.toString()
 						+ '/count/' + count.toString()).then(function (data) {
 					// TODO: If not editing
 					$('#convName').text(data['conversation']['name']);
@@ -471,6 +472,7 @@ block scripts
 				});
 
 				$.get('/conversation_users/' + convID + '/').done(function (data) {
+				$.get('/conversations/' + convID + '/users/').done(function (data) {
 					for (var u in data['users']) {
 						if(data['users'].hasOwnProperty(u)) {
 							var memberHTML = '<div class="member" data-username="'
