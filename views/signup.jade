@@ -12,12 +12,12 @@ block scripts
 				window.location.replace('/login/');
 			});
 
-			var $cursor = $('#cursor');
+			//var $cursor = $('#cursor');
 			var $brushSizeRange = $('#brushSizeRange');
 			var $avatarCanvas = $('#avatarCanvas');
 
 			var hover = false;
-			$cursor.hide();
+			//$cursor.hide();
 
 			var drawCanvas = new SWCanvas('avatarCanvas');
 
@@ -53,9 +53,9 @@ block scripts
 					drawCanvas.redraw();
 				}
 
-				if (hover) {
-					drawCursor(event.pageX, event.pageY + $(this).scrollTop());
-				}
+				//if (hover) {
+				//	drawCursor(event.pageX, event.pageY + $(this).scrollTop());
+				//}
 			});
 			$avatarCanvas.on('touchmove', function (event) {
 				event.preventDefault();
@@ -92,7 +92,7 @@ block scripts
 			$avatarCanvas.on('mouseenter', function (event) {
 				hover = true;
 				$cursor.show();
-				drawCursor(event.pageX, event.pageY);
+				//drawCursor(event.pageX, event.pageY);
 			});
 
 			$('.colorTool').click(function () {
@@ -140,7 +140,7 @@ block scripts
 		});
 
 block content
-	img#cursor(width='100', height='57', src='/images/cursor.png')
+	//img#cursor(width='100', height='57', src='/images/cursor.png')
 	h1#bigForm.wider
 		span Sign Up
 		div#controls
