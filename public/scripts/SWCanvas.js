@@ -78,7 +78,7 @@ SWCanvas.prototype.redraw = function () {
 	this.context.lineJoin = 'round';
 
 	for (var p in this.points) {
-		if(this.points.hasOwnProperty(p)) {
+		if (this.points.hasOwnProperty(p)) {
 			if (this.points[p].tool == 'brush') {
 				// We're using the paintbrush and not stamps
 
@@ -137,7 +137,7 @@ SWCanvas.prototype.addPoint = function (x, y, dragging) {
 		stamp: (this.brush.tool === 'brush') ? null : this.brush.stamp
 	});
 
-	if(this.points.length > 50) {
+	if (this.points.length > 50) {
 		this.redraw();
 		this.imageToBg(true);
 		if (dragging) {
@@ -166,9 +166,9 @@ SWCanvas.prototype.stopPainting = function () {
  * @param updates {object} - The updates to apply to the brush object.
  */
 SWCanvas.prototype.updateBrush = function(updates) {
-	for(var u in updates) {
-		if(updates.hasOwnProperty(u)) {
-			if(this.brush[u] !== updates[u]) {
+	for (var u in updates) {
+		if (updates.hasOwnProperty(u)) {
+			if (this.brush[u] !== updates[u]) {
 				this.brush[u] = updates[u];
 			}
 		}
