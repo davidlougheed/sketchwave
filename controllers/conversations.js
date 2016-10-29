@@ -7,21 +7,23 @@ var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
+	// Shows a list of convesations.
 	objects.router.get('/conversations/', function (req, res) {
 		if (!req.isAuthenticated()) {
-			// TODO: Handle non-authentication more gracefully, perhaps with a login form + redirect
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
 
 		res.render('conversations', { user: req.user });
 	});
+
+	// Creates a conversation if the user is authenticated.
 	objects.router.post('/conversations/', function (req, res) {
 		//TODO: Handle errors properly
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
 		if (!req.body) {
-			return res.send('error no body');
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {});
 		}
 
 		var names = req.body.names || [];
@@ -44,11 +46,12 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	// Get conversations data.
 	objects.router.get('/conversations_data/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
-			return appError.generate(req, res, 403, {}); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: Handle non authentication
 		}
 
 		objects.models.User.findOne({
@@ -58,23 +61,23 @@ module.exports.controller = function (objects) {
 		}).then(function (user) {
 			user.getConversations().then(function (conversations) {
 				conversations.sort(function (a, b) {
-					if(a['lastMessage'] < b['lastMessage']) return 1;
-					if(a['lastMessage'] > b['lastMessage']) return -1;
+					if (a['lastMessage'] < b['lastMessage']) return 1;
+					if (a['lastMessage'] > b['lastMessage']) return -1;
 
 					return 0;
 				});
 
 				var usersList = [];
 
-				async.eachSeries(conversations, function(conversation, callback) {
+				async.eachSeries(conversations, function (conversation, callback) {
 					conversation.getUsers({
 						attributes: { exclude: ['password'] }
 					}).then(function (users) {
 						var userList = [];
-						for(var u in users) {
+						for (var u in users) {
 							if (users.hasOwnProperty(u)) {
 								var userData = users[u].toJSON();
-								if(userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+								if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 
 								// Prevent XSS from username
 								userData['username'] = entities.encode(userData['username']);
@@ -86,18 +89,24 @@ module.exports.controller = function (objects) {
 						callback();
 					});
 				}, function (err) {
+					if (err) {
+						throw err;
+						// TODO: Send internal server error
+					}
+
 					return res.send({ conversations: conversations, users: usersList });
 				});
 			});
 		});
 	});
 
+	// Shows a specific conversation if the user is part of it.
     objects.router.get('/conversations/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversation/' + req.params.id));
 		}
-		if(!parseInt(req.params.id)) {
-			return res.send('invalid id');
+		if (!parseInt(req.params.id)) {
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
 		}
 
 		objects.models.Conversation.findOne({
@@ -113,7 +122,7 @@ module.exports.controller = function (objects) {
 				conversation.getUsers().then(function (users) {
 					var permission = false;
 					for (var u in users) {
-						if(users.hasOwnProperty(u)) {
+						if (users.hasOwnProperty(u)) {
 							if (user.id == (users[u].toJSON())['id']) {
 								permission = true;
 							}
@@ -121,7 +130,7 @@ module.exports.controller = function (objects) {
 					}
 
 					if (!permission) {
-						return res.send('no permission');
+						appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 					} else {
 						res.render('conversation', {
 							user: req.user,
@@ -158,14 +167,14 @@ module.exports.controller = function (objects) {
 			return res.send({ success: true });
 		});
 	});
-	objects.router.delete('/conversation/:id/', function (req, res) {
+	objects.router.delete('/conversations/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if (!req.isAuthenticated()) {
-			return appError.generate(req, res, 403, {});
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 		}
-		if(!parseInt(req.params.id)) {
-			return res.send({ error: 'invalid id' });
+		if (!parseInt(req.params.id)) {
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
 		}
 
 		objects.models.Conversation.findOne({
@@ -209,10 +218,10 @@ module.exports.controller = function (objects) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if (!req.isAuthenticated()) {
-			return res.send({ error: 'not_authenticated' }); // TODO: Handle non authentication
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
-		if(!parseInt(req.params.id)) {
-			return res.send({ error: 'invalid id' });
+		if (!parseInt(req.params.id)) {
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
 		}
 
 		objects.models.Conversation.findOne({
@@ -226,12 +235,12 @@ module.exports.controller = function (objects) {
 					id: req.user.id
 				}
 			}).then(function (users) {
-				if(users != null && users.length > 0) {
+				if (users != null && users.length > 0) {
 					conversation.getUsers().then(function (users) {
 						var usersData = [];
 
-						for(var u in users) {
-							if(users.hasOwnProperty(u)) {
+						for (var u in users) {
+							if (users.hasOwnProperty(u)) {
 								var userData = users[u].toJSON();
 
 								// Convert avatar from buffer to string
@@ -251,7 +260,7 @@ module.exports.controller = function (objects) {
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
+					return res.send({ success: false, error: 'not_allowed' }); // TODO: appError format
 				}
 			});
 		});
@@ -259,10 +268,10 @@ module.exports.controller = function (objects) {
 	objects.router.get('/conversations/:id/data/from/:from/count/:count/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
-		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle more gracefully
+		if (!req.isAuthenticated()) {
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: appError format
 		}
-		if(!parseInt(req.params.id)) {
+		if (!parseInt(req.params.id)) {
 			return res.send({ error: 'invalid id' });
 		}
 
@@ -332,6 +341,8 @@ module.exports.controller = function (objects) {
 									.emit('userAdd', userData);
 							}
 						});
+					} else {
+						// TODO: Throw a forbidden-esque error
 					}
 				});
 			});
@@ -364,18 +375,20 @@ module.exports.controller = function (objects) {
 									.emit('userRemove', { id: userID, username: data.username });
 							}
 						});
+					} else {
+						// TODO: Throw a forbidden-esque error
 					}
 				});
 			});
 		});
 
-		socket.on('userJoin', function (data) {
+		socket.on('userJoin', function (conversationID) {
 			// TODO: Send user connect message, handle online/offline stuff...
 			// TODO: Cache conversation data FOR ALL APP!!! SO THAT NOT SO MANY DB REQUESTS ARE MADE
 
 			objects.models.Conversation.findOne({
 				where: {
-					id: parseInt(data.conversationID)
+					id: parseInt(conversationID)
 				}
 			}).then(function (conversation) {
 				conversation.getUsers({
