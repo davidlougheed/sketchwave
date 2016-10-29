@@ -212,15 +212,13 @@ SWCanvas.prototype.moveImageDataToBackground = function () {
  */
 SWCanvas.prototype.drawBackground = function (keepPoints) {
 	if (this.background) {
-		var imageLoad = function (bg) {
+		var bgImage = document.createElement('img');
+		bgImage.setAttribute('src', this.background);
+		bgImage.onload = function (bg) {
 			this.clearAllCanvasData(false, keepPoints);
 			this.context.clearRect(0, 0, this.cw, this.ch);
 			this.context.drawImage(bg, 0, 0, this.cw, this.ch);
-		};
-
-		var bgImage = document.createElement('img');
-		bgImage.setAttribute('src', this.background);
-		bgImage.onload = imageLoad.bind(this, bgImage);
+		}.bind(this, bgImage);
 	}
 };
 
