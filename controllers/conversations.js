@@ -156,36 +156,45 @@ module.exports.controller = function (objects) {
 				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
-			if(conversation == null) {
-				return res.send({ success: false });
+			if (conversation == null) {
+				return res.send({ success: false }); // TODO: appError format
 			}
-
-			conversation.getUsers({
-				where: {
-					id: req.user.id
-				}
-			}).then(function (users) {
-				if (users != null && users.length > 0) {
-					objects.models.Message.findAll({
+			conversation.getOwner().then(function (owner) {
+				if (owner == null || owner.id == req.user.id) {
+					conversation.getUsers({
 						where: {
-							ConversationId: conversation.id
+							id: req.user.id
 						}
-					}).then(function (messages) {
-						for(var m in messages) {
-							if(messages.hasOwnProperty(m)) {
-								messages[m].destroy();
-							}
+					}).then(function (users) {
+						if (users != null && users.length > 0) {
+							objects.models.Message.findAll({
+								where: {
+									ConversationId: conversation.id
+								}
+							}).then(function (messages) {
+								for (var m in messages) {
+									if (messages.hasOwnProperty(m)) {
+										messages[m].destroy();
+									}
+								}
+							});
+
+							conversation.destroy();
+
+							return res.send({ success: true });
+						} else {
+							// If the user is not part of the conversation, block the action.
+							appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 						}
 					});
-
-					conversation.destroy();
-
-					return res.send({ success: true });
 				} else {
-					// User is not part of the conversation and should not be able to delete it
-					return res.send({ success: false, error: 'not_allowed' }); // TODO: Handle more gracefully
+					// If there is an owner and the current user is not the owner, block the action.
+					appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 				}
 			});
+
+			// If nothing works, send an internal server error.
+			return res.send({ success: false, error: 'serverError' }); // TODO: appError format
 		});
 	});
 	objects.router.get('/conversations/:id/users/', function (req, res) {
