@@ -102,6 +102,11 @@ module.exports.controller = function (objects) {
 		}
 	});
 
+	objects.router.post('/api/login/', objects.passport.authenticate('local'), function (req, res) {
+		res.setHeader('Content-Type', 'application/json');
+		res.send({ success: true })
+	});
+
 	objects.router.get('/logout/', function (req, res) {
 		req.logout();
 		res.redirect('/');
