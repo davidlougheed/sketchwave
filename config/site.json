@@ -1,0 +1,6 @@
+{
+	"host": "localhost",
+	"port": 4321,
+	"sessionSecret": "replaceThis",
+	"captchaSecret": "replaceThis"
+}

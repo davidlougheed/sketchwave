@@ -1,0 +1,46 @@
+{
+	"development": {
+		"username": "sketchwave",
+		"password": "sketchwave",
+		"database": "sketchwave",
+		"host": "localhost",
+		"port": 5432,
+		"dialect": "postgres",
+
+		"redis": {
+			"host": "localhost",
+			"port": 6379,
+			"ttl": 400
+		}
+	},
+
+	"test": {
+		"username": "sketchwave",
+		"password": "sketchwave",
+		"database": "sketchwave",
+		"host": "localhost",
+		"port": 5432,
+		"dialect": "postgres",
+
+		"redis": {
+			"host": "localhost",
+			"port": 6379,
+			"ttl": 400
+		}
+	},
+
+	"production": {
+		"username": "sketchwave",
+		"password": "sketchwave",
+		"database": "sketchwave",
+		"host": "localhost",
+		"port": 5432,
+		"dialect": "postgres",
+
+		"redis": {
+			"host": "localhost",
+			"port": 6379,
+			"ttl": 400
+		}
+	}
+}
