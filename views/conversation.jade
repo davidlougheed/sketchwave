@@ -7,10 +7,11 @@ block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
 			const convID = #{conversationID};
+			var ownerId;
 
 			var active = true;
-
 			var useCursor = false;
+			var editingName = false;
 
 			var socket = io();
 			var authors = {};
@@ -59,7 +60,11 @@ block scripts
 
 			// TODO: Optimize small avatars
 			var displayMessage = function (userID, messageData, messageType, date, immediate, top) {
-				var messageHTML = '<div class="message ' + messageType + '-message" id="message-' + '">'
+				var messageHTML = '<div class="message ' + messageType + '-message';
+				if (userID == #{user.id}) {
+					messageHTML += ' you';
+				}
+				messageHTML += '" id="message-' + '">'
 						+ '<div class="topBar"><div class="author">';
 
 				if(authors[userID]['avatar']) {
@@ -127,8 +132,16 @@ block scripts
 
 				$.get('/conversations/' + convID.toString() + '/data/from/' + from.toString()
 						+ '/count/' + count.toString()).then(function (data) {
+
+					var $convName = $('#convName');
+
 					// TODO: If not editing
-					$('#convName').text(data['conversation']['name']);
+					$convName.text(data['conversation']['name']);
+					ownerId = data['conversation']['OwnerId'];
+
+					if(ownerId == null) {
+						$convName.after('<button id="claimConv">Claim</button>');
+					}
 
 					if (!top) {
 						data['messages'].reverse();
@@ -393,6 +406,8 @@ block scripts
 
 			// Start changing the conversation name
 			$changeNameButton.click(function () {
+				editingName = true;
+
 				$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
 						+ $('#convName').text() + '">');
 				$('#changeNameText').after(' <div id="nameChangeControls"><button id="saveName">'
@@ -406,8 +421,20 @@ block scripts
 						newName: $('#changeNameText').val(),
 						conversationID: convID
 					});
+
+					editingName = false;
+
+					$('#saveName').remove();
+					$('#cancelChange').remove();
+
+					$('#changeNameText').replaceWith('<span id="convName">'
+							+ $('#changeNameText').val() + '</span>');
+					$changeNameButton.removeAttr('disabled');
+					$changeNameButton.show();
 				});
 				$('#cancelChange').click(function () {
+					editingName = false;
+
 					$('#saveName').remove();
 					$(this).remove();
 
@@ -425,11 +452,9 @@ block scripts
 				var modalHTML = '<div id="modal"><h1><span>Edit Members</span><div class="controls">'
 						+ '<button id="closeModal" class="transparent iconOnly big noMargin">'
 						+ '<i class="material-icons">clear</i>'
-						+ '</button></div></h1><div id="members"></div><select id="addMemberBox"></select>';
-
-				modalHTML += ' <button id="addMember">'
-						+ '<i class="material-icons">person_add</i> Add Member</button><br><br>'
-						+ '</div>';
+						+ '</button></div></h1><div id="members"></div><select id="addMemberBox"></select> '
+						+ '<button id="addMember"><i class="material-icons">person_add</i> Add Member</button>'
+						+ '<br><br></div>';
 
 				$body.append(modalHTML);
 
@@ -484,20 +509,35 @@ block scripts
 					for (var u in data['users']) {
 						if (data['users'].hasOwnProperty(u)) {
 							var memberHTML = '<div class="member" data-username="'
-									+ data['users'][u]['username'] + '"><div class="avatar">';
+									+ data['users'][u]['username'] + '" data-id="' + data['users'][u]['id']
+									+ '"><div class="avatar">';
 
 							if (data['users'][u]['avatar']) {
 								memberHTML += '<img src="' + data['users'][u]['avatar'] + '">';
 							}
 
 							memberHTML += '</div><a class="name" href="/user/' + data['users'][u]['id'] + '/">'
-									+ data['users'][u]['username'] + '</a>'
+									+ data['users'][u]['username'] + '</a><div class="onlineIndicator"></div>'
 									+ ' <button class="deleteMember iconOnly transparent">'
-									+ '<i class="material-icons">clear</i></button></div>';
+									+ '<i class="material-icons">clear</i></button>';
+
+							if (ownerId == data['users'][u]['id']) {
+								memberHTML += '<div class="ownerBadge">Owner</div>';
+							}
+
+							memberHTML += '</div>';
 
 							$('#members').append(memberHTML);
 						}
 					}
+
+					$('#members').find('.member').each(function () {
+						$.get('/user/' + $(this).data('id') + '/status/').done(function (statusData) {
+							if (statusData['online']) {
+								$(this).children('.onlineIndicator').first().addClass('online');
+							}
+						}.bind(this));
+					});
 				});
 
 				$('#addMember').click(function () {
@@ -592,6 +632,16 @@ block scripts
 					Notification.requestPermission();
 				}
 			}
+
+			$body.on('click', '#claimConv', function () {
+				socket.emit('claimConversation', convID);
+			});
+
+			socket.on('claimConversation', function (claimerId) {
+				// TODO: Some additional logic to update UI
+				$('#claimConv').remove();
+				ownerId = claimerId;
+			});
 
 			socket.on('newMessage', function (data) {
 				if (parseInt(data['ConversationId']) == convID) {
