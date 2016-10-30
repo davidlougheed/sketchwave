@@ -103,7 +103,7 @@ module.exports.controller = function (objects) {
 	// Shows a specific conversation if the user is part of it.
     objects.router.get('/conversations/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
-			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversation/' + req.params.id));
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/' + req.params.id));
 		}
 		if (!parseInt(req.params.id)) {
 			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
@@ -387,13 +387,13 @@ module.exports.controller = function (objects) {
 							attributes: { exclude: ['password', 'avatar'] }
 						}).then(function (user) {
 							if (user) {
-								var userID = user.id;
+								var userId = user.id;
 								conversation.removeUser(user);
 
 								// TODO: Add meta message to database
 
 								objects.io.to('conversation' + data.conversationID.toString())
-									.emit('userRemove', { id: userID, username: data.username });
+									.emit('userRemove', { id: userId, username: data.username });
 							}
 						});
 					} else {
@@ -473,11 +473,11 @@ module.exports.controller = function (objects) {
 										.emit('claimConversation', users[0].id);
 								});
 							} else {
-								// TODO: Send bad req error
+								// TODO: Send bad request error.
 							}
 						});
 					} else {
-						// TODO: Throw a forbidden-esque error
+						// TODO: Throw a forbidden-esque error.
 					}
 				});
 			});
