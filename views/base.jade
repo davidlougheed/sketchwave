@@ -31,7 +31,7 @@ html
 				ul
 					if user
 						li
-							a(href='/conversations')
+							a(href='/conversations/')
 								i.material-icons forum
 								span Conversations
 						li
@@ -39,7 +39,7 @@ html
 								i.material-icons account_circle
 								span My Profile
 						li(style='float: right')
-							a(href='/logout') Log Out #[span#logOutUsername (#{user.username})]
+							a(href='/logout/') Log Out #[span#logOutUsername (#{user.username})]
 					else
 						li
 							a(href='/')
