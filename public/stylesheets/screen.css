@@ -250,12 +250,12 @@ button#claimConv {
 
 button#toggleCanvas {
 	position: fixed;
-	width: 86px;
+	width: 125px;
 	left: 50%;
-	margin-left: -43px;
+	margin-left: -75px;
+	text-align: center;
 	bottom: 10px;
 	z-index: 95;
-	box-shadow: 0 1px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
 	display: none;
 }
@@ -1115,7 +1115,7 @@ button.big i.material-icons {
 }
 button.big span {
 	font-size: 17px;
-	font-weight: 300;
+	font-weight: 400;
 	line-height: 18px;
 }
 button.big.borderRight {

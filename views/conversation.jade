@@ -576,11 +576,13 @@ block scripts
 			$('#toggleCanvas').click(function () {
 				if ($drawPanel.css('left') != '0px') {
 					$drawPanel.animate({left: 0});
-					$(this).text('Messages');
+					$(this).children('span').text('Messages');
+					$(this).children('i').text('chevron_left');
 					$drawPanel.focus();
 				} else {
 					$drawPanel.animate({left: '100%'});
-					$(this).text('Draw');
+					$(this).children('span').text('Draw');
+					$(this).children('i').text('gesture');
 				}
 			});
 
@@ -709,7 +711,9 @@ block scripts
 
 block content
 	img#cursor(width='100', height='57', src='/images/cursor-scaled.png')
-	button#toggleCanvas Draw
+	button#toggleCanvas.transparent.big
+		i.material-icons gesture
+		span Draw
 
 	div#conversation
 		section#messages
@@ -724,7 +728,8 @@ block content
 							i.material-icons people
 							span Members
 			section#messagesContainer
-				button#loadMore Load More
+				button#loadMore
+					span Load More
 
 		section#drawPanel
 			div#scrollIt
@@ -761,7 +766,8 @@ block content
 
 			div#commands
 				div(style='float: left;')
-					button#stampIt
+					// position: absolute; margin-left: -75px; left: 50%; width: 150px;
+					button#stampIt.transparent.big
 						i.material-icons image
 						span Stamp It!
 				div(style='float: right;')
