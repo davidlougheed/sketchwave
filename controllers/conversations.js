@@ -2,6 +2,7 @@
 
 var async = require('async');
 var appError = require('../modules/app-error');
+var appMessage = require('../modules/app-message');
 
 var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
@@ -322,6 +323,11 @@ module.exports.controller = function (objects) {
 
 						objects.io.to('conversation' + conversation.id.toString())
 							.emit('changeName', conversation.name);
+
+						appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
+							action: appMessage.ACTION_NAME_CHANGED,
+							name: conversation.name
+						});
 					} else {
 						// TODO: Throw a forbidden-esque error
 					}
@@ -343,7 +349,7 @@ module.exports.controller = function (objects) {
 					if (users != null && users.length > 0) {
 						objects.models.User.findOne({
 							where: {
-								username: data.username
+								id: data.userID
 							},
 							attributes: { exclude: ['password'] }
 						}).then(function (user) {
@@ -356,10 +362,13 @@ module.exports.controller = function (objects) {
 								// Prevent XSS from username
 								userData['username'] = entities.encode(userData['username']);
 
-								// TODO: Add meta message to database
-
 								objects.io.to('conversation' + data.conversationID.toString())
 									.emit('userAdd', userData);
+
+								appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
+									action: appMessage.ACTION_USER_ADDED,
+									subject: user.id
+								});
 							}
 						});
 					} else {
@@ -390,10 +399,13 @@ module.exports.controller = function (objects) {
 								var userId = user.id;
 								conversation.removeUser(user);
 
-								// TODO: Add meta message to database
-
 								objects.io.to('conversation' + data.conversationID.toString())
 									.emit('userRemove', { id: userId, username: data.username });
+
+								appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
+									action: appMessage.ACTION_USER_REMOVED,
+									subject: userId
+								});
 							}
 						});
 					} else {
@@ -471,6 +483,9 @@ module.exports.controller = function (objects) {
 								conversation.setOwner(users[0]).then(function () {
 									socket.broadcast.to('conversation' + conversationID.toString())
 										.emit('claimConversation', users[0].id);
+									appMessage.create(objects, socket, conversationID, null, appMessage.TYPE_META, {
+										action: appMessage.ACTION_CLAIMED
+									});
 								});
 							} else {
 								// TODO: Send bad request error.
