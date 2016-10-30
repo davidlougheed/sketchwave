@@ -1395,6 +1395,10 @@ form#formSignUp h2 {
 		padding: 10px;
 		line-height: 1.4em;
 	}
+
+	section#main blockquote footer {
+		margin-right: 40px;
+	}
 }
 
 @media screen and (max-width: 530px) {
@@ -1430,5 +1434,9 @@ form#formSignUp h2 {
 		position: absolute;
 		top: 10px;
 		right: 10px;
+	}
+
+	section#main blockquote footer {
+		margin-right: 40px;
 	}
 }

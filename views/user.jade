@@ -73,7 +73,7 @@ block scripts
 						}
 
 						if (hover) {
-							drawCursor(event.pageX, event.pageY + $(this).scrollTop());
+							// drawCursor(event.pageX, event.pageY + $(this).scrollTop());
 						}
 					});
 					$avatarCanvas.on('touchmove', function (event) {
@@ -107,9 +107,9 @@ block scripts
 					});
 
 					$avatarCanvas.on('mouseenter', function (event) {
-						hover = true;
-						$cursor.show();
-						drawCursor(event.pageX, event.pageY);
+						// hover = true;
+						// $cursor.show();
+						// drawCursor(event.pageX, event.pageY);
 					});
 
 					$('.colorTool').click(function () {
