@@ -10,6 +10,10 @@ module.exports.ACTION_USER_ADDED = 'userAdded';
 module.exports.ACTION_NAME_CHANGED = 'nameChanged';
 module.exports.ACTION_CLAIMED = 'claimed';
 
+module.exports.TYPE_IMAGE = 'image';
+module.exports.TYPE_TEXT = 'text';
+module.exports.TYPE_META = 'meta';
+
 module.exports.create = function (objects, socket, conversationID, data, type, metaData) {
 	metaData = metaData || {};
 
@@ -32,11 +36,10 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 
 				switch (type) {
 					case 'image':
-						var imageString = sanitizeHtml(data, {
+						var imageString = sanitizeHtml(data.replace('data:image/png;base64,', ''), {
 							allowedTags: [],
 							allowedAttributes: []
 						}).toString();
-						imageString = imageString.replace('data:image/png;base64,', '');
 						var imageBuffer = Buffer.from(imageString, 'base64');
 						messageCreationData.imageData2 = [imageBuffer];
 						break;
@@ -44,20 +47,19 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 						messageCreationData.textData = sanitizeHtml(data);
 						break;
 					case 'meta':
-						messageCreationData.textData = sanitizeHtml(data);
 						messageCreationData.metaData = {
 							action: metaData.action
 						};
 
-						switch (messageCreationData.metaData.action) {
+						switch (metaData.action) {
 							case module.exports.ACTION_USER_LEFT:
 							case module.exports.ACTION_USER_REMOVED:
 							case module.exports.ACTION_USER_JOINED:
 							case module.exports.ACTION_USER_ADDED:
-								messageCreationData['subject'] = metaData.subject;
+								messageCreationData.metaData['subject'] = metaData.subject;
 								break;
 							case module.exports.ACTION_NAME_CHANGED:
-								messageCreationData['name'] = metaData.name;
+								messageCreationData.metaData['name'] = metaData.name;
 								break;
 						}
 
@@ -68,8 +70,18 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 					conversation.lastMessage = Date.now();
 					conversation.save();
 
+					var expandedMessage = message.toJSON();
+					expandedMessage.imageData = [];
+					delete expandedMessage.imageData2;
+					for (var i in message.imageData2) {
+						if (message.imageData2.hasOwnProperty(i)) {
+							expandedMessage.imageData.push('data:image/png;base64,' +
+								message.imageData2[i].toString('base64'));
+						}
+					}
+
 					socket.broadcast.to('conversation' + conversationID.toString())
-						.emit('newMessage', message);
+						.emit('newMessage', expandedMessage);
 				});
 			}
 		});
