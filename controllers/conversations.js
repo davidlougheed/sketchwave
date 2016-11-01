@@ -220,7 +220,9 @@ module.exports.controller = function (objects) {
 				}
 			}).then(function (users) {
 				if (users != null && users.length > 0) {
-					conversation.getUsers().then(function (users) {
+					conversation.getUsers({
+						order: [['username', 'ASC']]
+					}).then(function (users) {
 						var usersData = [];
 
 						for (var u in users) {
