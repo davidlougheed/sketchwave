@@ -7,7 +7,9 @@ module.exports = {
 		}).then(function () {
 			queryInterface.sequelize.query('UPDATE "Messages" SET "imageData2"=ARRAY[decode(' +
 				'replace("imageData"[1], \'data:image/png;base64,\', \'\'), \'BASE64\')]').then(function () {
-				done();
+				queryInterface.sequelize.query('UPDATE "Messages" SET "imageData2"=NULL WHERE "imageData" IS NULL').then(function () {
+					done();
+				});
 			});
 		});
 	},
