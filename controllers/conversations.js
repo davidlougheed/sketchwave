@@ -385,16 +385,25 @@ module.exports.controller = function (objects) {
 							attributes: { exclude: ['password', 'avatar'] }
 						}).then(function (user) {
 							if (user) {
-								var userId = user.id;
-								conversation.removeUser(user);
+								if (users[0].id == conversation.OwnerId || conversation.OwnerId == null) {
+									var userId = user.id;
+									conversation.removeUser(user);
 
-								objects.io.to('conversation' + data.conversationID.toString())
-									.emit('userRemove', { id: userId, username: data.username });
+									if (conversation.OwnerId == userId) {
+										conversation.OwnerId = null;
+										conversation.save();
+									}
 
-								appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
-									action: appMessage.ACTION_USER_REMOVED,
-									subject: userId
-								});
+									objects.io.to('conversation' + data.conversationID.toString())
+										.emit('userRemove', {id: userId, username: data.username});
+
+									appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
+										action: appMessage.ACTION_USER_REMOVED,
+										subject: userId
+									});
+								} else {
+									// TODO: Throw a forbidden-esque error
+								}
 							}
 						});
 					} else {
