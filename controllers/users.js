@@ -7,7 +7,7 @@ var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
-	objects.router.get('/users_data/', function (req, res) {
+	objects.router.get('/users/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {

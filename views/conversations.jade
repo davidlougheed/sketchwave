@@ -84,7 +84,7 @@ block scripts
 			$conversations.append('<div class="loader" '
 					+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
-			$.get('/users_data/').done(function (data) {
+			$.get('/users/').done(function (data) {
 				$names.html('');
 
 				for (var u in data['users']) {
