@@ -55,7 +55,7 @@ module.exports.controller = function (objects) {
 		var searchTerm = req.query.q;
 
 		objects.models.User.findAll({
-			attributes: { exclude: ['password'] },
+			attributes: { exclude: ['avatar', 'avatarThumb', 'password'] },
 			where: {
 				username: {
 					$like: '%' + searchTerm + '%'
