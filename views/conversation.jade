@@ -4,9 +4,9 @@ block vars
 	- var footer = false
 
 block scripts
-	script(type='text/javascript', src='/scripts/ConversationUI.js')
+	script(type='text/javascript', src='/scripts/SWConversationUI.js')
 	script(type='text/javascript').
-		new ConversationUI({
+		new SWConversationUI({
 			id: #{user.id},
 			username: '#{user.username}'
 		}, {
