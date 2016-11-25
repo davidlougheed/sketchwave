@@ -8,6 +8,7 @@
 var SWCanvas = function (canvas) {
 	this.canvas = document.getElementById(canvas);
 	this.context = this.canvas.getContext('2d');
+	this.canvasOffset = $(this.canvas).offset();
 
 	// Cache canvas' real width/height (without scaling)
 	this.cw = this.context.canvas.width;
@@ -175,18 +176,21 @@ SWCanvas.prototype.updateBrush = function(updates) {
 	}
 };
 
+SWCanvas.prototype.updateCanvasOffset = function () {
+	this.canvasOffset = $(this.canvas).offset();
+};
+
 /**
  * Calculates canvas point coordinates based on event mouse coordinates.
  * @param x {number} - The event page X coordinate.
  * @param y {number} - The event page Y coordinate.
  * @returns {{x: number, y: number}}
  */
-SWCanvas.prototype.calculateMouse = function(x, y) {
+SWCanvas.prototype.calculateMouse = function (x, y) {
 	// TODO: When viable, replace offset() with a native JS equivalent
-	// TODO: Cache offset to boost performance, change on window resize
 	return {
-		x: (x - $(this.canvas).offset().left) / (this.canvas.offsetWidth / this.cw),
-		y: (y - $(this.canvas).offset().top) / (this.canvas.offsetHeight / this.ch)
+		x: (x - this.canvasOffset.left) / (this.canvas.offsetWidth / this.cw),
+		y: (y - this.canvasOffset.top) / (this.canvas.offsetHeight / this.ch)
 	};
 };
 

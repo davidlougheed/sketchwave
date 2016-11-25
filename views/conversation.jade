@@ -598,8 +598,8 @@ block scripts
 						$drawPanel.css({left: '100%'});
 					}
 				}
-
 				$canvas.css('height', ($canvas.width() / 1.5).toString() + 'px');
+				drawCanvas.updateCanvasOffset();
 			});
 
 			$(window).on('beforeunload', function (event) {
