@@ -6,8 +6,8 @@ block vars
 block scripts
 	script(type='text/javascript').
 		$(document).ready(function () {
-			const convID = #{conversationID};
-			var ownerId;
+			const convID = #{conversation.id};
+			var ownerId = #{conversation.OwnerId};
 
 			var active = true;
 			var useCursor = false;

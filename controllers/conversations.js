@@ -115,31 +115,22 @@ module.exports.controller = function (objects) {
 				id: parseInt(req.params.id)
 			}
 		}).then(function (conversation) {
-			objects.models.User.findOne({
-				where: {
-					id: req.user.id
-				}
-			}).then(function (user) {
-				conversation.getUsers().then(function (users) {
-					var permission = false;
-					for (var u in users) {
-						if (users.hasOwnProperty(u)) {
-							if (user.id == (users[u].toJSON())['id']) {
-								permission = true;
-							}
-						}
-					}
-
-					if (!permission) {
-						appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
-					} else {
+			if (conversation) {
+				conversation.getUsers({
+					where: {id: req.user.id}
+				}).then(function (users) {
+					if (users != null && users.length > 0) {
 						res.render('conversation', {
 							user: req.user,
-							conversationID: req.params.id
+							conversation: conversation
 						});
+					} else {
+						appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 					}
 				});
-			});
+			} else {
+				appError.generate(req, res, appError.ERROR_NOT_FOUND, {});
+			}
 		});
     });
 	objects.router.delete('/conversations/:id/', function (req, res) {
