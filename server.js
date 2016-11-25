@@ -49,6 +49,7 @@ var appRouter = express.Router();
 var dbConfig = require('./config/config.json')[process.env.NODE_ENV];
 var siteConfig = require('./config/site.json');
 
+// Note: maxAge is in milliseconds!
 var sessionMiddleware = session({
 	store: new redisStore({
 		host: dbConfig.redis.host,
@@ -60,7 +61,7 @@ var sessionMiddleware = session({
 	resave: false,
 	saveUninitialized: false,
 
-	cookie: { maxAge: 60000 }
+	cookie: { maxAge: 600000 }
 });
 
 var io = socketIO.listen(appServer).use(function (socket, next) {
