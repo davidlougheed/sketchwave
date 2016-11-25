@@ -1000,6 +1000,7 @@ label {
 	font-weight: bold;
 	font-family: sans-serif;
 	font-size: 0.8rem;
+	font-family: "Open Sans", sans-serif;
 	color: #333;
 }
 label span {
@@ -1031,6 +1032,9 @@ input[type="text"], input[type="password"] {
 	vertical-align: top;
 
 	outline: none;
+}
+input[type="text"].full-width, input[type="password"].full-width {
+	width: 100%;
 }
 input[type="text"]:focus, input[type="password"]:focus {
 	border-color: #1e90ff;
