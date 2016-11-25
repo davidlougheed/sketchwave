@@ -11,10 +11,11 @@ block scripts
 			var $body = $('body');
 			var $conversations = $('#conversations');
 			var $names = $('#names');
+			var $conversationsMessage = $('#conversationsMessage');
 
 			var active = true;
 
-			$('#conversationsMessage').hide();
+			$conversationsMessage.hide();
 
 			window.setInterval(function () {
 				if (active) {
@@ -72,10 +73,10 @@ block scripts
 					}
 
 					if (data['conversations'].length == 0) {
-						$('#conversationsMessage').show();
-						$('#conversationsMessage').text('You are not currently in any conversations.');
+						$conversationsMessage.show();
+						$conversationsMessage.text('You are not currently in any conversations.');
 					} else {
-						$('#conversationsMessage').hide();
+						$conversationsMessage.hide();
 					}
 				});
 			};
