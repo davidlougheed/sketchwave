@@ -5,23 +5,24 @@
   "repository": "https://bitbucket.org/slowdaniel/sketchwave",
   "license": "UNLICENSED",
   "dependencies": {
-    "async": "^2.1.2",
+    "async": "^2.1.4",
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.1.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
-    "express-session": "^1.14.1",
+    "express-session": "^1.14.2",
     "html-entities": "^1.2.0",
     "jade": "^1.11.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
-    "redis": "^2.6.2",
-    "request": "^2.76.0",
+    "redis": "^2.6.3",
+    "request": "^2.79.0",
     "sanitize-html": "^1.13.0",
-    "sequelize": "^3.24.6",
-    "socket.io": "^1.5.1"
+    "sequelize": "^3.27.0",
+    "sharp": "^0.16.2",
+    "socket.io": "^1.6.0"
   }
 }
