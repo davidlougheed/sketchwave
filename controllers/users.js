@@ -143,6 +143,60 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	objects.router.get('/users/:id/avatar/thumb/', function (req, res) {
+		if(!req.isAuthenticated()) {
+			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		}
+
+		res.header('Content-Type', 'image/png');
+
+		var userId = parseInt(req.params.id);
+		if (isNaN(userId)) {
+			userId = -1;
+		}
+
+		objects.models.User.findOne({
+			where: {
+				id: userId
+			},
+			attributes: ['id', 'avatarThumb']
+		}).then(function (user) {
+			if (user) {
+				var userData = user.toJSON();
+				if (userData.avatarThumb !== null) {
+					return res.send(user.avatarThumb);
+				} else {
+					// Duplicate query to avoid fetching the big avatar if we don't have to.
+					objects.models.User.findOne({
+						where: {
+							id: parseInt(req.params.id)
+						},
+						attributes: ['id', 'avatar']
+					}).then(function (user) {
+						if (user.avatar != null) {
+							if (user.avatar.indexOf('data:image/png;base64,') == -1) {
+								// New Avatar Storage System
+								sharp(user.avatar).resize(108, 108).toBuffer().then(function (data) {
+									return res.send(data);
+								});
+							} else {
+								// Old Avatar Storage System
+								var userAvatar = user.avatar.toString()
+									.replace('data:image/png;base64,', '');
+								var newBuffer = new Buffer(userAvatar, 'base64');
+								sharp(newBuffer).resize(108, 108).toBuffer().then(function (data) {
+									return res.send(data);
+								});
+							}
+						}
+					});
+				}
+			} else {
+				return res.send();
+			}
+		});
+	});
+
 	objects.router.post('/users/:id/avatar/', function (req, res) {
 		if(!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
