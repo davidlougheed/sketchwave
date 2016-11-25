@@ -27,7 +27,7 @@ block scripts
 				$.get('/conversations_data/').done(function (data) {
 					$conversations.html('');
 					for (var c in data['conversations']) {
-						if(data['conversations'].hasOwnProperty(c)) {
+						if (data['conversations'].hasOwnProperty(c)) {
 							var rawDate = data['conversations'][c]['lastMessage'];
 							var formattedDate = moment(rawDate).format("h:mm A; dddd, MMMM D, YYYY");
 							if (rawDate == null) {
@@ -37,8 +37,8 @@ block scripts
 							var userList = '';
 
 							for (var u in data['users'][c]) {
-								if(data['users'][c].hasOwnProperty(u)) {
-									userList += data['users'][c][u]['username'];
+								if (data['users'][c].hasOwnProperty(u)) {
+									userList += '<a href="/users/' + data['users'][c][u]['id'] + '/">'
 											+ data['users'][c][u]['username'] + '</a>';
 									if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
 										userList += ', ';
@@ -71,7 +71,7 @@ block scripts
 						}
 					}
 
-					if(data['conversations'].length == 0) {
+					if (data['conversations'].length == 0) {
 						$('#conversationsMessage').show();
 						$('#conversationsMessage').text('You are not currently in any conversations.');
 					} else {
@@ -86,8 +86,8 @@ block scripts
 			$.get('/users_data/').done(function (data) {
 				$names.html('');
 
-				for(var u in data['users']) {
-					if(data['users'].hasOwnProperty(u)) {
+				for (var u in data['users']) {
+					if (data['users'].hasOwnProperty(u)) {
 						if (data['users'][u]['id'] != #{user.id})
 							$names.append('<option value="' + data['users'][u]['username'] + '">'
 									+ data['users'][u]['username'] + '</option>');
@@ -110,7 +110,7 @@ block scripts
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>Are you sure you want to delete conversation "'
 						+ $(this).parent().parent().children('.link').first().children('a').first().text() + '"?</h1>'
-						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') +  '">'
+						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') + '">'
 						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
 						+ '</div>');
 
