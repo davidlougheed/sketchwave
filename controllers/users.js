@@ -1,6 +1,7 @@
 'use strict';
 
 var sanitizeHtml = require('sanitize-html');
+var sharp = require('sharp');
 
 var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
@@ -23,9 +24,16 @@ module.exports.controller = function (objects) {
 				if(users.hasOwnProperty(u)) {
 					var userData = users[u].toJSON();
 
-					// TODO: Convert this to a shared function
 					// Convert avatar from buffer to string
-					if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
+					if (userData['avatar'] !== null) {
+						if (userData['avatar'].indexOf('data:image/png;base64,') == -1) {
+							// New Avatar Storage System
+							userData.avatar = 'data:image/png;base64,' + userData.avatar.toString('base64');
+						} else {
+							// Old Avatar Storage System
+							userData['avatar'] = users[u].avatar.toString();
+						}
+					}
 
 					// Prevent XSS from username
 					userData['username'] = entities.encode(userData['username']);
@@ -89,6 +97,14 @@ module.exports.controller = function (objects) {
 		}).then(function (user) {
 			var userData = user.toJSON();
 
+			if (userData.avatar.toString().indexOf('data:image/png;base64,') == -1) {
+				// New Avatar Storage System
+				userData.avatar = 'data:image/png;base64,' + userData.avatar.toString('base64');
+			} else {
+				// Old Avatar Storage System
+				userData.avatar = userData.avatar.toString();
+			}
+
 			res.render('user', {
 				user: req.user, // The currently signed-in user
 				profile: userData // User who's profile someone is viewing
@@ -111,10 +127,16 @@ module.exports.controller = function (objects) {
 		}).then(function (user) {
 			var userData = user.toJSON();
 			if(userData.avatar !== null) {
-				userData.avatar = userData.avatar.toString()
-					.replace('data:image/png;base64,', '');
-				var newBuffer = new Buffer(userData.avatar, 'base64');
-				return res.send(newBuffer);
+				if (userData.avatar.indexOf('data:image/png;base64,') == -1) {
+					// New Avatar Storage System
+					return res.send(user.avatar);
+				} else {
+					// Old Avatar Storage System
+					userData.avatar = userData.avatar.toString()
+						.replace('data:image/png;base64,', '');
+					var newBuffer = new Buffer(userData.avatar, 'base64');
+					return res.send(newBuffer);
+				}
 			}
 
 			return res.send(null);
@@ -130,17 +152,19 @@ module.exports.controller = function (objects) {
 			where: {
 				id: parseInt(req.params.id)
 			},
-			attributes: { include: ['id', 'avatar'] }
+			attributes: ['id', 'avatar', 'avatarThumb']
 		}).then(function (user) {
 			// Prevent XSS
-			user.avatar = sanitizeHtml(req.body.imageData, {
+			var userAvatar = Buffer.from(sanitizeHtml(req.body.imageData.replace('data:image/png;base64,', ''), {
 				allowedTags: [],
 				allowedAttributes: []
+			}).toString(), 'base64');
+			user.avatar = userAvatar;
+			sharp(userAvatar).resize(108, 108).toBuffer().then(function (data) {
+				user.avatarThumb = data;
+				user.save();
+				return res.send({ success: true });
 			});
-
-			user.save();
-
-			return res.send({ success: true });
 		});
 	});
 
