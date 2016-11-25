@@ -163,9 +163,8 @@ module.exports.controller = function (objects) {
 			conversation.getOwner().then(function (owner) {
 				if (owner == null || owner.id == req.user.id) {
 					conversation.getUsers({
-						where: {
-							id: req.user.id
-						}
+						where: { id: req.user.id },
+						attributes: ['id']
 					}).then(function (users) {
 						if (users != null && users.length > 0) {
 							objects.models.Message.findAll({
@@ -221,19 +220,14 @@ module.exports.controller = function (objects) {
 			}).then(function (users) {
 				if (users != null && users.length > 0) {
 					conversation.getUsers({
-						order: [['username', 'ASC']]
+						order: [['username', 'ASC']],
+						attributes: { exclude: ['avatar', 'avatarThumb', 'password'] }
 					}).then(function (users) {
 						var usersData = [];
 
 						for (var u in users) {
 							if (users.hasOwnProperty(u)) {
 								var userData = users[u].toJSON();
-
-								// Convert avatar from buffer to string
-								if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
-
-								// Delete password
-								delete userData['password'];
 
 								// Prevent XSS from username
 								userData['username'] = entities.encode(userData['username']);
@@ -317,7 +311,8 @@ module.exports.controller = function (objects) {
 				conversation.getUsers({
 					where: {
 						id: socket.request.session.passport.user
-					}
+					},
+					attributes: ['id']
 				}).then(function (users) {
 					if (users != null && users.length > 0) {
 						conversation.name = entities.encode(data.newName);
@@ -346,7 +341,8 @@ module.exports.controller = function (objects) {
 				conversation.getUsers({
 					where: {
 						id: socket.request.session.passport.user
-					}
+					},
+					attributes: ['id']
 				}).then(function (users) {
 					if (users != null && users.length > 0) {
 						objects.models.User.findOne({
