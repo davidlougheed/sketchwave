@@ -39,6 +39,7 @@ block scripts
 							for (var u in data['users'][c]) {
 								if(data['users'][c].hasOwnProperty(u)) {
 									userList += data['users'][c][u]['username'];
+											+ data['users'][c][u]['username'] + '</a>';
 									if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
 										userList += ', ';
 									}

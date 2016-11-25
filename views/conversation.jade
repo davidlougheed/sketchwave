@@ -71,7 +71,7 @@ block scripts
 					messageHTML += '<img src="' + authors[userID]['avatar'] + '">';
 				}
 
-				messageHTML += '<a href="/user/' + userID + '/">'
+				messageHTML += '<a href="/users/' + userID + '/">'
 						+ authors[userID]['username'] + '</a></div><div class="date">'
 						+ date + '</div></div>';
 
@@ -532,7 +532,7 @@ block scripts
 					}
 
 					$('#members').find('.member').each(function () {
-						$.get('/user/' + $(this).data('id') + '/status/').done(function (statusData) {
+						$.get('/users/' + $(this).data('id') + '/status/').done(function (statusData) {
 							if (statusData['online']) {
 								$(this).children('.onlineIndicator').first().addClass('online');
 							}

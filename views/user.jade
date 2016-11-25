@@ -157,7 +157,7 @@ block scripts
 						onMouseUp(event);
 					});
 				} else {
-					$.post('/user/#{profile.id}/avatar/', {
+					$.post('/users/#{profile.id}/avatar/', {
 						imageData: $avatarCanvas[0].toDataURL()
 					}, function (data) {
 						// TODO: If success, update avatar + canvas

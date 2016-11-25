@@ -96,7 +96,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	objects.router.get('/user/:id/avatar/', function (req, res) {
+	objects.router.get('/users/:id/avatar/', function (req, res) {
 		if(!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
@@ -121,7 +121,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	objects.router.post('/user/:id/avatar/', function (req, res) {
+	objects.router.post('/users/:id/avatar/', function (req, res) {
 		if(!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
@@ -144,7 +144,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	objects.router.get('/user/:id/status/', function (req, res) {
+	objects.router.get('/users/:id/status/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
 		if(!req.isAuthenticated()) {
