@@ -72,13 +72,13 @@ module.exports.controller = function (objects) {
 
 				async.eachSeries(conversations, function (conversation, callback) {
 					conversation.getUsers({
-						attributes: { exclude: ['password'] }
+						attributes: ['id', 'username'],
+						order: [['username', 'ASC']]
 					}).then(function (users) {
 						var userList = [];
 						for (var u in users) {
 							if (users.hasOwnProperty(u)) {
 								var userData = users[u].toJSON();
-								if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
 
 								// Prevent XSS from username
 								userData['username'] = entities.encode(userData['username']);
