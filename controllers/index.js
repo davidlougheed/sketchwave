@@ -60,11 +60,16 @@ module.exports.controller = function (objects) {
 				var salt = bcrypt.genSaltSync(10);
 				var hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
+				var userAvatar = Buffer.from(sanitizeHtml(req.body.imageData.replace('data:image/png;base64,', ''), {
+					allowedTags: [],
+					allowedAttributes: []
+				}).toString(), 'base64');
+
 				// TODO: Fix XSS vulnerability with direct avatar database pass
 				objects.models.User.create({
 					username: req.body.username,
 					password: hashedPassword,
-					avatar: req.body.avatar
+					avatar: userAvatar
 				}).then(function (user) {
 					req.login(user, function (err) {
 						if (err) {
