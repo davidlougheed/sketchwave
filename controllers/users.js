@@ -76,9 +76,9 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	objects.router.get('/user/:id/', function (req, res) {
+	objects.router.get('/users/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
-			return res.redirect('/login/?redirect=' + encodeURIComponent('/user/' + req.params.id));
+			return res.redirect('/login/?redirect=' + encodeURIComponent('/users/' + req.params.id));
 		}
 
 		objects.models.User.findOne({
