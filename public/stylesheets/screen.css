@@ -957,6 +957,25 @@ div#modal h1 div.controls {
 	top: 2px;
 }
 
+.search-member div.avatar {
+	vertical-align: top;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 38px; width: 38px;
+
+	border-radius: 100%;
+	border: 1px solid #e0e0e0;
+}
+.search-member div.avatar img {
+	max-height: 36px; max-width: 36px;
+	border-radius: 100%;
+}
+.search-member div.name {
+	display: inline-block;
+	margin-top: 7px;
+	margin-left: 10px;
+}
+
 .loader {
 	position: relative;
 	top: 30px;
