@@ -53,6 +53,9 @@ module.exports.controller = function (objects) {
 		}
 
 		var searchTerm = req.query.q;
+		var exclude = req.query.exclude;
+		var parseExclude = parseInt(exclude);
+		if (isNaN(parseExclude) || !parseExclude) parseExclude = -1;
 
 		objects.models.User.findAll({
 			attributes: { exclude: ['avatar', 'avatarThumb', 'password'] },
@@ -63,24 +66,47 @@ module.exports.controller = function (objects) {
 			}
 		}).then(function (users) {
 			// TODO: Only include data that is needed for searching
-			var usersData = [];
 
-			for(var u in users) {
-				if(users.hasOwnProperty(u)) {
-					var userData = users[u].toJSON();
+			var userIds = [];
 
-					// TODO: Convert this to a shared function
-					// Convert avatar from buffer to string
-					if (userData['avatar'] !== null) userData['avatar'] = users[u].avatar.toString();
-
-					// Prevent XSS from username
-					userData['username'] = entities.encode(userData['username']);
-
-					usersData.push(userData);
+			for (var u in users) {
+				if (users.hasOwnProperty(u)) {
+					userIds.push(users[u].id);
 				}
 			}
 
-			return res.send({ success: true, users: usersData });
+			objects.models.Conversation.findOne({
+				where: { id: parseExclude }
+			}).then(function (conversation) {
+				if (conversation) {
+					return conversation.getUsers();
+				} else {
+					return [];
+				}
+			}).then(function (result) {
+				var usersData = [];
+				var resultIds = [];
+
+				for (var r in result) {
+					if (result.hasOwnProperty(r)) {
+						resultIds.push(result[r].id);
+					}
+				}
+
+				for (var u in users) {
+					if (users.hasOwnProperty(u)) {
+						if (resultIds.indexOf(users[u].id) == -1) {
+							var userData = users[u].toJSON();
+
+							// Prevent XSS from username
+							userData['username'] = entities.encode(userData['username']);
+							usersData.push(userData);
+						}
+					}
+				}
+
+				return res.send({ success: true, users: usersData });
+			});
 		});
 	});
 
