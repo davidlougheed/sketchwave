@@ -51,6 +51,7 @@ SWConversationUI.prototype.initialize = function () {
 	this.$changeNameButton = $('#changeName');
 	this.$controls = $('#controls');
 	this.$commands = $('#commands');
+	this.$onionSkin = $('#onionSkin');
 
 	this.$controls.hide();
 	this.$commands.hide();
@@ -186,17 +187,36 @@ SWConversationUI.prototype.initialize = function () {
 		this.drawCanvas.clearAllCanvasData(true, false);
 	}.bind(this));
 	$('#send').click(function () {
-		var messageData = {
-			messageData: this.drawCanvas.canvas.toDataURL(),
-			conversationID: this.convID,
-			type: 'image'
-		};
+		var messageData;
+		if (this.drawCanvas.frames.length == 1) {
+			messageData = {
+				messageData: this.drawCanvas.canvas.toDataURL(),
+				conversationID: this.convID,
+				type: 'image'
+			};
+		} else {
+			messageData = {
+				messageData: this.drawCanvas.getFrameDataURLs(),
+				conversationID: this.convID,
+				type: 'animation'
+			};
+		}
 
 		this.drawCanvas.clearAllCanvasData(true, false);
+		this.drawCanvas.clearFrames();
+		this.drawCanvas.stopPlaying();
+
+		$('.frame').each(function () {
+			if ($(this).data('frame') > 0) {
+				$(this).remove();
+			}
+		});
+		$('#frame-1').addClass('selected');
+
 		this.socket.emit('newMessage', messageData);
 		this.messagesLoaded++;
 
-		if (window.innerWidth <= 1040) {
+		if (window.innerWidth <= 1100) {
 			if (this.$drawPanel.css('left') != '0px') {
 				this.$drawPanel.css({left: '100%'});
 			}
@@ -469,8 +489,41 @@ SWConversationUI.prototype.initialize = function () {
 		this.refreshMessages(true, this.messagesLoaded, 10, true);
 	}.bind(this));
 
+	this.$body.on('click', '.frame', function (event) {
+		this.drawCanvas.setFrame($(event.target).data('frame'));
+		this.drawCanvas.redraw();
+		$('.frame').removeClass('selected');
+		$(event.target).addClass('selected');
+	}.bind(this));
+
+	$('#addFrame').click(function () {
+		if (this.drawCanvas.addFrame()) {
+			$('.frame').last().after('<a id="frame-' + this.drawCanvas.frames.length + '" class="frame" data-frame="'
+				+ (this.drawCanvas.frames.length - 1) + '">' + this.drawCanvas.frames.length + '</a>');
+		}
+	}.bind(this));
+	$('#removeFrame').click(function () {
+		if (this.drawCanvas.removeFrame()) {
+			$('.frame').last().remove();
+			$('.frame').removeClass('selected');
+			$('#frame-' + (this.drawCanvas.currentFrame + 1)).addClass('selected');
+		}
+	}.bind(this));
+
+	$('#toggleAnimation').click(function () {
+		if (self.drawCanvas.playing) {
+			self.drawCanvas.stopPlaying();
+			$(this).children('i').first().text('play_arrow');
+			$('#frame-' + (self.drawCanvas.currentFrame + 1)).addClass('selected');
+		} else {
+			self.drawCanvas.startPlaying();
+			$(this).children('i').first().text('pause');
+			$('.frame.selected').first().removeClass('selected');
+		}
+	});
+
 	$(window).resize(function () {
-		if (window.innerWidth > 1040) {
+		if (window.innerWidth > 1100) {
 			this.$drawPanel.css({left: '50%'});
 		} else {
 			if (this.$drawPanel.css('left') != '0px') {
@@ -493,6 +546,10 @@ SWConversationUI.prototype.initialize = function () {
 			$.get('/keepalive/');
 		}
 	}.bind(this), 10000);
+
+	$('#scrollIt').scroll(function () {
+		this.drawCanvas.updateCanvasOffset();
+	}.bind(this));
 
 	// -----------------
 
@@ -534,14 +591,14 @@ SWConversationUI.prototype.initialize = function () {
 			switch (data['type']) {
 				case 'image':
 					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a sketch!';
-					displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+					this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
 					break;
 				case 'text':
 					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a message!';
-					displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
+					this.displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
 					break;
 				case 'meta':
-					displayMetaMessage(data['textData'], false);
+					this.displayMetaMessage(data['textData'], false);
 			}
 
 			if ('Notification' in window && notificationToCreate != '') {

@@ -39,7 +39,21 @@ block content
 
 		section#drawPanel
 			div#scrollIt
-				canvas#drawCanvas(height='640', width='960', style='width: 480px; height: 320px;')
+				div#canvasContainer
+					img#onionSkin(style='width: 480px; height: 320px;')
+					canvas#drawCanvas(height='640', width='960', style='width: 480px; height: 320px;')
+
+				div#frames
+					a#frame-1(data-frame='0').frame.selected 1
+
+					button#addFrame.transparent.not-selectable
+						i.material-icons add
+
+					button#removeFrame.transparent.not-selectable
+						i.material-icons remove
+
+					button#toggleAnimation.transparent.not-selectable
+						i.material-icons play_arrow
 
 				div#tools
 					ul#colors
