@@ -998,6 +998,14 @@ div#modal h1 div.controls {
 	}
 }
 
+.not-selectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 form {
 	clear: both;
 	padding: 15px;
