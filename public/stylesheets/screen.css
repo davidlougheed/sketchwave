@@ -15,6 +15,7 @@
 }
 
 .material-icons {
+	/*noinspection CssNoGenericFontName*/
 	font-family: 'Material Icons';
 	font-weight: normal;
 	font-style: normal;
@@ -47,6 +48,7 @@ body {
 }
 
 header#siteHeader {
+	/*noinspection CssUnknownTarget*/
 	background: url(/images/wave.png) repeat-x;
 	background-size: auto 62px;
 	background-position: 43px 0;
@@ -472,8 +474,7 @@ div#conversation section#messages section#messagesContainer div.message:last-chi
 }
 div#conversation section#messages section#messagesContainer div.message div.topBar {
 	overflow: hidden;
-	margin: auto;
-	margin-bottom: 8px;
+	margin: 0 auto 8px auto;
 	max-width: 480px;
 	width: 100%;
 	height: 36px;
@@ -524,8 +525,7 @@ div#conversation section#messages section#messagesContainer div.message div.text
 	box-sizing: border-box;
 	width: 100%;
 	max-width: 480px;
-	margin: auto;
-	margin-top: 11px;
+	margin: 11px auto 0 auto;
 	padding: 8px 12px;
 
 	background-color: #1e90ff;
@@ -565,8 +565,7 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	image-rendering: crisp-edges;
 }
 div#conversation section#messages section#messagesContainer div.message div.controls {
-	margin: auto;
-	margin-top: 5px;
+	margin: 5px auto 0 auto;
 	max-width: 480px;
 	width: 100%;
 	color: #666;
@@ -805,8 +804,7 @@ div#modal {
 	margin-left: 25%;
 	/*margin-top: 40px;*/
 	top: 40px; bottom: 50px;
-	padding: 20px;
-	padding-top: 55px;
+	padding: 55px 20px 20px 20px;
 
 	max-height: 500px;
 	overflow-y: auto;
@@ -987,6 +985,7 @@ div#modal h1 div.controls {
 	border-radius: 100%;
 	border: 4px solid rgba(0, 0, 0, 0.1);
 
+	/*noinspection CssUnknownTarget*/
 	background: url('/images/gabe.png') no-repeat center;
 	background-size: 88%;
 
@@ -1017,9 +1016,8 @@ label {
 
 	text-transform: uppercase;
 	font-weight: bold;
-	font-family: sans-serif;
-	font-size: 0.8rem;
 	font-family: "Open Sans", sans-serif;
+	font-size: 0.8rem;
 	color: #333;
 }
 label span {
