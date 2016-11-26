@@ -291,8 +291,10 @@ SWConversationUI.prototype.initialize = function () {
 	});
 
 	this.$body.on('click', '.importToCanvas', function () {
-		if (!self.drawCanvas.background) self.drawCanvas.background = document.createElement('img');
-		self.drawCanvas.background.setAttribute('src', $(this).parent().parent()
+		if (!self.drawCanvas.frames[self.drawCanvas.currentFrame].background) {
+			self.drawCanvas.frames[self.drawCanvas.currentFrame].background = document.createElement('img');
+		}
+		self.drawCanvas.frames[self.drawCanvas.currentFrame].background.setAttribute('src', $(this).parent().parent()
 			.children('div.image').first().children('img').first().attr('src'));
 		self.drawCanvas.clearAllCanvasData(false, false);
 		self.drawCanvas.redraw();
