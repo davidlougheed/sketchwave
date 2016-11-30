@@ -206,6 +206,8 @@ SWConversationUI.prototype.initialize = function () {
 		this.drawCanvas.clearFrames();
 		this.drawCanvas.stopPlaying();
 
+		this.$onionSkin.attr('src', ''); // TODO: Sub in a blank image instead of nothing.
+
 		$('.frame').each(function () {
 			if ($(this).data('frame') > 0) {
 				$(this).remove();
@@ -379,11 +381,11 @@ SWConversationUI.prototype.initialize = function () {
 					}
 				},
 				/*data: function (params) {
-				 return {
-				 q: params.term, // search term
-				 page: params.page
-				 };
-				 },*/
+				return {
+				q: params.term, // search term
+				page: params.page
+				};
+				},*/
 				processResults: function (data, params) {
 					// parse the results into the format expected by Select2
 					// since we are using custom formatting functions we do not need to
@@ -399,8 +401,8 @@ SWConversationUI.prototype.initialize = function () {
 							}
 						})
 						/*pagination: {
-						 more: (params.page * 30) < data.total_count
-						 }*/
+						more: (params.page * 30) < data.total_count
+						}*/
 					};
 				},
 				cache: true
@@ -506,8 +508,9 @@ SWConversationUI.prototype.initialize = function () {
 	}.bind(this));
 	$('#removeFrame').click(function () {
 		if (this.drawCanvas.removeFrame()) {
-			$('.frame').last().remove();
-			$('.frame').removeClass('selected');
+			var $frames = $('.frame');
+			$frames.last().remove();
+			$frames.removeClass('selected');
 			$('#frame-' + (this.drawCanvas.currentFrame + 1)).addClass('selected');
 		}
 	}.bind(this));
@@ -694,7 +697,6 @@ SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate)
 	this.$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
 	if (immediate) {
 		this.$messagesContainer.scrollTop(this.$messagesContainer[0].scrollHeight);
-
 	} else {
 		this.$messagesContainer.animate({scrollTop: this.$messagesContainer[0].scrollHeight.toString() + 'px'});
 	}
