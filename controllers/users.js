@@ -57,6 +57,8 @@ module.exports.controller = function (objects) {
 		var parseExclude = parseInt(exclude);
 		if (isNaN(parseExclude) || !parseExclude) parseExclude = -1;
 
+		var exclude_me = req.query.exclude_me;
+
 		objects.models.User.findAll({
 			attributes: { exclude: ['avatar', 'avatarThumb', 'password'] },
 			where: {
@@ -66,14 +68,6 @@ module.exports.controller = function (objects) {
 			}
 		}).then(function (users) {
 			// TODO: Only include data that is needed for searching
-
-			var userIds = [];
-
-			for (var u in users) {
-				if (users.hasOwnProperty(u)) {
-					userIds.push(users[u].id);
-				}
-			}
 
 			objects.models.Conversation.findOne({
 				where: { id: parseExclude }
@@ -97,10 +91,12 @@ module.exports.controller = function (objects) {
 					if (users.hasOwnProperty(u)) {
 						if (resultIds.indexOf(users[u].id) == -1) {
 							var userData = users[u].toJSON();
-
 							// Prevent XSS from username
 							userData['username'] = entities.encode(userData['username']);
-							usersData.push(userData);
+
+							if ((exclude_me === 'true' && users[u].id != req.user.id) || exclude_me !== 'true') {
+								usersData.push(userData);
+							}
 						}
 					}
 				}
