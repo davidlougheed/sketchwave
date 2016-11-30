@@ -508,7 +508,8 @@ div#conversation section#messages section#messagesContainer div.message div.topB
 	font-size: 0.9rem;
 	margin-top: 9px;
 }
-div#conversation section#messages section#messagesContainer div.message div.image {
+div#conversation section#messages section#messagesContainer div.message div.image,
+div#conversation section#messages section#messagesContainer div.message div.animation {
 	position: relative;
 	clear: both;
 	width: 100%;
@@ -519,6 +520,22 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
 	border: 1px solid #bbb;
 	border-radius: 4px;
+}
+div#conversation section#messages section#messagesContainer div.message div.animation.stopped:before {
+	content: "play_arrow";
+	position: absolute;
+	top: 50%; left: 50%;
+	height: 72px; width: 72px;
+	margin-top: -36px; margin-left: -36px;
+
+	background-color: rgba(150, 150, 150, 0.4);
+	border-radius: 100%;
+
+	font-family: "Material Icons", serif;
+	font-size: 4rem;
+	text-align: center;
+	line-height: 72px;
+	color: rgba(0, 0, 0, 0.4);
 }
 div#conversation section#messages section#messagesContainer div.message div.text {
 	position: relative;
@@ -551,7 +568,8 @@ div#conversation section#messages section#messagesContainer div.message div.text
 
 	transform: rotate(45deg);
 }
-div#conversation section#messages section#messagesContainer div.message div.image img {
+div#conversation section#messages section#messagesContainer div.message div.image img,
+div#conversation section#messages section#messagesContainer div.message div.animation img {
 	width: 100%;
 	max-width: 480px;
 	vertical-align: top;
@@ -563,6 +581,15 @@ div#conversation section#messages section#messagesContainer div.message div.imag
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -webkit-crisp-edges;
 	image-rendering: crisp-edges;
+}
+div#conversation section#messages section#messagesContainer div.message div.animation div.animation-frame {
+	width: 100%;
+	max-width: 480px;
+	overflow: hidden;
+	display: none;
+}
+div#conversation section#messages section#messagesContainer div.message div.animation div.animation-frame.current {
+	display: block;
 }
 div#conversation section#messages section#messagesContainer div.message div.controls {
 	margin: 5px auto 0 auto;
