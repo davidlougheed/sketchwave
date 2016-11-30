@@ -11,6 +11,7 @@ module.exports.ACTION_NAME_CHANGED = 'nameChanged';
 module.exports.ACTION_CLAIMED = 'claimed';
 
 module.exports.TYPE_IMAGE = 'image';
+module.exports.TYPE_ANIMATION = 'animation';
 module.exports.TYPE_TEXT = 'text';
 module.exports.TYPE_META = 'meta';
 
@@ -34,14 +35,27 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 					UserId: parseInt(socket.request.session.passport.user)
 				};
 
+				var buf;
 				switch (type) {
 					case 'image':
-						var imageString = sanitizeHtml(data.replace('data:image/png;base64,', ''), {
+						buf = Buffer.from(sanitizeHtml(data.replace('data:image/png;base64,', ''), {
 							allowedTags: [],
 							allowedAttributes: []
-						}).toString();
-						var imageBuffer = Buffer.from(imageString, 'base64');
-						messageCreationData.imageData2 = [imageBuffer];
+						}).toString(), 'base64');
+						messageCreationData.imageData2 = [buf];
+						break;
+					case 'animation':
+						var animationFrames = [];
+						for (var f in data) {
+							if (data.hasOwnProperty(f)) {
+								buf = Buffer.from(sanitizeHtml(data[f].replace('data:image/png;base64,', ''), {
+									allowedTags: [],
+									allowedAttributes: []
+								}).toString(), 'base64');
+								animationFrames.push(buf);
+							}
+						}
+						messageCreationData.imageData2 = animationFrames;
 						break;
 					case 'text':
 						messageCreationData.textData = sanitizeHtml(data);
