@@ -545,12 +545,12 @@ div#conversation section#messages section#messagesContainer div.message div.text
 	margin: 11px auto 0 auto;
 	padding: 8px 12px;
 
-	background-color: #1e90ff;
-	box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1), inset 1px 1px 2px rgba(255, 255, 255, 0.15);;
-	border: 1px solid #1d77e0;
+	background-color: #f7f7f5;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07), inset 1px 1px 2px rgba(255, 255, 255, 0.5);
+	border: 1px solid #d1d1cf;
 	border-radius: 4px;
 
-	color: #eef9ff;
+	color: #333330;
 	font-family: "Open Sans", sans-serif;
 	font-size: 0.9rem;
 	line-height: 1.4em;
@@ -562,9 +562,9 @@ div#conversation section#messages section#messagesContainer div.message div.text
 	left: 12px;
 	height: 8px; width: 8px;
 
-	background-color: #1e90ff;
-	border-left: 1px solid #1d77e0;
-	border-top: 1px solid #1d77e0;
+	background-color: #f7f7f5;
+	border-left: 1px solid #d1d1cf;
+	border-top: 1px solid #d1d1cf;
 
 	transform: rotate(45deg);
 }
