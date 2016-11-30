@@ -580,6 +580,27 @@ SWConversationUI.prototype.initialize = function () {
 		this.socket.emit('claimConversation', this.convID);
 	}.bind(this));
 
+	this.$body.on('click', '.animation.stopped', function () {
+		$(this).removeClass('stopped');
+		$(this).addClass('playing');
+		this.nextFrame = setInterval(function () {
+			var currentFrame = parseInt($(this).children('.animation-frame.current').first().data('frame')) + 1;
+			if (currentFrame >= $(this).children('.animation-frame').length) {
+				currentFrame = 0;
+			}
+
+			$(this).children('.animation-frame.current').removeClass('current');
+			$(this).children('.animation-frame-' + currentFrame.toString()).addClass('current');
+		}.bind(this), 100);
+	});
+	this.$body.on('click', '.animation.playing', function () {
+		clearInterval(this.nextFrame);
+		$(this).children('.animation-frame.current').removeClass('current');
+		$(this).children('.animation-frame-0').addClass('current');
+		$(this).removeClass('playing');
+		$(this).addClass('stopped');
+	});
+
 	this.socket.on('claimConversation', function (claimerId) {
 		// TODO: Some additional logic to update UI
 		$('#claimConv').remove();
@@ -596,6 +617,10 @@ SWConversationUI.prototype.initialize = function () {
 			switch (data['type']) {
 				case 'image':
 					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a sketch!';
+					this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+					break;
+				case 'animation':
+					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a flip-book!';
 					this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
 					break;
 				case 'text':
@@ -673,6 +698,23 @@ SWConversationUI.prototype.displayMessage = function (userID, messageData, messa
 				+ '<div class="controls"><button class="importToCanvas transparent noMargin">'
 				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
 			break;
+		case 'animation':
+			messageHTML += '<div class="animation stopped">';
+			var frameNumber = 0;
+			for (var f in messageData) {
+				if (messageData.hasOwnProperty(f)) {
+					messageHTML += '<div class="animation-frame animation-frame-' + frameNumber;
+					if (frameNumber == 0) {
+						messageHTML += ' current'; // First frame, show it as the current frame.
+					}
+					messageHTML += '" data-frame="' + frameNumber + '"><img src="' + messageData[f]
+						+ '"></div>';
+					frameNumber++;
+				}
+			}
+			messageHTML += '</div><div class="controls"><button class="importToCanvas transparent noMargin">'
+				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
+			break;
 		case 'text':
 			messageHTML += '<div class="text">' + messageData + '</div>';
 			break;
@@ -745,6 +787,10 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 
 			switch (data['messages'][m]['type']) {
 				case 'image':
+					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+						data['messages'][m]['type'], formattedDate, immediate, top);
+					break;
+				case 'animation':
 					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
 						data['messages'][m]['type'], formattedDate, immediate, top);
 					break;
