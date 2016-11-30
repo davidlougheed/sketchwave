@@ -126,7 +126,8 @@ SWCanvas.prototype.redraw = function () {
 				// We're adding stamps
 
 				if (this.frames[this.currentFrame].points[p].stamp) {
-					var size = this.frames[this.currentFrame].points[p].size * 1.5; // Where 1.5 is the size ratio of the canvas width to height
+					// Where 1.5 is the size ratio of the canvas width to height:
+					var size = this.frames[this.currentFrame].points[p].size * 1.5;
 					// TODO: Make this not dependent on DOM
 					if (this.frames[this.currentFrame].points[p].stamp == 'hotswap') {
 						this.context.drawImage($('#' + this.frames[this.currentFrame].points[p].stamp + ' img')[0],
@@ -135,7 +136,8 @@ SWCanvas.prototype.redraw = function () {
 					} else {
 						this.context.drawImage($('#' + this.frames[this.currentFrame].points[p].stamp + ' img')[0],
 							this.frames[this.currentFrame].points[p].x - (this.frames[this.currentFrame].points[p].size / 2),
-							this.frames[this.currentFrame].points[p].y - (this.frames[this.currentFrame].points[p].size / 2), this.frames[this.currentFrame].points[p].size, this.frames[this.currentFrame].points[p].size);
+							this.frames[this.currentFrame].points[p].y - (this.frames[this.currentFrame].points[p].size / 2),
+							this.frames[this.currentFrame].points[p].size, this.frames[this.currentFrame].points[p].size);
 					}
 				}
 			}
@@ -237,8 +239,11 @@ SWCanvas.prototype.setFrame = function (frame) {
  */
 SWCanvas.prototype.getFrameDataURLs = function () {
 	var urls = [];
-	for (var i = 0; i < this.frames.length; i++) {
-		urls.push(this.frames.background); // GabeSave should have moved everything into the background.
+	for (var i in this.frames) {
+		if (this.frames.hasOwnProperty(i)) {
+			// GabeSave should have moved everything into the background.
+			urls.push(this.frames[i].background.getAttribute('src'));
+		}
 	}
 	return urls;
 };
