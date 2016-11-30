@@ -96,7 +96,8 @@ block scripts
 					type: 'GET',
 					data: function (params) {
 						return {
-							q: params.term
+							q: params.term,
+							exclude_me: 'true'
 						}
 					},
 					processResults: function (data, params) {
