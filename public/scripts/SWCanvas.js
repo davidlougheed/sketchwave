@@ -300,6 +300,7 @@ SWCanvas.prototype.updateCanvasOffset = function () {
  */
 SWCanvas.prototype.calculateMouse = function (x, y) {
 	// TODO: When viable, replace offset() with a native JS equivalent
+	//noinspection JSUnresolvedVariable
 	return {
 		x: (x - this.canvasOffset.left) / (this.canvas.offsetWidth / this.cw),
 		y: (y - this.canvasOffset.top) / (this.canvas.offsetHeight / this.ch)
