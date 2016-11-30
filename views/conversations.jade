@@ -40,7 +40,7 @@ block scripts
 							for (var u in data['users'][c]) {
 								if (data['users'][c].hasOwnProperty(u)) {
 									userList += '<a href="/users/' + data['users'][c][u]['id'] + '/">'
-											+ data['users'][c][u]['username'] + '</a>';
+										+ data['users'][c][u]['username'] + '</a>';
 									if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
 										userList += ', ';
 									}
@@ -50,20 +50,20 @@ block scripts
 							var conversationID = data['conversations'][c]['id'];
 
 							var conversationHTML = '<li class="conversation'
-									+ ((data['users'][c].length == 1) ? ' deletable' : '')
-									+ '" data-id="' + conversationID
-									+ '" id="conversation-'
-									+ conversationID + '"><div class="link"><a href="/conversations/'
-									+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
-									+ '<div class="date">Last message posted: ' + formattedDate + '</div>'
-									+ '<div class="memberList"><strong>Members:</strong> '
-									+ '<span class="members">' + userList + '</span></div> ';
+								+ ((data['users'][c].length == 1) ? ' deletable' : '')
+								+ '" data-id="' + conversationID
+								+ '" id="conversation-'
+								+ conversationID + '"><div class="link"><a href="/conversations/'
+								+ conversationID + '/">' + data['conversations'][c]['name'] + '</a></div>'
+								+ '<div class="date">Last message posted: ' + formattedDate + '</div>'
+								+ '<div class="memberList"><strong>Members:</strong> '
+								+ '<span class="members">' + userList + '</span></div> ';
 
 
 							if (data['users'][c].length == 1) {
 								conversationHTML += '<div class="controls">'
-										+ '<button class="delete transparent iconOnly noMargin">'
-										+ '<i class="material-icons">clear</i></button></div>';
+									+ '<button class="delete transparent iconOnly noMargin">'
+									+ '<i class="material-icons">clear</i></button></div>';
 							}
 
 							conversationHTML += '</li>';
@@ -82,20 +82,54 @@ block scripts
 			};
 
 			$conversations.append('<div class="loader" '
-					+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
+				+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
-			$.get('/users/').done(function (data) {
-				$names.html('');
+			$names.select2({
+				placeholder: {
+					id: '-1', // the value of the option
+					text: 'Select an option'
+				},
+				ajax: {
+					url: '/users_search/',
+					dataType: 'json',
+					delay: 250,
+					type: 'GET',
+					data: function (params) {
+						return {
+							q: params.term
+						}
+					},
+					processResults: function (data, params) {
+						// parse the results into the format expected by Select2
+						// since we are using custom formatting functions we do not need to
+						// alter the remote JSON data, except to indicate that infinite
+						// scrolling can be used
+						//params.page = params.page || 1;
 
-				for (var u in data['users']) {
-					if (data['users'].hasOwnProperty(u)) {
-						if (data['users'][u]['id'] != #{user.id})
-							$names.append('<option value="' + data['users'][u]['username'] + '">'
-									+ data['users'][u]['username'] + '</option>');
+						return {
+							results: $.map(data.users, function (user) {
+								return {
+									text: user.username,
+									id: user.id
+								}
+							})
+							/*pagination: {
+								more: (params.page * 30) < data.total_count
+							}*/
+						};
+					},
+					cache: true
+				},
+				templateResult: function (data) {
+					if (data.id !== undefined) {
+						return $('<span class="search-member"><div class="avatar"><img src="/users/'
+							+ data.id + '/avatar/thumb/"></div><div class="name">'
+							+ data.text + '</div></span>');
 					}
-				}
-
-				$names.select2();
+					return $('<span class="search-member"><div class="avatar loading"></div><div class="name">'
+						+ data.text + '</div></span>');
+				},
+				minimumInputLength: 1
 			});
 
 			$('#formCreateConversation').hide();
@@ -110,10 +144,10 @@ block scripts
 			$body.on('click', '.delete', function () {
 				$body.append('<div id="modalBackground"></div>');
 				$body.append('<div id="modal"><h1>Are you sure you want to delete conversation "'
-						+ $(this).parent().parent().children('.link').first().children('a').first().text() + '"?</h1>'
-						+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') + '">'
-						+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
-						+ '</div>');
+					+ $(this).parent().parent().children('.link').first().children('a').first().text() + '"?</h1>'
+					+ '<input type="hidden" id="toDelete" value="' + $(this).parent().parent().data('id') + '">'
+					+ '<button id="confirmDelete">Yes</button> <button id="cancelDelete">No</button>'
+					+ '</div>');
 
 				$('#confirmDelete').click(function () {
 					$.ajax({
