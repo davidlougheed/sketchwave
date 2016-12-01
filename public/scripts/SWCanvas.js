@@ -23,7 +23,6 @@ var SWCanvas = function (canvas) {
 
 	this.paint = false;
 
-	this.points = [];
 	this.brush = {
 		color: this.colors.red,
 		size: 5,
@@ -38,8 +37,6 @@ var SWCanvas = function (canvas) {
 	this.currentFrame = 0;
 	this.animationInterval = null;
 	this.playing = false;
-
-	this.background = null;
 };
 
 /**
