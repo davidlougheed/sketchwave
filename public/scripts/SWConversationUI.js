@@ -1,6 +1,11 @@
 'use strict';
 
 /**
+ * @file Describes class for managing the SketchWave single conversation user interface.
+ * @author David Lougheed
+ */
+
+/**
  * Handles the SketchWave conversation user interface.
  * @param currentUser {object} - The object containing user data from the server.
  * @param conversation {object} - The object containing conversation data from the server.
@@ -38,6 +43,9 @@ var SWConversationUI = function (currentUser, conversation) {
 
 };
 
+/**
+ * Initializes the SketchWave conversation user interface. To be called when the document is ready.
+ */
 SWConversationUI.prototype.initialize = function () {
 	// Cache various elements that remain unchanged.
 	this.$body = $('body');
@@ -674,6 +682,15 @@ SWConversationUI.prototype.initialize = function () {
 	}.bind(this));
 };
 
+/**
+ * Display a message in the conversation.
+ * @param userID - The user ID of the message.
+ * @param messageData - The data contained in the message object.
+ * @param messageType - The type of the message: image, animation, meta, or text.
+ * @param date - The date and time at which the message was sent.
+ * @param immediate - Whether to animate its appearance; true means it will appear without animation.
+ * @param top - Add the message to the top rather than at the bottom.
+ */
 SWConversationUI.prototype.displayMessage = function (userID, messageData, messageType, date, immediate, top) {
 	var messageHTML = '<div class="message ' + messageType + '-message';
 	if (userID == this.CURRENT_USER.id) {
@@ -735,6 +752,11 @@ SWConversationUI.prototype.displayMessage = function (userID, messageData, messa
 	}
 };
 
+/**
+ * Display a non-template-based meta message.
+ * @param message - The raw HTML contents of the message.
+ * @param immediate - A flag for scrolling the page with animation or immediately.
+ */
 SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate) {
 	this.$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
 	if (immediate) {
@@ -744,6 +766,11 @@ SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate)
 	}
 };
 
+/**
+ * Display a template-based meta message.
+ * @param message - The message data.
+ * @param immediate A flag for scrolling the page with animation or immediately.
+ */
 SWConversationUI.prototype.displayMetaMessage = function (message, immediate) {
 	// TODO: The authors array is garbage and has to be fixed.
 	var processedString = this.META_MESSAGES[message['metaData']['action']];
@@ -758,6 +785,14 @@ SWConversationUI.prototype.displayMetaMessage = function (message, immediate) {
 	this.displayRawMetaMessage(processedString, immediate);
 };
 
+/**
+ * Fetch a certain range of messages from the server.
+ * @param immediate - A flag for scrolling the page with animation or immediately.
+ * @param from - The starting point for the list of messages to fetch.
+ * @param count - The number of messages to fetch.
+ * @param top - Whether to add them to the top of the message container rather than the bottom.
+ */
+// TODO: This is probably almost completely broken due to IDs not being sequential????
 SWConversationUI.prototype.refreshMessages = function (immediate, from, count, top) {
 	this.$loadMoreButton.attr('disabled', 'disabled');
 	this.$loadMoreButton.addClass('disabled');
@@ -831,6 +866,9 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 	}.bind(this));
 };
 
+/**
+ * Fills in the content of the stamp selection container.
+ */
 SWConversationUI.prototype.refreshStamps = function () {
 	for (var s in this.stamps) {
 		if (this.stamps.hasOwnProperty(s)) {
@@ -846,6 +884,11 @@ SWConversationUI.prototype.refreshStamps = function () {
 	}
 };
 
+/**
+ * Draws the cursor over the canvas.
+ * @param x - the x position of the mouse.
+ * @param y - the y position of the mouse.
+ */
 SWConversationUI.prototype.drawCursor = function (x, y) {
 	this.$cursor.css({'top': (y - 114).toString() + 'px', 'left': x.toString() + 'px'});
 };
