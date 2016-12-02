@@ -1,6 +1,11 @@
 'use strict';
 
 /**
+ * @file Describes class for managing SketchWave canvases.
+ * @author David Lougheed
+ */
+
+/**
  * Creates the SketchWave canvas object and sets up basic initial properties.
  * @param canvas {string} - The ID of the canvas element to use for drawing.
  * @constructor
