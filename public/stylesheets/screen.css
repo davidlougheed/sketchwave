@@ -641,11 +641,12 @@ div#avatarContainer canvas#avatarCanvas {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	user-select: none;
+	outline: none;
 
 	max-width: 100%;
 }
 div#conversation section#drawPanel canvas#drawCanvas {
-	position: absolute;
+	position: relative;
 	z-index: 49;
 	left: 50%;
 	margin: 20px auto 0 -240px;
@@ -664,7 +665,9 @@ div#conversation section#drawPanel img#onionSkin {
 	position: absolute;
 	z-index: 48;
 	left: 50%;
-	margin: 20px auto 0 -240px;
+	margin: 1px 0 0 -239px;
+	max-width: 100%;
+
 	background-color: white;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
@@ -759,8 +762,6 @@ div#avatarContainer div#tools {
 }
 div#conversation section#drawPanel div#tools {
 	padding: 15px 15px 10px 15px;
-	position: absolute; top: 339px; left: 50%;
-	margin-left: -240px;
 	z-index: 50;
 
 	border-top: none;
@@ -1433,6 +1434,10 @@ form#formSignUp h2 {
 		left: 0;
 		margin-left: 499px;
 	}
+	div#conversation section#drawPanel img#onionSkin {
+		left: 0;
+		margin: 0 0 0 20px;
+	}
 	div#conversation section#drawPanel div#tools {
 		float: left;
 		left: 20px;
@@ -1452,11 +1457,20 @@ form#formSignUp h2 {
 	}
 
 	div#conversation section#drawPanel canvas#drawCanvas {
-		margin: 20px auto 0 auto;
+		left: 50%;
+		margin-left: -240px;
 	}
 	div#conversation section#drawPanel div#frames {
 		left: 50%;
 		margin-left: 239px;
+	}
+	div#conversation section#drawPanel div#tools {
+		left: 50%;
+		margin-left: -240px;
+	}
+	div#conversation section#drawPanel img#onionSkin {
+		left: 50%;
+		margin: 0 auto 0 -259px;
 	}
 
 	button#toggleCanvas {
@@ -1544,6 +1558,29 @@ form#formSignUp h2 {
 
 	section#main blockquote footer {
 		margin-right: 40px;
+	}
+}
+
+@media screen and (max-width: 580px) {
+	div#conversation section#drawPanel canvas#drawCanvas {
+		/*left: 20px;*/
+		/*margin-left: 0;*/
+		max-width: calc(100% - 40px);
+		/*margin-left: calc(100% / 2);*/
+	}
+	div#conversation section#drawPanel div#frames {
+		/*left: 0;*/
+		/*margin-left: 499px;*/
+	}
+	div#conversation section#drawPanel div#tools {
+		/*left: 20px;*/
+		max-width: calc(100% - 40px);
+		/*margin-left: 0;*/
+		/*max-width: calc(100% - 40px);*/
+	}
+	div#conversation section#drawPanel img#onionSkin {
+		/*left: 0;*/
+		/*margin: 1px 0 0 21px;*/
 	}
 }
 

@@ -59,6 +59,7 @@ SWConversationUI.prototype.initialize = function () {
 	this.$changeNameButton = $('#changeName');
 	this.$controls = $('#controls');
 	this.$commands = $('#commands');
+	this.$tools = $('#tools');
 	this.$onionSkin = $('#onionSkin');
 	this.$canvas = $('#drawCanvas');
 
@@ -491,12 +492,16 @@ SWConversationUI.prototype.initialize = function () {
 
 	$('#toggleCanvas').click(function () {
 		if (self.$drawPanel.css('left') != '0px') {
-			self.$drawPanel.animate({left: 0});
+			self.$drawPanel.animate({left: 0}, 300, function () {
+				self.drawCanvas.updateCanvasOffset();
+			});
 			$(this).children('span').text('Messages');
 			$(this).children('i').text('chevron_left');
 			self.$drawPanel.focus();
 		} else {
-			self.$drawPanel.animate({left: '100%'});
+			self.$drawPanel.animate({left: '100%'}, 300, function () {
+				self.drawCanvas.updateCanvasOffset();
+			});
 			$(this).children('span').text('Draw');
 			$(this).children('i').text('gesture');
 		}
@@ -547,8 +552,13 @@ SWConversationUI.prototype.initialize = function () {
 			if (this.$drawPanel.css('left') != '0px') {
 				this.$drawPanel.css({left: '100%'});
 			}
+			this.$canvas.css('margin-left', -(this.$canvas.width() / 2.0) - 20 - 1);
+			this.$tools.css('margin-left', -(this.$canvas.width() / 2.0) - 20 - 1);
+			$('#frames').css('margin-left', (this.$canvas.width() / 2.0) - 20);
 		}
 		this.$canvas.css('height', (this.$canvas.width() / 1.5).toString() + 'px');
+		this.$onionSkin.css('width', this.$canvas.width().toString() + 'px');
+		this.$onionSkin.css('height', this.$canvas.height().toString() + 'px');
 		this.drawCanvas.updateCanvasOffset();
 	}.bind(this));
 
