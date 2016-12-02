@@ -613,47 +613,7 @@ SWConversationUI.prototype.initialize = function () {
 		this.ownerId = claimerId;
 	}.bind(this));
 
-	this.socket.on('newMessage', function (data) {
-		if (parseInt(data['ConversationId']) == this.convID) {
-			var rawDate = data['createdAt'];
-			var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
-
-			var notificationToCreate = '';
-
-			switch (data['type']) {
-				case 'image':
-					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a sketch!';
-					this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
-					break;
-				case 'animation':
-					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a flip-book!';
-					this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
-					break;
-				case 'text':
-					notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a message!';
-					this.displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
-					break;
-				case 'meta':
-					this.displayMetaMessage(data['textData'], false);
-			}
-
-			if ('Notification' in window && notificationToCreate != '') {
-				if (!document.hasFocus() && this.authors[data['UserId']] != this.CURRENT_USER.id) {
-					if (Notification.permission === 'granted') {
-						// TODO: Notification toggle
-						new Notification(notificationToCreate);
-					} else if (Notification.permission !== 'denied') {
-						// TODO: This version of requestPermission (callback rather than promise) is deprecated
-						Notification.requestPermission(function (permission) {
-							if (permission === 'granted') {
-								new Notification(notificationToCreate);
-							}
-						});
-					}
-				}
-			}
-		}
-	}.bind(this));
+	this.socket.on('newMessage', this.receiveMessage);
 
 	this.socket.on('stampAdd', function (stamp) {
 		this.stamps[stamp['id']] = stamp;
@@ -862,6 +822,52 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 		this.$commands.fadeIn();
 		this.$loadMoreButton.show();
 	}.bind(this));
+};
+
+/**
+ * Bound to a socket IO receive message event. Adds the received message to the conversation.
+ * @param data {object} - The data object containing the message information.
+ */
+SWConversationUI.prototype.receiveMessage = function (data) {
+	if (parseInt(data['ConversationId']) == this.convID) {
+		var rawDate = data['createdAt'];
+		var formattedDate = moment(rawDate).format("h:mm A; MMMM D");
+
+		var notificationToCreate = '';
+
+		switch (data['type']) {
+			case 'image':
+				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a sketch!';
+				this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+				break;
+			case 'animation':
+				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a flip-book!';
+				this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+				break;
+			case 'text':
+				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a message!';
+				this.displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
+				break;
+			case 'meta':
+				this.displayMetaMessage(data['textData'], false);
+		}
+
+		if ('Notification' in window && notificationToCreate != '') {
+			if (!document.hasFocus() && this.authors[data['UserId']] != this.CURRENT_USER.id) {
+				if (Notification.permission === 'granted') {
+					// TODO: Notification toggle
+					new Notification(notificationToCreate);
+				} else if (Notification.permission !== 'denied') {
+					// TODO: This version of requestPermission (callback rather than promise) is deprecated
+					Notification.requestPermission(function (permission) {
+						if (permission === 'granted') {
+							new Notification(notificationToCreate);
+						}
+					});
+				}
+			}
+		}
+	}
 };
 
 /**
