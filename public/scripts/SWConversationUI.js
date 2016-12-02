@@ -60,12 +60,18 @@ SWConversationUI.prototype.initialize = function () {
 	this.$controls = $('#controls');
 	this.$commands = $('#commands');
 	this.$onionSkin = $('#onionSkin');
+	this.$canvas = $('#drawCanvas');
+
+	this.drawCanvas = new SWCanvas('drawCanvas');
 
 	this.$controls.hide();
 	this.$commands.hide();
+	this.$cursor.hide();
+	this.$loadMoreButton.hide();
 
 	var self = this;
 
+	var hover = false;
 	this.$messagesContainer.append('<div class="loader" '
 		+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
@@ -76,14 +82,6 @@ SWConversationUI.prototype.initialize = function () {
 			}
 		}
 	}.bind(this));
-
-	this.$cursor.hide();
-	this.$loadMoreButton.hide();
-
-	this.$canvas = $('#drawCanvas');
-	this.drawCanvas = new SWCanvas('drawCanvas');
-
-	var hover = false;
 
 	this.$canvas.on('mousedown', function (event) {
 		var mCoords = this.drawCanvas.calculateMouse(event.pageX, event.pageY);
