@@ -72,9 +72,12 @@ SWConversationUI.prototype.initialize = function () {
 	var self = this;
 
 	var hover = false;
+
+	// Add a temporary loading indicator.
 	this.$messagesContainer.append('<div class="loader" '
 		+ 'style="position:absolute;left:50%;margin-left:-23px;margin-top:50px;"></div>');
 
+	// Fetch the conversation's stamps from the server.
 	$.get('/conversations/' + this.convID + '/stamps/').done(function (data) {
 		for (var s in data['stamps']) {
 			if (data['stamps'].hasOwnProperty(s)) {
@@ -312,9 +315,13 @@ SWConversationUI.prototype.initialize = function () {
 	this.$changeNameButton.click(function () {
 		self.editingName = true;
 
-		$('#convName').replaceWith('<input type="text" id="changeNameText" value="'
-			+ $('#convName').text() + '">');
-		$('#changeNameText').after(' <div id="nameChangeControls"><button id="saveName">'
+		var $convName = $('#convName');
+
+		$convName.replaceWith('<input type="text" id="changeNameText" value="' + $convName.text() + '">');
+
+		var $changeNameText = $('#changeNameText');
+
+		$changeNameText.after(' <div id="nameChangeControls"><button id="saveName">'
 			+ '<i class="material-icons">done</i><span>Save</span></button>'
 			+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i>'
 			+ '<span>Cancel</span></button></div>');
@@ -331,8 +338,7 @@ SWConversationUI.prototype.initialize = function () {
 			$('#saveName').remove();
 			$('#cancelChange').remove();
 
-			$('#changeNameText').replaceWith('<span id="convName">'
-				+ $('#changeNameText').val() + '</span>');
+			$changeNameText.replaceWith('<span id="convName">' + $changeNameText.val() + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
@@ -342,8 +348,7 @@ SWConversationUI.prototype.initialize = function () {
 			$('#saveName').remove();
 			$(this).remove();
 
-			$('#changeNameText').replaceWith('<span id="convName">'
-				+ $('#changeNameText').val() + '</span>');
+			$changeNameText.replaceWith('<span id="convName">' + $changeNameText.val() + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
@@ -392,7 +397,7 @@ SWConversationUI.prototype.initialize = function () {
 				page: params.page
 				};
 				},*/
-				processResults: function (data, params) {
+				processResults: function (data) { // function (data, params) {
 					// parse the results into the format expected by Select2
 					// since we are using custom formatting functions we do not need to
 					// alter the remote JSON data, except to indicate that infinite
@@ -417,7 +422,9 @@ SWConversationUI.prototype.initialize = function () {
 			minimumInputLength: 1
 		});
 
+		// Fetch a list of the conversation's users from the server.
 		$.get('/conversations/' + self.convID + '/users/').done(function (data) {
+			var $members = $('#members');
 			for (var u in data['users']) {
 				if (data['users'].hasOwnProperty(u)) {
 					var memberHTML = '<div class="member" data-username="'
@@ -434,11 +441,11 @@ SWConversationUI.prototype.initialize = function () {
 					}
 					memberHTML += '</div>';
 
-					$('#members').append(memberHTML);
+					$members.append(memberHTML);
 				}
 			}
 
-			$('#members').find('.member').each(function () {
+			$members.find('.member').each(function () {
 				$.get('/users/' + $(this).data('id') + '/status/').done(function (statusData) {
 					if (statusData['online']) {
 						$(this).children('.onlineIndicator').first().addClass('online');
