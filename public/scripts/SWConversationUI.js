@@ -212,7 +212,7 @@ SWConversationUI.prototype.initialize = function () {
 		this.drawCanvas.clearFrames();
 		this.drawCanvas.stopPlaying();
 
-		this.$onionSkin.attr('src', ''); // TODO: Sub in a blank image instead of nothing.
+		this.$onionSkin.attr('src', '/images/blank.png');
 
 		$('.frame').each(function () {
 			if ($(this).data('frame') > 0) {
