@@ -563,7 +563,7 @@ SWConversationUI.prototype.initialize = function () {
 			// Keep session alive
 			$.get('/keepalive/');
 		}
-	}.bind(this), 10000);
+	}.bind(this), 30000);
 
 	$('#scrollIt').scroll(function () {
 		this.drawCanvas.updateCanvasOffset();
