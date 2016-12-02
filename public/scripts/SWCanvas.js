@@ -32,11 +32,13 @@ var SWCanvas = function (canvas) {
 
 	this.frames = [{
 		points: [],
-		background: null
+		background: document.createElement('img')
 	}];
 	this.currentFrame = 0;
 	this.animationInterval = null;
 	this.playing = false;
+
+	this.BLANK_PNG = "/images/blank.png";
 };
 
 /**
@@ -65,7 +67,7 @@ SWCanvas.prototype.clearAllCanvasData = function (backgroundClear, keepPoints) {
 		this.frames[this.currentFrame].points = [];
 	}
 	if (backgroundClear) {
-		this.frames[this.currentFrame].background = null;
+		this.frames[this.currentFrame].background = document.createElement('img');
 	}
 };
 
@@ -76,7 +78,7 @@ SWCanvas.prototype.clearFrames = function () {
 	this.context.clearRect(0, 0, this.cw, this.ch);
 	this.frames = [{
 		points: [],
-		background: null
+		background: document.createElement('img')
 	}];
 	this.currentFrame = 0;
 };
@@ -142,10 +144,10 @@ SWCanvas.prototype.redraw = function () {
 	}
 
 	if (!this.playing && this.currentFrame > 0) {
-		if (this.frames[this.currentFrame - 1].background) {
+		if (this.frames[this.currentFrame - 1].background && this.frames[this.currentFrame - 1].background.src) {
 			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.getAttribute('src'));
 		} else {
-			$('#onionSkin').attr('src', ''); // TODO: Sub in a blank image instead of nothing.
+			$('#onionSkin').attr('src', this.BLANK_PNG);
 		}
 	}
 };
@@ -194,7 +196,7 @@ SWCanvas.prototype.addFrame = function () {
 	if (this.frames.length < 10) {
 		this.frames.push({
 			points: [],
-			background: null
+			background: document.createElement('img')
 		});
 		return true;
 	}
@@ -259,7 +261,7 @@ SWCanvas.prototype.playStep = function () {
 SWCanvas.prototype.startPlaying = function () {
 	this.playing = true;
 	this.animationInterval = setInterval(this.playStep.bind(this), 100);
-	$('#onionSkin').attr('src', ''); // TODO: Sub in a blank image instead of nothing.
+	$('#onionSkin').attr('src', this.BLANK_PNG);
 };
 
 /**
@@ -318,9 +320,6 @@ SWCanvas.prototype.setBrushSize = function (value) {
  */
 SWCanvas.prototype.moveImageDataToBackground = function (checkPoints, dragging) {
 	// TODO: Eventually move this to toBlob when it is supported in more browsers.
-	if (!this.frames[this.currentFrame].background) {
-		this.frames[this.currentFrame].background = document.createElement('img');
-	}
 	if (!dragging) {
 		this.frames[this.currentFrame].background.setAttribute('src', this.canvas.toDataURL());
 		this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
