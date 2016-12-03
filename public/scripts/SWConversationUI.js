@@ -651,6 +651,12 @@ SWConversationUI.prototype.initialize = function () {
 	this.socket.on('userAdd', function (data) {
 		this.authors[data.id] = data;
 	}.bind(this));
+	this.socket.on('userRemove', function (data) {
+		if (this.CURRENT_USER.id == data.id) {
+			// If the current user is removed, auto-redirect them out of the conversation.
+			window.location = '/conversations/';
+		}
+	}.bind(this));
 
 	this.socket.on('userJoin', function (data) {
 		// TODO: Some form of indication that the user is viewing the chat
