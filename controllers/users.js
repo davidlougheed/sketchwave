@@ -15,7 +15,7 @@ module.exports.controller = function (objects) {
 		}
 
 		objects.models.User.findAll({
-			attributes: { exclude: ['password'] }
+			attributes: { exclude: ['avatar', 'avatarThumb', 'password'] }
 		}).then(function (users) {
             //TODO: THIS HECKING SUCKS... BUT HOW???
             var usersData = {};
@@ -23,17 +23,6 @@ module.exports.controller = function (objects) {
             for(var u in users) {
 				if(users.hasOwnProperty(u)) {
 					var userData = users[u].toJSON();
-
-					// Convert avatar from buffer to string
-					if (userData['avatar'] !== null) {
-						if (userData['avatar'].indexOf('data:image/png;base64,') == -1) {
-							// New Avatar Storage System
-							userData.avatar = 'data:image/png;base64,' + userData.avatar.toString('base64');
-						} else {
-							// Old Avatar Storage System
-							userData['avatar'] = users[u].avatar.toString();
-						}
-					}
 
 					// Prevent XSS from username
 					userData['username'] = entities.encode(userData['username']);

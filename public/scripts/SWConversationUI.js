@@ -690,13 +690,9 @@ SWConversationUI.prototype.displayMessage = function (userID, messageData, messa
 	}
 	// TODO: Add a message specific ID
 	messageHTML += '" id="message-' + '">'
-		+ '<div class="topBar"><div class="author">';
-
-	if (this.authors[userID]['avatar']) {
-		messageHTML += '<img src="/users/' + this.authors[userID]['id'] + '/avatar/thumb/">';
-	}
-
-	messageHTML += '<a href="/users/' + userID + '/">'
+		+ '<div class="topBar"><div class="author">'
+		+ '<img src="/users/' + this.authors[userID]['id'] + '/avatar/thumb/">'
+		+ '<a href="/users/' + userID + '/">'
 		+ this.authors[userID]['username'] + '</a></div><div class="date">'
 		+ date + '</div></div>';
 
