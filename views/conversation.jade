@@ -5,13 +5,19 @@ block vars
 
 block scripts
 	script(type='text/javascript', src='/scripts/SWConversationUI.js')
+
+	if conversation.OwnerId
+		script(type='text/javascript') var ownerId = #{conversation.OwnerId};
+	else
+		script(type='text/javascript') var ownerId = null;
+
 	script(type='text/javascript').
 		new SWConversationUI({
 			id: #{user.id},
 			username: '#{user.username}'
 		}, {
 			id: #{conversation.id},
-			owner: #{conversation.OwnerId}
+			owner: ownerId
 		});
 
 
