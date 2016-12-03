@@ -478,6 +478,11 @@ SWConversationUI.prototype.initialize = function () {
 			self.displayRawMetaMessage(usernameToRemove + ' was removed from the conversation by '
 				+ self.CURRENT_USER.username + '.', false);
 			$(this).parent().remove();
+
+			if (self.CURRENT_USER.username == usernameToRemove) {
+				// User has removed themselves; send them to the conversation list page.
+				window.location = '/conversations/';
+			}
 		});
 
 		$('#closeModal, #modalBackground').click(function () {
