@@ -61,7 +61,7 @@ var sessionMiddleware = session({
 	resave: false,
 	saveUninitialized: false,
 
-	cookie: { maxAge: 600000 }
+	cookie: { maxAge: 1800000 }
 });
 
 var io = socketIO.listen(appServer).use(function (socket, next) {

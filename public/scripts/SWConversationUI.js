@@ -579,9 +579,12 @@ SWConversationUI.prototype.initialize = function () {
 	window.setInterval(function () {
 		if (this.active) {
 			// Keep session alive
-			$.get('/keepalive/');
+			$.get('/keepalive/').fail(function () {
+				// User was logged out due to inactivity.
+				window.location = '/login/?redirect=%2Fconversations%2F' + this.convID.toString();
+			}.bind(this));
 		}
-	}.bind(this), 30000);
+	}.bind(this), 20000);
 
 	$('#scrollIt').scroll(function () {
 		this.drawCanvas.updateCanvasOffset();

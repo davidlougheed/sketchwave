@@ -118,7 +118,11 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.router.get('/keepalive/', function (req, res) {
-		req.session.lastAccess = new Date().getTime();
-		res.sendStatus(200);
+		if (req.isAuthenticated()) {
+			req.session.lastAccess = new Date().getTime();
+			req.session.touch();
+			return res.sendStatus(200);
+		}
+		return res.sendStatus(403);
 	});
 };
