@@ -433,12 +433,15 @@ SWConversationUI.prototype.initialize = function () {
 						+ '"><div class="avatar">'
 						+ '<img src="/users/' + data['users'][u]['id'] + '/avatar/thumb/">'
 						+ '</div><a class="name" href="/users/' + data['users'][u]['id'] + '/">'
-						+ data['users'][u]['username'] + '</a><div class="onlineIndicator"></div>'
-						+ ' <button class="deleteMember iconOnly transparent">'
-						+ '<i class="material-icons">clear</i></button>';
+						+ data['users'][u]['username'] + '</a>'
+						+ '<div class="onlineIndicator"></div>';
 
 					if (self.ownerId == data['users'][u]['id']) {
 						memberHTML += '<div class="ownerBadge">Owner</div>';
+					}
+					if (self.ownerId == self.CURRENT_USER.id) {
+						memberHTML += ' <button class="deleteMember iconOnly transparent">'
+							+ '<i class="material-icons">clear</i></button>';
 					}
 					memberHTML += '</div>';
 

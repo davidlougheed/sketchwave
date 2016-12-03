@@ -1030,10 +1030,10 @@ div#modal h1 div.controls {
 	background-color: #2ecc71;
 }
 #members .member div.ownerBadge {
-	float: right;
+	display: inline-block;
 	padding: 0.1em 0.3em;
+	margin: 9px 0 0 1em;
 	vertical-align: top;
-	margin-top: 8px;
 
 	background-color: #ff5562;
 	border-radius: 3px;
