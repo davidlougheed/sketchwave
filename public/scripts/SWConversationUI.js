@@ -548,6 +548,9 @@ SWConversationUI.prototype.initialize = function () {
 	$(window).resize(function () {
 		if (window.innerWidth > 1100) {
 			this.$drawPanel.css({left: '50%'});
+			this.$canvas.css('margin-left', '');
+			this.$tools.css('margin-left', '');
+			$('#frames').css('margin-left', '');
 		} else {
 			if (this.$drawPanel.css('left') != '0px') {
 				this.$drawPanel.css({left: '100%'});
