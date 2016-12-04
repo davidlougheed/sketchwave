@@ -86,12 +86,12 @@ block scripts
 			$avatarCanvas.on('mouseleave', function (event) {
 				drawCanvas.stopPainting();
 				hover = false;
-				$cursor.hide();
+				//$cursor.hide();
 			});
 
 			$avatarCanvas.on('mouseenter', function (event) {
 				hover = true;
-				$cursor.show();
+				//$cursor.show();
 				//drawCursor(event.pageX, event.pageY);
 			});
 
@@ -136,6 +136,10 @@ block scripts
 
 			$(window).on('beforeunload', function (event) {
 				onMouseUp(event);
+			});
+
+			$('#main').scroll(function () {
+				drawCanvas.updateCanvasOffset();
 			});
 		});
 
