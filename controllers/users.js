@@ -249,20 +249,27 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	// TODO: This online system doesn't really work... replace with a keep-alive type of deal?
 	objects.io.on('connection', function (socket) {
 		socket.on('userOnline', function () {
-			objects.redis.sadd(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
-				if (err) {
-					throw err;
-				}
-			});
+			if (socket.request.session.passport.user) {
+				objects.redis.sadd(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+					if (err) {
+						throw err;
+					}
+				});
+			}
 		});
 		socket.on('disconnect', function () {
-			objects.redis.srem(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
-				if (err) {
-					throw err;
-				}
-			});
+			if (socket.request.session.passport.user) {
+				objects.redis.srem(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+					if (err) {
+						throw err;
+					}
+				});
+			} else {
+				// TODO: Do something to remove the formerly logged in user... this is pretty broken at the moment.
+			}
 		});
 	});
 };
