@@ -218,6 +218,8 @@ SWConversationUI.prototype.initialize = function () {
 
 		this.$onionSkin.attr('src', '/images/blank.png');
 
+		$('#toggleAnimation').children('i').first().text('play_arrow');
+
 		$('.frame').each(function () {
 			if ($(this).data('frame') > 0) {
 				$(this).remove();
