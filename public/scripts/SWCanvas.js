@@ -49,6 +49,8 @@ var SWCanvas = function (canvas) {
 	this.playing = false;
 
 	this.BLANK_PNG = "/images/blank.png";
+
+	this.moveImageDataToBackground(false, false, null);
 };
 
 /**
@@ -78,6 +80,7 @@ SWCanvas.prototype.clearAllCanvasData = function (backgroundClear, keepPoints) {
 	}
 	if (backgroundClear) {
 		this.frames[this.currentFrame].background = document.createElement('img');
+		this.moveImageDataToBackground(false, false, null); // Make sure there's a background in place.
 	}
 };
 
@@ -91,6 +94,7 @@ SWCanvas.prototype.clearFrames = function () {
 		background: document.createElement('img')
 	}];
 	this.currentFrame = 0;
+	this.moveImageDataToBackground(false, false, null);
 };
 
 /**
@@ -261,6 +265,7 @@ SWCanvas.prototype.setFrame = function (frame) {
 		this.allowGabeSave = true;
 		this.currentFrame = frame;
 		this.redraw();
+		this.moveImageDataToBackground(false, false, null);
 		if (frame == 0 || (this.currentFrame > 0 && !this.frames[this.currentFrame].background.getAttribute('src'))) {
 			$('#onionSkin').attr('src', this.BLANK_PNG);
 		}
