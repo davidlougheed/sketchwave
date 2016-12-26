@@ -305,13 +305,43 @@ SWConversationUI.prototype.initialize = function () {
 	});
 
 	this.$body.on('click', '.importToCanvas', function () {
-		if (!self.drawCanvas.frames[self.drawCanvas.currentFrame].background) {
-			self.drawCanvas.frames[self.drawCanvas.currentFrame].background = document.createElement('img');
+		var $messageDataContainer = $(this).parent().parent().children('.message-data').first();
+		if ($messageDataContainer.hasClass('image')) {
+			if (!self.drawCanvas.frames[self.drawCanvas.currentFrame].background) {
+				self.drawCanvas.frames[self.drawCanvas.currentFrame].background = document.createElement('img');
+			}
+			self.drawCanvas.frames[self.drawCanvas.currentFrame].background.setAttribute('src', $(this).parent().parent()
+				.children('div.image').first().children('img').first().attr('src'));
+			self.drawCanvas.clearAllCanvasData(false, false);
+			self.drawCanvas.redraw();
+		} else if ($messageDataContainer.hasClass('animation')) {
+			var $animationFrames = $messageDataContainer.children('.animation-frame');
+			var $frames = $('.frame');
+
+			while (self.drawCanvas.frames.length != $animationFrames.size()) {
+				$frames = $('.frame');
+				if (self.drawCanvas.frames.length < $animationFrames.size()) {
+					self.drawCanvas.addFrame();
+					$frames.last().after('<a id="frame-' + self.drawCanvas.frames.length
+						+ '" class="frame" data-frame="' + (self.drawCanvas.frames.length - 1) + '">'
+						+ self.drawCanvas.frames.length + '</a>');
+				} else {
+					self.drawCanvas.removeFrame();
+					$frames.last().remove();
+				}
+			}
+
+			$animationFrames.each(function () {
+				self.drawCanvas.frames[parseInt($(this).data('frame'))].background.setAttribute('src',
+					$(this).children('img').first().attr('src'));
+			});
+
+			self.drawCanvas.currentFrame = 0;
+			$frames.removeClass('selected');
+			$('#frame-' + (self.drawCanvas.currentFrame + 1)).addClass('selected');
+
+			self.drawCanvas.redraw();
 		}
-		self.drawCanvas.frames[self.drawCanvas.currentFrame].background.setAttribute('src', $(this).parent().parent()
-			.children('div.image').first().children('img').first().attr('src'));
-		self.drawCanvas.clearAllCanvasData(false, false);
-		self.drawCanvas.redraw();
 	});
 
 	// Start changing the conversation name
@@ -530,8 +560,11 @@ SWConversationUI.prototype.initialize = function () {
 
 	$('#addFrame').click(function () {
 		if (this.drawCanvas.addFrame()) {
-			$('.frame').last().after('<a id="frame-' + this.drawCanvas.frames.length + '" class="frame" data-frame="'
-				+ (this.drawCanvas.frames.length - 1) + '">' + this.drawCanvas.frames.length + '</a>');
+			var $frames = $('.frame');
+			$frames.last().after('<a id="frame-' + this.drawCanvas.frames.length
+				+ '" class="frame selected" data-frame="' + (this.drawCanvas.frames.length - 1) + '">'
+				+ this.drawCanvas.frames.length + '</a>');
+			$frames.removeClass('selected');
 		}
 	}.bind(this));
 	$('#removeFrame').click(function () {
@@ -711,13 +744,13 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 
 	switch (messageType) {
 		case 'image':
-			messageHTML += '<div class="image">'
+			messageHTML += '<div class="message-data image">'
 				+ '<img src="' + messageData + '"></div>'
 				+ '<div class="controls"><button class="importToCanvas transparent noMargin">'
 				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
 			break;
 		case 'animation':
-			messageHTML += '<div class="animation stopped">';
+			messageHTML += '<div class="message-data animation stopped">';
 			var frameNumber = 0;
 			for (var f in messageData) {
 				if (messageData.hasOwnProperty(f)) {
@@ -734,7 +767,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
 			break;
 		case 'text':
-			messageHTML += '<div class="text">' + messageData + '</div>';
+			messageHTML += '<div class="message-data text">' + messageData + '</div>';
 			break;
 	}
 
