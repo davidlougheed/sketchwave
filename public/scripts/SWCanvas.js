@@ -60,8 +60,9 @@ SWCanvas.prototype.colors = {
 	white: '#FFFFFF',
 	grey: '#808080',
 	black: '#000000',
-	red: '#FF0000',
 	pink: '#FF69B4',
+	red: '#FF0000',
+	orange: '#FF9300',
 	yellow: '#FFFF00',
 	blue: '#0000FF',
 	green: '#00FF00'
