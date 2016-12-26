@@ -103,7 +103,7 @@ block scripts
 							exclude_me: 'true'
 						}
 					},
-					processResults: function (data, params) {
+					processResults: function (data) { // function (data, params) {
 						// parse the results into the format expected by Select2
 						// since we are using custom formatting functions we do not need to
 						// alter the remote JSON data, except to indicate that infinite
@@ -158,6 +158,7 @@ block scripts
 						url: '/conversation/' + $(this).parent().children('#toDelete').first().val() + '/',
 						method: 'DELETE'
 					}).done(function (data) {
+						// TODO: Check if delete was successful.
 						$('#modal').fadeOut('fast', function () {
 							$(this).remove();
 						});
