@@ -236,7 +236,7 @@ SWConversationUI.prototype.initialize = function () {
 			}
 		}
 
-		this.displayMessage(this.CURRENT_USER.id.toString(), messageData.messageData, messageData.type,
+		this.displayMessage(this.CURRENT_USER.id.toString(), null, messageData.messageData, messageData.type,
 			moment(Date.now()).format('h:mm A; MMMM D'), false);
 	}.bind(this));
 
@@ -682,20 +682,28 @@ SWConversationUI.prototype.initialize = function () {
 /**
  * Display a message in the conversation.
  * @param userID - The user ID of the message.
+ * @param mId - The message's ID.
  * @param messageData - The data contained in the message object.
  * @param messageType - The type of the message: image, animation, meta, or text.
  * @param date - The date and time at which the message was sent.
  * @param immediate - Whether to animate its appearance; true means it will appear without animation.
  * @param top - Add the message to the top rather than at the bottom.
  */
-SWConversationUI.prototype.displayMessage = function (userID, messageData, messageType, date, immediate, top) {
-	var messageHTML = '<div class="message ' + messageType + '-message';
+SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, messageType, date, immediate, top) {
+	var messageHTML = '<div class="message ' + messageType + '-message not-selectable';
 	if (userID == this.CURRENT_USER.id) {
 		messageHTML += ' you';
 	}
-	// TODO: Add a message specific ID
-	messageHTML += '" id="message-' + '">'
-		+ '<div class="topBar"><div class="author">'
+
+	// TODO: Add a message specific ID with local instances...
+
+	if (mId) {
+		messageHTML += '" id="message-' + mId + '">';
+	} else {
+		messageHTML += '">';
+	}
+
+	messageHTML += '<div class="topBar"><div class="author">'
 		+ '<img src="/users/' + this.authors[userID]['id'] + '/avatar/thumb/">'
 		+ '<a href="/users/' + userID + '/">'
 		+ this.authors[userID]['username'] + '</a></div><div class="date">'
@@ -815,15 +823,18 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 
 			switch (data['messages'][m]['type']) {
 				case 'image':
-					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['id'],
+						data['messages'][m]['imageData'],
 						data['messages'][m]['type'], formattedDate, immediate, top);
 					break;
 				case 'animation':
-					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['imageData'],
+					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['id'],
+						data['messages'][m]['imageData'],
 						data['messages'][m]['type'], formattedDate, immediate, top);
 					break;
 				case 'text':
-					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['textData'],
+					this.displayMessage(data['messages'][m]['UserId'], data['messages'][m]['id'],
+						data['messages'][m]['textData'],
 						data['messages'][m]['type'], formattedDate, immediate, top);
 					break;
 				case 'meta':
@@ -873,15 +884,15 @@ SWConversationUI.prototype.receiveMessage = function (data) {
 		switch (data['type']) {
 			case 'image':
 				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a sketch!';
-				this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+				this.displayMessage(data['UserId'], data['id'], data['imageData'], data['type'], formattedDate, false);
 				break;
 			case 'animation':
 				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a flip-book!';
-				this.displayMessage(data['UserId'], data['imageData'], data['type'], formattedDate, false);
+				this.displayMessage(data['UserId'], data['id'], data['imageData'], data['type'], formattedDate, false);
 				break;
 			case 'text':
 				notificationToCreate = this.authors[data['UserId']]['username'] + ' sent a message!';
-				this.displayMessage(data['UserId'], data['textData'], data['type'], formattedDate, false);
+				this.displayMessage(data['UserId'], data['id'], data['textData'], data['type'], formattedDate, false);
 				break;
 			case 'meta':
 				this.displayMetaMessage(data['textData'], false);
