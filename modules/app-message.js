@@ -48,10 +48,12 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 						var animationFrames = [];
 						for (var f in data) {
 							if (data.hasOwnProperty(f)) {
-								buf = Buffer.from(sanitizeHtml(data[f].replace('data:image/png;base64,', ''), {
-									allowedTags: [],
-									allowedAttributes: []
-								}).toString(), 'base64');
+								if (data[f]) {
+									buf = Buffer.from(sanitizeHtml(data[f].replace('data:image/png;base64,', ''), {
+										allowedTags: [],
+										allowedAttributes: []
+									}).toString(), 'base64');
+								}
 								animationFrames.push(buf);
 							}
 						}
