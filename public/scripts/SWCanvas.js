@@ -199,6 +199,7 @@ SWCanvas.prototype.addPoint = function (x, y, dragging) {
 		tool: this.brush.tool,
 		stamp: (this.brush.tool === 'brush') ? null : this.brush.stamp
 	});
+
 	this.pointsSinceSave += 1;
 
 	if (this.frames[this.currentFrame].points.length > 50 && this.allowGabeSave) {
@@ -232,6 +233,7 @@ SWCanvas.prototype.addFrame = function () {
 			points: [],
 			background: document.createElement('img')
 		});
+		this.setFrame(this.frames.length - 1);
 		return true;
 	}
 
