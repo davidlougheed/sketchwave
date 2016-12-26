@@ -123,6 +123,16 @@ module.exports.controller = function (objects) {
 			req.session.touch();
 			return res.sendStatus(200);
 		}
+
+		// TODO: This may be exploitable to fake log out many users...
+		var userIdToRemove = parseInt(req.query.id);
+		if (!isNaN(userIdToRemove)) {
+			objects.redis.srem(['swUsersOnline', userIdToRemove], function (err) {
+				if (err) {
+					throw err;
+				}
+			});
+		}
 		return res.sendStatus(403);
 	});
 };
