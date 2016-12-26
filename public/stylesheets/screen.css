@@ -242,6 +242,10 @@ footer#pageFooter #footerLogo {
 	position: absolute;
 	z-index: 100;
 	margin-top: -46px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 	user-select: none;
 	pointer-events: none;
 }
@@ -587,6 +591,13 @@ div#conversation section#messages section#messagesContainer div.message div.anim
 	max-width: 480px;
 	overflow: hidden;
 	display: none;
+	pointer-events: none;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 div#conversation section#messages section#messagesContainer div.message div.animation div.animation-frame.current {
 	display: block;
@@ -640,6 +651,8 @@ div#avatarContainer canvas#avatarCanvas {
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 	user-select: none;
 	outline: none;
 
