@@ -20,6 +20,8 @@ var SWCanvas = function (canvas) {
 	this.cw = this.context.canvas.width;
 	this.ch = this.context.canvas.height;
 
+	this.updateCanvasOffset();
+
 	// Reduce anti-aliasing
 	this.context.mozImageSmoothingEnabled = false;
 	this.context.webkitImageSmoothingEnabled = false;
