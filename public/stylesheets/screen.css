@@ -461,6 +461,10 @@ div#conversation section#messages header h1 {
 div#conversation section#messages header h1 span#conversationName {
 	position: relative;
 	top: 4px;
+	max-width: 55%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 div#conversation section#messages header h1 div#nameChangeControls {
 	display: inline-block;
@@ -1486,6 +1490,9 @@ form#formSignUp h2 {
 	div#conversation section#messages {
 		width: 100%;
 	}
+	div#conversation section#messages header h1 span#conversationName {
+		max-width: 70%;
+	}
 
 	div#conversation section#drawPanel {
 		width: 100%;
@@ -1550,6 +1557,9 @@ form#formSignUp h2 {
 		white-space: normal;
 
 		overflow: visible;
+	}
+	div#conversation section#messages header h1 span#conversationName {
+		max-width: 58%;
 	}
 
 	ul#conversations li.conversation div.link {
@@ -1627,6 +1637,9 @@ form#formSignUp h2 {
 	div#conversation section#drawPanel img#onionSkin {
 		/*left: 0;*/
 		/*margin: 1px 0 0 21px;*/
+	}
+	div#conversation section#messages header h1 span#conversationName {
+		max-width: 66.6%;
 	}
 
 	div#conversation section#messages header h1 button#changeName span,
