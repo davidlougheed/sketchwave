@@ -339,6 +339,26 @@ ul#conversations li.conversation div.link {
 	border-right: 1px solid #bbb;
 	padding: 0 15px;
 }
+ul#conversations li.conversation div.member {
+	display: inline-block;
+}
+ul#conversations li.conversation div.avatar {
+	vertical-align: text-bottom;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 26px; width: 26px;
+	margin: 0 0.3rem 0 0.5rem;
+	position: relative;
+	top: 2px;
+
+	border-radius: 100%;
+	border: 1px solid #e0e0e0;
+}
+ul#conversations li.conversation div.avatar img {
+	max-height: 24px; max-width: 24px;
+	border-radius: 100%;
+	vertical-align: top;
+}
 ul#conversations li.conversation a {
 	color: #666;
 }

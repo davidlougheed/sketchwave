@@ -42,8 +42,11 @@ block scripts
 
 							for (var u in data['users'][c]) {
 								if (data['users'][c].hasOwnProperty(u)) {
+									userList += '<div class="member"><div class="avatar">'
+										+ '<img src="/users/' + data['users'][c][u]['id'] + '/avatar/thumb/">'
+										+ '</div>';
 									userList += '<a href="/users/' + data['users'][c][u]['id'] + '/">'
-										+ data['users'][c][u]['username'] + '</a>';
+										+ data['users'][c][u]['username'] + '</a></div>';
 									if (data['users'][c][u] !== data['users'][c][data['users'][c].length - 1]) {
 										userList += ', ';
 									}
