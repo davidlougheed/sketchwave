@@ -552,6 +552,10 @@ SWConversationUI.prototype.initialize = function () {
 	}.bind(this));
 
 	this.$body.on('click', '.frame', function (event) {
+		if (self.drawCanvas.playing) {
+			self.drawCanvas.stopPlaying();
+			$('#toggleAnimation').children('i').first().text('play_arrow');
+		}
 		this.drawCanvas.setFrame($(event.target).data('frame'));
 		this.drawCanvas.redraw();
 		$('.frame').removeClass('selected');
