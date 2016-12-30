@@ -348,9 +348,9 @@ SWConversationUI.prototype.initialize = function () {
 	this.$changeNameButton.click(function () {
 		self.editingName = true;
 
-		var $convName = $('#convName');
+		var $conversationName = $('#conversationName');
 
-		$convName.replaceWith('<input type="text" id="changeNameText" value="' + $convName.text() + '">');
+		$conversationName.replaceWith('<input type="text" id="changeNameText" value="' + $conversationName.text() + '">');
 
 		var $changeNameText = $('#changeNameText');
 
@@ -690,7 +690,7 @@ SWConversationUI.prototype.initialize = function () {
 
 	this.socket.on('changeName', function (name) {
 		if (!this.editingName) {
-			$('#convName').html(name);
+			$('#conversationName').html(name);
 		}
 	}.bind(this));
 
@@ -834,14 +834,14 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 	$.get('/conversations/' + this.convID.toString() + '/data/from/' + from.toString()
 		+ '/count/' + count.toString()).then(function (data) {
 
-		var $convName = $('#convName');
+		var $conversationName = $('#conversationName');
 
 		// TODO: If not editing
-		$convName.text(data['conversation']['name']);
+		$conversationName.text(data['conversation']['name']);
 		this.ownerId = data['conversation']['OwnerId'];
 
 		if (this.ownerId == null) {
-			$convName.after('<button id="claimConv">Claim</button>');
+			$conversationName.after('<button id="claimConv">Claim</button>');
 		}
 
 		if (!top) {

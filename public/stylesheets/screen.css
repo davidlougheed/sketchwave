@@ -458,7 +458,7 @@ div#conversation section#messages header h1 {
 	color: #505055;
 	font-weight: 600;
 }
-div#conversation section#messages header h1 span#convName {
+div#conversation section#messages header h1 span#conversationName {
 	position: relative;
 	top: 4px;
 }
