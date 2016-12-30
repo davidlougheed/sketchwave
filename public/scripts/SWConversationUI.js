@@ -316,7 +316,7 @@ SWConversationUI.prototype.initialize = function () {
 			self.drawCanvas.redraw();
 		} else if ($messageDataContainer.hasClass('animation')) {
 			var $animationFrames = $messageDataContainer.children('.animation-frame');
-			var $frames = $('.frame');
+			var $frames;
 
 			while (self.drawCanvas.frames.length != $animationFrames.size()) {
 				$frames = $('.frame');
