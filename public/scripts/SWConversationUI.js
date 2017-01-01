@@ -390,73 +390,69 @@ SWConversationUI.prototype.initialize = function () {
 	});
 
 	this.$editMembersButton.click(function () {
-		self.$body.append('<div id="modalBackground"></div>');
-		var modalHTML = '<div id="modal"><h1><span>Edit Members</span><div class="controls">'
-			+ '<button id="closeModal" class="transparent iconOnly big noMargin">'
-			+ '<i class="material-icons">clear</i>'
-			+ '</button></div></h1><div id="members"></div><select id="addMemberBox"></select> '
-			+ '<button id="addMember"><i class="material-icons">person_add</i> Add Member</button>'
-			+ '<br><br></div>';
-
-		self.$body.append(modalHTML);
-
-		function template(data) {
-			return $('<span class="search-member"><div class="avatar"><img src="/users/'
-				+ data.id + '/avatar/thumb/"></div><div class="name">'
-				+ data.text + '</div></span>');
-		}
-
-		var $membersList = $('#members');
-		$('#addMemberBox').select2({
-			placeholder: {
-				id: '-1', // the value of the option
-				text: 'Select an option'
-			},
-
-			ajax: {
-				url: '/users_search/',
-				dataType: 'json',
-				delay: 250,
-				type: 'GET',
-				data: function (params) {
-					return {
-						q: params.term,
-						exclude: self.convID
-					}
-				},
-				/*data: function (params) {
-				return {
-				q: params.term, // search term
-				page: params.page
-				};
-				},*/
-				processResults: function (data) { // function (data, params) {
-					// parse the results into the format expected by Select2
-					// since we are using custom formatting functions we do not need to
-					// alter the remote JSON data, except to indicate that infinite
-					// scrolling can be used
-					//params.page = params.page || 1;
-
-					return {
-						results: $.map(data.users, function (user) {
-							return {
-								text: user.username,
-								id: user.id
-							}
-						})
-						/*pagination: {
-						more: (params.page * 30) < data.total_count
-						}*/
-					};
-				},
-				cache: true
-			},
-			templateResult: template,
-			minimumInputLength: 1
-		});
-
 		// Fetch a list of the conversation's users from the server.
 		$.get('/conversations/' + self.convID + '/users/').done(function (data) {
+			self.$body.append('<div id="modalBackground"></div><div id="modal"><h1><span>Edit Members</span>'
+				+ '<div class="controls"><button id="closeModal" class="transparent iconOnly big noMargin">'
+				+ '<i class="material-icons">clear</i>'
+				+ '</button></div></h1><div id="members"></div><select id="addMemberBox"></select> '
+				+ '<button id="addMember"><i class="material-icons">person_add</i> Add Member</button>'
+				+ '<br><br></div>');
+
+			function template(data) {
+				return $('<span class="search-member"><div class="avatar"><img src="/users/'
+					+ data.id + '/avatar/thumb/"></div><div class="name">'
+					+ data.text + '</div></span>');
+			}
+
+			$('#addMemberBox').select2({
+				placeholder: {
+					id: '-1', // the value of the option
+					text: 'Select an option'
+				},
+
+				ajax: {
+					url: '/users_search/',
+					dataType: 'json',
+					delay: 250,
+					type: 'GET',
+					data: function (params) {
+						return {
+							q: params.term,
+							exclude: self.convID
+						}
+					},
+					/*data: function (params) {
+					 return {
+					 q: params.term, // search term
+					 page: params.page
+					 };
+					 },*/
+					processResults: function (data) { // function (data, params) {
+						// parse the results into the format expected by Select2
+						// since we are using custom formatting functions we do not need to
+						// alter the remote JSON data, except to indicate that infinite
+						// scrolling can be used
+						//params.page = params.page || 1;
+
+						return {
+							results: $.map(data.users, function (user) {
+								return {
+									text: user.username,
+									id: user.id
+								}
+							})
+							/*pagination: {
+							 more: (params.page * 30) < data.total_count
+							 }*/
+						};
+					},
+					cache: true
+				},
+				templateResult: template,
+				minimumInputLength: 1
+			});
+
 			var $members = $('#members');
 			for (var u in data['users']) {
 				if (data['users'].hasOwnProperty(u)) {
@@ -488,46 +484,46 @@ SWConversationUI.prototype.initialize = function () {
 					}
 				}.bind(this));
 			});
-		});
 
-		$('#addMember').click(function () {
-			var userToAdd = $('#addMemberBox').val();
-			if (userToAdd) {
-				self.socket.emit('userAdd', {userID: userToAdd, conversationID: self.convID});
-				self.displayRawMetaMessage(self.authors[userToAdd]['username'] + ' was added to the conversation by '
-					+ self.CURRENT_USER.username + '.', false);
+			$('#addMember').click(function () {
+				var userToAdd = $('#addMemberBox').val();
+				if (userToAdd) {
+					self.socket.emit('userAdd', {userID: userToAdd, conversationID: self.convID});
+					self.displayRawMetaMessage(self.authors[userToAdd]['username'] + ' was added to the conversation by '
+						+ self.CURRENT_USER.username + '.', false);
 
-				$membersList.append('<div class="member" data-username="'
-					+ self.authors[userToAdd]['username'] + '"><div class="avatar"><img src="/users/'
-					+ self.authors[userToAdd]['id'] + '/avatar/thumb/"></div><a class="name">'
-					+ self.authors[userToAdd]['username']
-					+ '</a> <button class="deleteMember iconOnly transparent">'
-					+ '<i class="material-icons">clear</i></button></div>');
-			}
-		});
-
-		self.$body.on('click', '.deleteMember', function () {
-			// TODO: We should probably only use one method of IDing users rather than DB ID + username
-			var usernameToRemove = $(this).parent().data('username');
-			self.socket.emit('userRemove', {username: usernameToRemove, conversationID: self.convID});
-			self.displayRawMetaMessage(usernameToRemove + ' was removed from the conversation by '
-				+ self.CURRENT_USER.username + '.', false);
-			$(this).parent().remove();
-
-			if (self.CURRENT_USER.username == usernameToRemove) {
-				// User has removed themselves; send them to the conversation list page.
-				window.location = '/conversations/';
-			}
-		});
-
-		$('#closeModal, #modalBackground').click(function () {
-			$('#modal').fadeOut('fast', function () {
-				$(this).remove();
+					$members.append('<div class="member" data-username="'
+						+ self.authors[userToAdd]['username'] + '"><div class="avatar"><img src="/users/'
+						+ self.authors[userToAdd]['id'] + '/avatar/thumb/"></div><a class="name">'
+						+ self.authors[userToAdd]['username']
+						+ '</a> <button class="deleteMember iconOnly transparent">'
+						+ '<i class="material-icons">clear</i></button></div>');
+				}
 			});
-			$('#modalBackground').fadeOut('fast', function () {
-				$(this).remove();
+
+			$('#closeModal, #modalBackground').click(function () {
+				$('#modal').fadeOut('fast', function () {
+					$(this).remove();
+				});
+				$('#modalBackground').fadeOut('fast', function () {
+					$(this).remove();
+				});
 			});
 		});
+	});
+
+	self.$body.on('click', '.deleteMember', function () {
+		// TODO: We should probably only use one method of IDing users rather than DB ID + username
+		var usernameToRemove = $(this).parent().data('username');
+		self.socket.emit('userRemove', {username: usernameToRemove, conversationID: self.convID});
+		self.displayRawMetaMessage(usernameToRemove + ' was removed from the conversation by '
+			+ self.CURRENT_USER.username + '.', false);
+		$(this).parent().remove();
+
+		if (self.CURRENT_USER.username == usernameToRemove) {
+			// User has removed themselves; send them to the conversation list page.
+			window.location = '/conversations/';
+		}
 	});
 
 	$('#toggleCanvas').click(function () {
