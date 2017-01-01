@@ -6,10 +6,10 @@
   "license": "UNLICENSED",
   "dependencies": {
     "async": "^2.1.4",
-    "bcrypt": "^0.8.7",
+    "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
     "connect-flash": "^0.1.1",
-    "connect-redis": "^3.1.0",
+    "connect-redis": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
@@ -17,12 +17,12 @@
     "jade": "^1.11.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
-    "pg": "^6.1.0",
+    "pg": "^6.1.2",
     "redis": "^2.6.3",
     "request": "^2.79.0",
     "sanitize-html": "^1.13.0",
-    "sequelize": "^3.27.0",
-    "sharp": "^0.16.2",
-    "socket.io": "^1.6.0"
+    "sequelize": "^3.28.0",
+    "sharp": "^0.17.0",
+    "socket.io": "^1.7.2"
   }
 }
