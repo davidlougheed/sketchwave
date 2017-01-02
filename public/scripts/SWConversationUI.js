@@ -371,7 +371,7 @@ SWConversationUI.prototype.initialize = function () {
 			$('#saveName').remove();
 			$('#cancelChange').remove();
 
-			$changeNameText.replaceWith('<span id="convName">' + $changeNameText.val() + '</span>');
+			$changeNameText.replaceWith('<span id="conversationName">' + $changeNameText.val() + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
@@ -381,7 +381,7 @@ SWConversationUI.prototype.initialize = function () {
 			$('#saveName').remove();
 			$(this).remove();
 
-			$changeNameText.replaceWith('<span id="convName">' + $changeNameText.val() + '</span>');
+			$changeNameText.replaceWith('<span id="conversationName">' + $changeNameText.val() + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
