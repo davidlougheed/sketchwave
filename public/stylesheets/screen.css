@@ -107,12 +107,16 @@ section#main {
 }
 section#main h1 {
 	overflow: hidden;
-	margin-top: 0;
+	margin: 0 auto 15px auto;
 	padding-bottom: 5px;
 	font-family: "Open Sans", sans-serif;
 	font-weight: 600;
 	color: #444;
 	border-bottom: 2px solid #6f9fce;
+	max-width: 960px;
+}
+section#main h1.full-width {
+	max-width: 100%;
 }
 section#main h1 > span {
 	float: left;
@@ -298,20 +302,30 @@ section#main div.aboutProfile p {
 
 /* conversation stuff */
 
+form#formCreateConversation {
+	box-sizing: border-box;
+	max-width: 960px;
+	margin: 0 auto 30px auto;
+}
+
 ul#conversations {
+	box-sizing: border-box;
 	list-style: none;
 	padding: 0;
-	margin: 20px 0;
+	margin: 20px auto;
 	border-radius: 3px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	max-width: 960px;
 }
 ul#conversations li.conversation {
+	box-sizing: border-box;
 	position: relative;
-	height: 48px;
+	margin-bottom: 10px;
 
 	border: 1px solid #bbb;
-	border-bottom: none;
+	/*border-bottom: none;*/
+	border-radius: 4px;
 	background-color: #fefefd;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
 	font-family: "Open Sans", sans-serif;
 
@@ -328,16 +342,15 @@ ul#conversations li.conversation:last-child {
 	border-bottom: 1px solid #bbb;
 }
 ul#conversations li.conversation div.link {
-	position: relative;
-	z-index: 11;
+	/*position: relative;*/
+	/*z-index: 11;*/
 
 	display: inline-block;
-	height: 48px;
-	line-height: 48px;
+	/*line-height: 48px;*/
 
 	/*background-color: #fefefd;*/
-	border-right: 1px solid #bbb;
-	padding: 0 15px;
+	/*border-right: 1px solid #bbb;*/
+	padding: 12px 15px;
 }
 ul#conversations li.conversation div.member {
 	display: inline-block;
@@ -363,19 +376,18 @@ ul#conversations li.conversation a {
 	color: #666;
 }
 ul#conversations li.conversation div.memberList {
-	display: inline-block;
-	height: 48px;
-	line-height: 48px;
+	padding: 12px 15px;
 
-	padding: 0 15px;
+	border-top: 1px solid #e9e9e9;
 
+	line-height: 30px;
 	color: #333;
 }
 ul#conversations li.conversation div.date {
 	position: absolute;
 	right: 0;
 	display: inline-block;
-	height: 47px;
+	height: 46px;
 	z-index: 10;
 	padding-left: 5px;
 	padding-right: 15px;
@@ -391,7 +403,7 @@ ul#conversations li.conversation div.date {
 ul#conversations li.conversation div.date:before {
 	position: absolute;
 	left: -20px;
-	width: 20px; height: 47px;
+	width: 20px; height: 46px;
 	display: inline-block;
 
 	background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
@@ -404,7 +416,9 @@ ul#conversations li.conversation.deletable div.date {
 	padding-right: 15px;
 }
 ul#conversations li.conversation div.controls {
-	float: right;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 ul#conversations li.conversation div.controls button {
 	position: relative;
@@ -1572,8 +1586,8 @@ form#formSignUp h2 {
 	ul#conversations li.conversation div.date {
 		display: block;
 		position: relative;
-		border-bottom: 1px solid #e0e0e0;
 		padding-left: 15px;
+		padding-top: 5px;
 		height: auto;
 		line-height: 1.2rem;
 		padding-bottom: 10px;
@@ -1596,11 +1610,6 @@ form#formSignUp h2 {
 	}
 	ul#conversations li.conversation div.controls button {
 		left: 14px;
-	}
-	ul#conversations li.conversation div.memberList {
-		height: auto;
-		padding: 10px;
-		line-height: 1.4em;
 	}
 
 	section#main blockquote footer {
