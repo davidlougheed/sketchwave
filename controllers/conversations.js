@@ -41,7 +41,9 @@ module.exports.controller = function (objects) {
 				}
 			}).then(function (users) {
 				conversation.setUsers(users).then(function () {
-					return res.render('conversations', { user: req.user });
+					conversation.setOwner(req.user).then(function () {
+						return res.render('conversations', { user: req.user });
+					});
 				});
 			});
 		});
@@ -469,6 +471,7 @@ module.exports.controller = function (objects) {
 					id: parseInt(conversationID)
 				}
 			}).then(function (conversation) {
+				// TODO: Is this request really needed?
 				conversation.getUsers({
 					where: {
 						id: socket.request.session.passport.user
