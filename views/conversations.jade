@@ -8,6 +8,10 @@ block scripts
 		$(document).ready(function () {
 			var socket = io();
 
+			var CURRENT_USER = {
+				id: #{user.id}
+			};
+
 			var $body = $('body');
 			var $conversations = $('#conversations');
 			var $names = $('#names');
@@ -20,7 +24,7 @@ block scripts
 			window.setInterval(function () {
 				if (active) {
 					// Keep session alive
-					$.get('/keepalive/', { id: this.CURRENT_USER.id }).fail(function () {
+					$.get('/keepalive/', { id: CURRENT_USER.id }).fail(function () {
 						// User was logged out due to inactivity.
 						window.location = '/login/?redirect=%2Fconversations%2F';
 					}.bind(this));

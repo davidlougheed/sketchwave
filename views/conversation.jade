@@ -12,6 +12,7 @@ block scripts
 		script(type='text/javascript') var ownerId = null;
 
 	script(type='text/javascript').
+		// TODO: This is an XSS vulnerability!
 		new SWConversationUI({
 			id: #{user.id},
 			username: '#{user.username}'
