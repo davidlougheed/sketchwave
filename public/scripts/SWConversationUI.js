@@ -37,10 +37,9 @@ var SWConversationUI = function (currentUser, conversation) {
 
 	this.messagesLoaded = 0;
 
-	$(document).ready(function () {
+	$(function () {
 		this.initialize();
 	}.bind(this));
-
 };
 
 /**
