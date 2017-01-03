@@ -5,20 +5,20 @@ block vars
 
 block scripts
 	script(type='text/javascript').
-			$('#gabe img').hover(function () {
 		$(function () {
+			$('#gabe').find('img').hover(function () {
 				$(this).attr('src', '/images/gabe_glitched.png');
 			}, function () {
 				$(this).attr('src', '/images/gabe.png');
 			});
 
-			$('#aidon img').hover(function () {
+			$('#aidon').find('img').hover(function () {
 				$(this).attr('src', '/images/aidon_glitched.png');
 			}, function () {
 				$(this).attr('src', '/images/aidon.png');
 			});
 
-			$('#david img').hover(function () {
+			$('#david').find('img').hover(function () {
 				$(this).attr('src', '/images/david_glitched.png');
 			}, function () {
 				$(this).attr('src', '/images/david.png');
