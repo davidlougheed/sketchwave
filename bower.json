@@ -18,8 +18,8 @@
   ],
   "dependencies": {
     "material-design-icons": "^3.0.1",
-    "jquery": "^2.2.4",
+    "jquery": "^3.1.1",
     "select2": "^4.0.3",
-    "moment": "^2.13.0"
+    "moment": "^2.17.1"
   }
 }
