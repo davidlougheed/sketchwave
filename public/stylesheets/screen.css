@@ -49,9 +49,7 @@ body {
 
 header#siteHeader {
 	/*noinspection CssUnknownTarget*/
-	background: url(/images/wave.png) repeat-x;
-	background-size: auto 62px;
-	background-position: 43px 0;
+	background: repeat-x 43px 0/auto 62px url(/images/wave.png) ;
 	height: 104px;
 	position: absolute;
 	left: 0; right: 0;
