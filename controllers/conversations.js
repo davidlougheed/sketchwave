@@ -1,6 +1,7 @@
 'use strict';
 
 var async = require('async');
+var csurf = require('csurf');
 var appError = require('../modules/app-error');
 var appMessage = require('../modules/app-message');
 
@@ -9,16 +10,16 @@ var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
 	// Shows a list of convesations.
-	objects.router.get('/conversations/', function (req, res) {
+	objects.router.get('/conversations/', objects.csrfProtection, function (req, res) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
 
-		res.render('conversations', { user: req.user });
+		res.render('conversations', { user: req.user, csrfToken: req.csrfToken() });
 	});
 
 	// Creates a conversation if the user is authenticated.
-	objects.router.post('/conversations/', function (req, res) {
+	objects.router.post('/conversations/', objects.csrfProtection, function (req, res) {
 		//TODO: Handle errors properly
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));

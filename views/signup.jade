@@ -153,6 +153,9 @@ block content
 				span Log In
 	form#formSignUp(method='post', action='/signup')
 		// TODO: Proper errors such as "already taken", etc...
+
+		input(type='hidden', name='_csrf', value='#{csrfToken}')
+
 		label(for='username')
 			span Username
 			em (min. 3 characters)

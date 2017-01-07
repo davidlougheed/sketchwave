@@ -1351,7 +1351,7 @@ form#formLogIn input[type="text"]:focus, form#formLogIn input[type="password"]:f
 form#formLogIn input[name="username"] {
 	border: 1px solid #bbb;
 }
-form#formLogIn input[name="username"]:first-child {
+form#formLogIn input[name="username"] {
 	border-top-left-radius: 3px;
 	border-top-right-radius: 3px;
 }

@@ -22,6 +22,8 @@ block content
 		if error != ''
 			div.siteMessage.error #{error}
 
+		input(type='hidden', name='_csrf', value='#{csrfToken}')
+
 		input(type='text', name='username', id='username'
 			autocapitalize='off', autocorrect='off', placeholder='Username')
 		input(type='password', name='password', id='password', placeholder='Password')

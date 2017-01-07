@@ -205,6 +205,8 @@ block content
 				span Create
 
 	form#formCreateConversation(method='post')
+		input(type='hidden', name='_csrf', value='#{csrfToken}')
+
 		label(for='names') Members
 		select(name='names[]', id='names', class='js-basic-multiple', multiple='multiple', style='width: 400px')
 		label(for='name') Conversation Name

@@ -16,6 +16,7 @@ var session = require('express-session');
 var flash = require('connect-flash');
 
 var passport = require('passport');
+var csurf = require('csurf');
 var bcrypt = require('bcrypt');
 
 const APP_BASE_PATH = __dirname;
@@ -63,6 +64,8 @@ var sessionMiddleware = session({
 
 	cookie: { maxAge: 1800000 }
 });
+
+var csrfProtection = csurf({});
 
 var io = socketIO.listen(appServer).use(function (socket, next) {
 	sessionMiddleware(socket.request, {}, next);
@@ -113,6 +116,7 @@ fs.readdirSync(controllerDir).filter(function (file) {
 		io: io,
 		redis: redisClient,
 		passport: passport,
+		csrfProtection: csrfProtection,
 		models: models,
 		dbConfig: dbConfig,
 		siteConfig: siteConfig

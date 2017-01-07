@@ -18,14 +18,14 @@ module.exports.controller = function (objects) {
 		res.render('contact');
 	});
 
-	objects.router.get('/signup/', function (req, res) {
+	objects.router.get('/signup/', objects.csrfProtection, function (req, res) {
 		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 
-		res.render('signup');
+		res.render('signup', { csrfToken: req.csrfToken() });
 	});
-	objects.router.post('/signup/', function (req, res) {
+	objects.router.post('/signup/', objects.csrfProtection, function (req, res) {
 		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
@@ -85,18 +85,22 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	objects.router.get('/login/', function (req, res) {
+	objects.router.get('/login/', objects.csrfProtection, function (req, res) {
 		if (req.isAuthenticated()) {
 			return res.redirect('/conversations/');
 		}
 
 		if(req.query.redirect) {
-			return res.render('login', { error: req.flash('error'), redirect: req.query.redirect });
+			return res.render('login', {
+				error: req.flash('error'),
+				redirect: req.query.redirect,
+				csrfToken: req.csrfToken()
+			});
 		}
 
-		return res.render('login', { error: req.flash('error'), redirect: '/' });
+		return res.render('login', { error: req.flash('error'), redirect: '/', csrfToken: req.csrfToken() });
 	});
-	objects.router.post('/login/', objects.passport.authenticate('local', {
+	objects.router.post('/login/', objects.csrfProtection, objects.passport.authenticate('local', {
 		failureRedirect: '/login/',
 		failureFlash: true
 	}), function (req, res) {
