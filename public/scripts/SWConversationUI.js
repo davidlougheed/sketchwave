@@ -557,6 +557,10 @@ SWConversationUI.prototype.initialize = function () {
 
 	$('#addFrame').click(function () {
 		if (this.drawCanvas.addFrame()) {
+			if (self.drawCanvas.playing) {
+				self.drawCanvas.stopPlaying();
+				$('#toggleAnimation').children('i').first().text('play_arrow');
+			}
 			var $frames = $('.frame');
 			$frames.last().after('<a id="frame-' + this.drawCanvas.frames.length
 				+ '" class="frame selected" data-frame="' + (this.drawCanvas.frames.length - 1) + '">'
