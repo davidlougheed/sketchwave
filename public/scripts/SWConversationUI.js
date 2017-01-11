@@ -645,7 +645,7 @@ SWConversationUI.prototype.initialize = function () {
 		}
 	}
 
-	this.$body.on('click', '#claimConv', function () {
+	this.$body.on('click', '#claimConversation', function () {
 		this.socket.emit('claimConversation', this.convID);
 	}.bind(this));
 
@@ -733,7 +733,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 		messageHTML += '">';
 	}
 
-	messageHTML += '<div class="topBar"><div class="author">'
+	messageHTML += '<div class="top-bar"><div class="author">'
 		+ '<img src="/users/' + this.authors[userID]['id'] + '/avatar/thumb/">'
 		+ '<a href="/users/' + userID + '/">'
 		+ this.authors[userID]['username'] + '</a></div><div class="date">'
@@ -789,7 +789,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
  * @param immediate - A flag for scrolling the page with animation or immediately.
  */
 SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate) {
-	this.$messagesContainer.append('<div class="metaMessage">' + message + '</div>');
+	this.$messagesContainer.append('<div class="meta-message">' + message + '</div>');
 	if (immediate) {
 		this.$messagesContainer.scrollTop(this.$messagesContainer[0].scrollHeight);
 	} else {
@@ -838,7 +838,7 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 		this.ownerId = data['conversation']['OwnerId'];
 
 		if (this.ownerId == null) {
-			$conversationName.after('<button id="claimConv">Claim</button>');
+			$conversationName.after('<button id="claimConversation">Claim</button>');
 		}
 
 		if (!top) {
