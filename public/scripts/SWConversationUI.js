@@ -314,9 +314,9 @@ SWConversationUI.prototype.initialize = function () {
 			var $animationFrames = $messageDataContainer.children('.animation-frame');
 			var $frames;
 
-			while (self.drawCanvas.frames.length != $animationFrames.size()) {
+			while (self.drawCanvas.frames.length != $animationFrames.length) {
 				$frames = $('.frame');
-				if (self.drawCanvas.frames.length < $animationFrames.size()) {
+				if (self.drawCanvas.frames.length < $animationFrames.length) {
 					self.drawCanvas.addFrame();
 					$frames.last().after('<a id="frame-' + self.drawCanvas.frames.length
 						+ '" class="frame" data-frame="' + (self.drawCanvas.frames.length - 1) + '">'
