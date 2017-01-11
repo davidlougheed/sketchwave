@@ -261,7 +261,7 @@ SWConversationUI.prototype.initialize = function () {
 		this.$body.append('<div id="modal"><h1><span>User Stamps</span><div class="controls">'
 			+ '<button id="closeModal" class="transparent iconOnly big noMargin">'
 			+ '<i class="material-icons">clear</i></button></div></h1>'
-			+ '<div id="stamps"><div class="stamp"><img src="/images/sciencerules.png"></div></div>'
+			+ '<div id="stamps"><div class="stamp"><img src="/images/speech_bubble.png"></div></div>'
 			+ '</div>');
 
 		this.refreshStamps();
