@@ -49,7 +49,7 @@ body {
 
 header#siteHeader {
 	/*noinspection CssUnknownTarget*/
-	background: repeat-x 43px 0/auto 62px url(/images/wave.png) ;
+	background: repeat-x 43px 0/auto 62px url(/images/wave.png);
 	height: 104px;
 	position: absolute;
 	left: 0; right: 0;
@@ -320,7 +320,6 @@ ul#conversations li.conversation {
 	margin-bottom: 10px;
 
 	border: 1px solid #bbb;
-	/*border-bottom: none;*/
 	border-radius: 4px;
 	background-color: #fefefd;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
