@@ -14,6 +14,7 @@ var SWCanvas = function (canvas) {
 	// A drawing can have up to 10 frames (with more than 1 frame it becomes animated).
 	this.canvas = document.getElementById(canvas);
 	this.context = this.canvas.getContext('2d');
+	// TODO: When viable, replace offset() with a native JS equivalent
 	this.canvasOffset = $(this.canvas).offset();
 
 	// Cache canvas' real width/height (without scaling)
@@ -42,13 +43,24 @@ var SWCanvas = function (canvas) {
 
 	this.frames = [{
 		points: [],
-		background: document.createElement('img')
+		background: document.createElement('canvas')
 	}];
+	this.frames[0].background.width = this.cw;
+	this.frames[0].background.height = this.ch;
+
 	this.currentFrame = 0;
 	this.animationInterval = null;
 	this.playing = false;
 
 	this.BLANK_PNG = "/images/blank.png";
+	this.GABESAVE_QUOTA = 50;
+
+	this.stamps = {
+		dolphin: $('#dolphin').find('img')[0],
+		hand: $('#hand').find('img')[0],
+		pizza: $('#pizza').find('img')[0],
+		gabe: $('#gabe').find('img')[0]
+	};
 
 	this.moveImageDataToBackground(false, false, null);
 };
@@ -80,7 +92,7 @@ SWCanvas.prototype.clearAllCanvasData = function (backgroundClear, keepPoints) {
 		this.frames[this.currentFrame].points = [];
 	}
 	if (backgroundClear) {
-		this.frames[this.currentFrame].background = document.createElement('img');
+		this.frames[this.currentFrame].background.getContext('2d').clearRect(0, 0, this.cw, this.ch);
 		this.moveImageDataToBackground(false, false, null); // Make sure there's a background in place.
 	}
 };
@@ -90,10 +102,14 @@ SWCanvas.prototype.clearAllCanvasData = function (backgroundClear, keepPoints) {
  */
 SWCanvas.prototype.clearFrames = function () {
 	this.context.clearRect(0, 0, this.cw, this.ch);
+
 	this.frames = [{
 		points: [],
-		background: document.createElement('img')
+		background: document.createElement('canvas')
 	}];
+	this.frames[0].background.width = this.cw;
+	this.frames[0].background.height = this.ch;
+
 	this.currentFrame = 0;
 	this.moveImageDataToBackground(false, false, null);
 };
@@ -104,15 +120,50 @@ SWCanvas.prototype.clearFrames = function () {
 SWCanvas.prototype.drawPoints = function () {
 	this.context.lineJoin = 'round';
 
+	var cacheStamp;
+	var cacheStampContext;
+	var size;
+
+	if (this.frames[this.currentFrame].points.length > 0) {
+		if (this.frames[this.currentFrame].points[0].tool == 'brush') {
+			// Only one line width / stroke style is in use at any point in time.
+
+			// Make brush size feel more natural
+			this.context.lineWidth = (Math.pow(this.frames[this.currentFrame].points[0].size / this.ch, 1.75)
+				* this.ch / 2.0) + 1;
+			this.context.strokeStyle = this.frames[this.currentFrame].points[0].color;
+		} else {
+			// The same size of stamp is used, so cache the size to avoid scaling.
+
+			cacheStamp = document.createElement('canvas');
+			cacheStampContext = cacheStamp.getContext('2d');
+
+			if (this.frames[this.currentFrame].points[0].stamp == 'hotswap') {
+				// Where 1.5 is the size ratio of the canvas width to height:
+				size = this.frames[this.currentFrame].points[0].size * 1.5;
+
+				cacheStamp.width = size;
+				cacheStamp.height = this.frames[this.currentFrame].points[0].size;
+
+				// TODO: Make this not dependent on DOM
+				cacheStampContext.drawImage($('#' + this.frames[this.currentFrame].points[0].stamp + ' img')[0], 0, 0,
+					cacheStamp.width, cacheStamp.height);
+			} else {
+				size = this.frames[this.currentFrame].points[0].size;
+
+				cacheStamp.width = size;
+				cacheStamp.height = size;
+
+				cacheStampContext.drawImage(this.stamps[this.frames[this.currentFrame].points[0].stamp], 0, 0,
+					size, size);
+			}
+		}
+	}
+
 	for (var p in this.frames[this.currentFrame].points) {
 		if (this.frames[this.currentFrame].points.hasOwnProperty(p)) {
 			if (this.frames[this.currentFrame].points[p].tool == 'brush') {
 				// We're using the paintbrush and not stamps
-
-				// Make brush size feel more natural
-				this.context.lineWidth = (Math.pow(this.frames[this.currentFrame].points[p].size / this.ch, 1.75)
-					* this.ch / 2.0) + 1;
-				this.context.strokeStyle = this.frames[this.currentFrame].points[p].color;
 
 				// Start drawing the line
 				this.context.beginPath();
@@ -133,18 +184,15 @@ SWCanvas.prototype.drawPoints = function () {
 				// We're adding stamps
 
 				if (this.frames[this.currentFrame].points[p].stamp) {
-					// Where 1.5 is the size ratio of the canvas width to height:
-					var size = this.frames[this.currentFrame].points[p].size * 1.5;
-					// TODO: Make this not dependent on DOM
 					if (this.frames[this.currentFrame].points[p].stamp == 'hotswap') {
-						this.context.drawImage($('#' + this.frames[this.currentFrame].points[p].stamp + ' img')[0],
+						this.context.drawImage(cacheStamp,
 							this.frames[this.currentFrame].points[p].x - Math.round(size / 2),
-							this.frames[this.currentFrame].points[p].y - Math.round(size / 3), size, size / 1.5);
+							this.frames[this.currentFrame].points[p].y - Math.round(size / 3), size,
+							this.frames[this.currentFrame].points[p].size);
 					} else {
-						this.context.drawImage($('#' + this.frames[this.currentFrame].points[p].stamp + ' img')[0],
-							this.frames[this.currentFrame].points[p].x - (this.frames[this.currentFrame].points[p].size / 2),
-							this.frames[this.currentFrame].points[p].y - (this.frames[this.currentFrame].points[p].size / 2),
-							this.frames[this.currentFrame].points[p].size, this.frames[this.currentFrame].points[p].size);
+						this.context.drawImage(cacheStamp, 0, 0, size, size,
+							this.frames[this.currentFrame].points[p].x - (size / 2),
+							this.frames[this.currentFrame].points[p].y - (size / 2), size, size);
 					}
 				}
 			}
@@ -152,11 +200,26 @@ SWCanvas.prototype.drawPoints = function () {
 	}
 
 	if (!this.playing && this.currentFrame > 0) {
-		if (this.frames[this.currentFrame - 1].background && this.frames[this.currentFrame - 1].background.src) {
-			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.getAttribute('src'));
+		if (this.frames[this.currentFrame - 1].background) {
+			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.toDataURL());
 		} else {
 			$('#onionSkin').attr('src', this.BLANK_PNG);
 		}
+	}
+};
+
+/**
+ * Clears the onion skin image.
+ */
+SWCanvas.prototype.redrawOnionSkin = function () {
+	if (!this.playing && this.currentFrame > 0) {
+		if (this.frames[this.currentFrame - 1].background) {
+			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.toDataURL());
+		} else {
+			$('#onionSkin').attr('src', this.BLANK_PNG);
+		}
+	} else {
+		$('#onionSkin').attr('src', this.BLANK_PNG);
 	}
 };
 
@@ -165,35 +228,25 @@ SWCanvas.prototype.drawPoints = function () {
  */
 SWCanvas.prototype.redraw = function () {
 	// Copy image as the first thing on the canvas as part of the GabeSave process.
-	if (this.frames[this.currentFrame].background && this.frames[this.currentFrame].background.getAttribute('src')) {
-		if (this.frames[this.currentFrame].background.complete) {
-			this.context.clearRect(0, 0, this.cw, this.ch);
-			this.context.drawImage(this.frames[this.currentFrame].background, 0, 0, this.cw, this.ch);
-			this.drawPoints();
-		} else {
-			this.frames[this.currentFrame].background.onload = function () {
-				this.context.clearRect(0, 0, this.cw, this.ch);
-				this.context.drawImage(this.frames[this.currentFrame].background, 0, 0, this.cw, this.ch);
-				this.drawPoints();
-			}.bind(this);
-		}
-	} else {
-		this.context.clearRect(0, 0, this.cw, this.ch);
-		this.drawPoints();
+	this.context.clearRect(0, 0, this.cw, this.ch);
+	if (this.frames[this.currentFrame].background) {
+		this.context.drawImage(this.frames[this.currentFrame].background, 0, 0, this.cw, this.ch);
 	}
+	this.drawPoints();
+
+	window.requestAnimationFrame(this.redraw.bind(this));
 };
 
 /**
  * Adds a point to the canvas.
- * @param x {number} - The X coordinate of the point to add.
- * @param y {number} - The Y coordinate of the point to add.
+ * @param mouseCoordinates {object} - The coordinates of the point to add.
  * @param dragging {boolean} - Whether or not this is part of a "dragged" line.
  */
-SWCanvas.prototype.addPoint = function (x, y, dragging) {
+SWCanvas.prototype.addPoint = function (mouseCoordinates, dragging) {
 	// Push a points object to the SW canvas object's internal list
 	this.frames[this.currentFrame].points.push({
-		x: x,
-		y: y,
+		x: mouseCoordinates.x,
+		y: mouseCoordinates.y,
 		dragging: dragging,
 		color: this.brush.color,
 		size: this.brush.size,
@@ -203,10 +256,10 @@ SWCanvas.prototype.addPoint = function (x, y, dragging) {
 
 	this.pointsSinceSave += 1;
 
-	if (this.frames[this.currentFrame].points.length > 50 && this.allowGabeSave) {
+	// TODO: Fix this hacky mess: GabeSave results in quantum teleportation while an animation is playing.
+	if (this.frames[this.currentFrame].points.length > this.GABESAVE_QUOTA && this.allowGabeSave && !this.playing) {
 		this.allowGabeSave = false;
 		this.moveImageDataToBackground(true, dragging, function () {
-			this.redraw();
 			this.allowGabeSave = true;
 		}.bind(this));
 	}
@@ -227,13 +280,17 @@ SWCanvas.prototype.stopPainting = function () {
 
 /**
  * Add a frame.
+ * @returns {boolean}
  */
 SWCanvas.prototype.addFrame = function () {
 	if (this.frames.length < 10) {
 		this.frames.push({
 			points: [],
-			background: document.createElement('img')
+			background: document.createElement('canvas')
 		});
+		this.frames[this.frames.length - 1].background.width = this.cw;
+		this.frames[this.frames.length - 1].background.height = this.ch;
+
 		this.setFrame(this.frames.length - 1);
 		return true;
 	}
@@ -248,8 +305,7 @@ SWCanvas.prototype.removeFrame = function () {
 	if (this.frames.length > 1) {
 		this.frames.pop();
 		if (this.currentFrame >= this.frames.length) {
-			this.currentFrame = this.frames.length - 1;
-			this.redraw();
+			this.setFrame(this.frames.length - 1);
 		}
 		return true;
 	}
@@ -263,13 +319,10 @@ SWCanvas.prototype.removeFrame = function () {
  */
 SWCanvas.prototype.setFrame = function (frame) {
 	if (frame >= 0 || frame < 10) {
-		this.frames[this.currentFrame].background.onload = null;
 		this.pointsSinceSave = 0;
 		this.allowGabeSave = true;
 		this.currentFrame = frame;
-		this.redraw();
-		this.moveImageDataToBackground(false, false, null);
-		if (frame == 0 || (this.currentFrame > 0 && !this.frames[this.currentFrame].background.getAttribute('src'))) {
+		if (frame == 0 || (this.currentFrame > 0 && !this.frames[this.currentFrame].background)) {
 			$('#onionSkin').attr('src', this.BLANK_PNG);
 		}
 	}
@@ -283,7 +336,7 @@ SWCanvas.prototype.getFrameDataURLs = function () {
 	for (var i in this.frames) {
 		if (this.frames.hasOwnProperty(i)) {
 			// GabeSave should have moved everything into the background.
-			urls.push(this.frames[i].background.getAttribute('src'));
+			urls.push(this.frames[i].background.toDataURL());
 		}
 	}
 	return urls;
@@ -294,7 +347,6 @@ SWCanvas.prototype.getFrameDataURLs = function () {
  */
 SWCanvas.prototype.playStep = function () {
 	this.currentFrame = (this.currentFrame + 1) % this.frames.length;
-	this.redraw();
 };
 
 /**
@@ -312,7 +364,6 @@ SWCanvas.prototype.startPlaying = function () {
 SWCanvas.prototype.stopPlaying = function () {
 	this.playing = false;
 	clearInterval(this.animationInterval);
-	this.redraw();
 };
 
 /**
@@ -340,7 +391,6 @@ SWCanvas.prototype.updateCanvasOffset = function () {
  * @returns {{x: number, y: number}}
  */
 SWCanvas.prototype.calculateMouse = function (x, y) {
-	// TODO: When viable, replace offset() with a native JS equivalent
 	//noinspection JSUnresolvedVariable
 	return {
 		x: (x - this.canvasOffset.left) / (this.canvas.offsetWidth / this.cw),
@@ -362,28 +412,16 @@ SWCanvas.prototype.setBrushSize = function (value) {
  */
 SWCanvas.prototype.moveImageDataToBackground = function (checkPoints, dragging, callback) {
 	this.pointsSinceSave = 0;
-	// TODO: Eventually move this to toBlob when it is supported in more browsers.
+	this.frames[this.currentFrame].background.getContext('2d').drawImage(this.canvas, 0, 0, this.cw, this.ch);
 	if (!dragging) {
-		this.frames[this.currentFrame].background.setAttribute('src', this.canvas.toDataURL());
-
-		this.frames[this.currentFrame].background.onload = function (callback) {
-			this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
-				.splice(0, this.frames[this.currentFrame].points.length);
-			if (callback) callback();
-		}.bind(this, callback);
-	} else {
-		setTimeout(function (checkPoints) {
-			this.frames[this.currentFrame].background.setAttribute('src', this.canvas.toDataURL());
-			this.frames[this.currentFrame].background.onload = function (checkPoints, callback) {
-				if (checkPoints) {
-					this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
-						.slice(this.frames[this.currentFrame].points.length - (this.pointsSinceSave + 1),
-							this.frames[this.currentFrame].points.length);
-				}
-				if (callback) callback();
-			}.bind(this, checkPoints, callback);
-		}.bind(this, checkPoints), 0);
+		this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
+			.splice(0, this.frames[this.currentFrame].points.length - 1);
+	} else if (checkPoints) {
+		this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
+			.slice(this.frames[this.currentFrame].points.length - (this.pointsSinceSave + 2),
+				this.frames[this.currentFrame].points.length);
 	}
+	if (callback) callback();
 };
 
 /**
@@ -393,9 +431,7 @@ SWCanvas.prototype.moveImageDataToBackground = function (checkPoints, dragging, 
 SWCanvas.prototype.drawBackground = function (keepPoints) {
 	if (this.frames[this.currentFrame].background) {
 		this.clearAllCanvasData(false, keepPoints);
-		this.context.clearRect(0, 0, this.cw, this.ch);
-		this.context.drawImage(this.frames[this.currentFrame].background,
-			0, 0, this.cw, this.ch);
+		this.context.drawImage(this.frames[this.currentFrame].background, 0, 0);
 	}
 };
 

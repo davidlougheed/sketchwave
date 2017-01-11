@@ -63,6 +63,7 @@ SWConversationUI.prototype.initialize = function () {
 	this.$canvas = $('#drawCanvas');
 
 	this.drawCanvas = new SWCanvas('drawCanvas');
+	window.requestAnimationFrame(this.drawCanvas.redraw.bind(this.drawCanvas));
 
 	this.$controls.hide();
 	this.$commands.hide();
@@ -87,29 +88,27 @@ SWConversationUI.prototype.initialize = function () {
 	}.bind(this));
 
 	this.$canvas.on('mousedown', function (event) {
-		var mCoords = this.drawCanvas.calculateMouse(event.pageX, event.pageY);
-
 		this.drawCanvas.startPainting();
-
-		this.drawCanvas.addPoint(mCoords.x, mCoords.y, false);
-		this.drawCanvas.redraw();
+		this.drawCanvas.addPoint(this.drawCanvas.calculateMouse(event.pageX, event.pageY), false);
 	}.bind(this));
 	this.$canvas.on('touchstart', function (event) {
 		//noinspection JSUnresolvedVariable
 		var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-		var mCoords = this.drawCanvas.calculateMouse(touch.pageX, touch.pageY);
-
 		this.drawCanvas.startPainting();
-
-		this.drawCanvas.addPoint(mCoords.x, mCoords.y, false);
-		this.drawCanvas.redraw();
+		this.drawCanvas.addPoint(this.drawCanvas.calculateMouse(touch.pageX, touch.pageY), false);
 	}.bind(this));
 	this.$canvas.on('mousemove', function (event) {
 		if (this.drawCanvas.paint) {
-			var mCoords = this.drawCanvas.calculateMouse(event.pageX, event.pageY);
+			this.drawCanvas.addPoint(this.drawCanvas.calculateMouse(event.pageX, event.pageY), true);
+		}
 
-			this.drawCanvas.addPoint(mCoords.x, mCoords.y, true);
-			this.drawCanvas.redraw();
+		if (hover) {
+			if (this.useCursor) this.drawCursor(event.pageX, event.pageY);
+		}
+	}.bind(this));
+	this.$canvas.on('drag', function (event) {
+		if (this.drawCanvas.paint) {
+			this.drawCanvas.addPoint(this.drawCanvas.calculateMouse(event.pageX, event.pageY), true);
 		}
 
 		if (hover) {
@@ -122,10 +121,7 @@ SWConversationUI.prototype.initialize = function () {
 		if (this.drawCanvas.paint) {
 			//noinspection JSUnresolvedVariable
 			var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-			var mCoords = this.drawCanvas.calculateMouse(touch.pageX, touch.pageY);
-
-			this.drawCanvas.addPoint(mCoords.x, mCoords.y, true);
-			this.drawCanvas.redraw();
+			this.drawCanvas.addPoint(this.drawCanvas.calculateMouse(touch.pageX, touch.pageY), true);
 		}
 	}.bind(this));
 
@@ -142,6 +138,7 @@ SWConversationUI.prototype.initialize = function () {
 	this.$canvas.on('mouseleave', function () {
 		this.drawCanvas.stopPainting();
 		hover = false;
+		this.drawCanvas.imageToBg(false);
 		if (this.useCursor) this.$cursor.hide();
 	}.bind(this));
 
@@ -307,12 +304,12 @@ SWConversationUI.prototype.initialize = function () {
 		var $messageDataContainer = $(this).parent().parent().children('.message-data').first();
 		if ($messageDataContainer.hasClass('image')) {
 			if (!self.drawCanvas.frames[self.drawCanvas.currentFrame].background) {
-				self.drawCanvas.frames[self.drawCanvas.currentFrame].background = document.createElement('img');
+				console.error('No background canvas element found.');
 			}
-			self.drawCanvas.frames[self.drawCanvas.currentFrame].background.setAttribute('src', $(this).parent().parent()
-				.children('div.image').first().children('img').first().attr('src'));
-			self.drawCanvas.clearAllCanvasData(false, false);
-			self.drawCanvas.redraw();
+			self.drawCanvas.clearAllCanvasData(true, false);
+			self.drawCanvas.frames[self.drawCanvas.currentFrame].background.getContext('2d').drawImage($(this).parent().parent()
+				.children('div.image').first().children('img').first()[0], 0, 0);
+			// self.drawCanvas.clearAllCanvasData(false, false);
 		} else if ($messageDataContainer.hasClass('animation')) {
 			var $animationFrames = $messageDataContainer.children('.animation-frame');
 			var $frames;
@@ -331,15 +328,17 @@ SWConversationUI.prototype.initialize = function () {
 			}
 
 			$animationFrames.each(function () {
-				self.drawCanvas.frames[parseInt($(this).data('frame'))].background.setAttribute('src',
-					$(this).children('img').first().attr('src'));
+				self.drawCanvas.frames[parseInt($(this).data('frame'))].background.getContext('2d').clearRect(0, 0,
+					self.drawCanvas.cw, self.drawCanvas.ch);
+				self.drawCanvas.frames[parseInt($(this).data('frame'))].background.getContext('2d')
+					.drawImage($(this).children('img').first()[0], 0, 0);
 			});
 
 			self.drawCanvas.currentFrame = 0;
 			$frames.removeClass('selected');
 			$('#frame-' + (self.drawCanvas.currentFrame + 1)).addClass('selected');
 
-			self.drawCanvas.redraw();
+			self.drawCanvas.redrawOnionSkin();
 		}
 	});
 
@@ -552,7 +551,6 @@ SWConversationUI.prototype.initialize = function () {
 			$('#toggleAnimation').children('i').first().text('play_arrow');
 		}
 		this.drawCanvas.setFrame($(event.target).data('frame'));
-		this.drawCanvas.redraw();
 		$('.frame').removeClass('selected');
 		$(event.target).addClass('selected');
 	}.bind(this));
@@ -674,7 +672,7 @@ SWConversationUI.prototype.initialize = function () {
 
 	this.socket.on('claimConversation', function (claimerId) {
 		// TODO: Some additional logic to update UI
-		$('#claimConv').remove();
+		$('#claimConversation').remove();
 		this.ownerId = claimerId;
 	}.bind(this));
 
