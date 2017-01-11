@@ -746,7 +746,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 	switch (messageType) {
 		case 'image':
 			messageHTML += '<div class="message-data image">'
-				+ '<img src="' + messageData + '"></div>'
+				+ '<img src="' + messageData + '" width="480" height="320"></div>'
 				+ '<div class="controls"><button class="importToCanvas transparent noMargin">'
 				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
 			break;
@@ -760,7 +760,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 						messageHTML += ' current'; // First frame, show it as the current frame.
 					}
 					messageHTML += '" data-frame="' + frameNumber + '"><img src="' + messageData[f]
-						+ '"></div>';
+						+ '" width="480" height="320"></div>';
 					frameNumber++;
 				}
 			}
