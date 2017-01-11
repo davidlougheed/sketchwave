@@ -9,6 +9,14 @@ block scripts
 			$('#btnSignUp').on('click touchstart', function () {
 				window.location.replace('/signup/');
 			});
+
+			// Keep the CSRF-session alive.
+			window.setInterval(function () {
+				$.get('/keepalive/').fail(function () {
+					// No CSRF token; reload the page.
+					window.location.reload(true);
+				});
+			}, 60000);
 		});
 
 block content

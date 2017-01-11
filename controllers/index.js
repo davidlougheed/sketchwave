@@ -122,7 +122,7 @@ module.exports.controller = function (objects) {
 	});
 
 	objects.router.get('/keepalive/', function (req, res) {
-		if (req.isAuthenticated()) {
+		if (req.isAuthenticated() || req.session.csrfToken) {
 			req.session.lastAccess = new Date().getTime();
 			req.session.touch();
 			return res.sendStatus(200);
