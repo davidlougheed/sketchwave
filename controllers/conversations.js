@@ -2,6 +2,8 @@
 
 var async = require('async');
 var csurf = require('csurf');
+
+// App-specific modules
 var appError = require('../modules/app-error');
 var appMessage = require('../modules/app-message');
 
@@ -9,7 +11,7 @@ var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
-	// Shows a list of convesations.
+	// Shows a list of conversations.
 	objects.router.get('/conversations/', objects.csrfProtection, function (req, res) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
@@ -136,6 +138,8 @@ module.exports.controller = function (objects) {
 			}
 		});
     });
+
+    // Delete a conversation.
 	objects.router.delete('/conversations/:id/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
@@ -191,6 +195,8 @@ module.exports.controller = function (objects) {
 			return res.send({ success: false, error: 'serverError' }); // TODO: appError format
 		});
 	});
+
+	// Get all users in a conversation.
 	objects.router.get('/conversations/:id/users/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
@@ -297,6 +303,7 @@ module.exports.controller = function (objects) {
 	// TODO: HANDLE 403 / AUTHENTICATION EXPIRY HERE!!!!!!!!!
 
 	objects.io.on('connection', function (socket) {
+		// Change the name of a conversation.
 		socket.on('changeName', function (data) {
 			objects.models.Conversation.findOne({where: {
 				id: parseInt(data.conversationID)
@@ -326,6 +333,7 @@ module.exports.controller = function (objects) {
 			});
 		});
 
+		// Add a user to a conversation.
 		socket.on('userAdd', function (data) {
 			objects.models.Conversation.findOne({
 				where: {
@@ -369,6 +377,8 @@ module.exports.controller = function (objects) {
 				});
 			});
 		});
+
+		// Remove a user from a conversation.
 		socket.on('userRemove', function (data) {
 			objects.models.Conversation.findOne({
 				where: {
@@ -466,6 +476,7 @@ module.exports.controller = function (objects) {
 			});
 		});
 
+		// Claim a conversation for a user.
 		socket.on('claimConversation', function (conversationID) {
 			objects.models.Conversation.findOne({
 				where: {

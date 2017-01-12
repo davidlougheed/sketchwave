@@ -3,6 +3,7 @@
 var http = require('http');
 var fs = require('fs');
 
+// Web-related resources
 var express = require('express');
 var jade = require('jade');
 
@@ -15,6 +16,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
 
+// Security
 var passport = require('passport');
 var csurf = require('csurf');
 var bcrypt = require('bcrypt');
@@ -50,7 +52,8 @@ var appRouter = express.Router();
 var dbConfig = require('./config/config.json')[process.env.NODE_ENV];
 var siteConfig = require('./config/site.json');
 
-// Note: maxAge is in milliseconds!
+// Set up the session middleware with a Redis store (to allow for multiple app instances).
+// NOTE: maxAge is in milliseconds!
 var sessionMiddleware = session({
 	store: new redisStore({
 		host: dbConfig.redis.host,
@@ -96,9 +99,11 @@ app.use(function (req, res) {
 	res.render('errors/403.jade', {});
 });
 
+// Convert a user object to its serialized form.
 passport.serializeUser(function (user, done) {
 	done(null, user.id);
 });
+// Convert a user's serialized form to an object.
 passport.deserializeUser(function (id, done) {
 	models.User.findOne({ where: { id: id }, attributes: { exclude: ['avatar'] } }).then(function (user) {
 		done(null, user);
@@ -107,10 +112,12 @@ passport.deserializeUser(function (id, done) {
 
 var controllerDir = './controllers';
 
+// Load all JavaScript files in the controller directory as controller objects.
 fs.readdirSync(controllerDir).filter(function (file) {
 	return (file.indexOf('.') !== 0) && (file.substr(-3) === '.js');
 }).forEach(function (file) {
 	var route = require(controllerDir + '/' + file);
+	// Pass an object containing shared instances needed for site function to each controller.
 	route.controller({
 		router: appRouter,
 		io: io,
@@ -124,6 +131,7 @@ fs.readdirSync(controllerDir).filter(function (file) {
 });
 
 models.sequelize.sync().then(function () {
+	// Once models are synced, server can be started!
 	var server = appServer.listen(siteConfig.port, siteConfig.host, function () {
 		console.log('Server running on ' + server.address().port);
 	});

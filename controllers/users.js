@@ -7,6 +7,7 @@ var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
+	// Get a list of users
 	objects.router.get('/users/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
@@ -34,6 +35,8 @@ module.exports.controller = function (objects) {
 			return res.send({ success: true, users: usersData });
 		});
 	});
+
+	// Search for certain users.
 	objects.router.get('/users_search/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
@@ -95,6 +98,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	// Get a user's profile page.
 	objects.router.get('/users/:id/', function (req, res) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/users/' + req.params.id));
@@ -233,6 +237,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
+	// Get a JSON object containing a boolean indicating if a user is online or not.
 	objects.router.get('/users/:id/status/', function (req, res) {
 		res.setHeader('Content-Type', 'application/json');
 
