@@ -20,9 +20,12 @@ block scripts
 			window.setInterval(function () {
 				if (active) {
 					// Keep session alive
-					$.get('/keepalive/');
+					$.get('/keepalive/', {id: #{user.id}}).fail(function () {
+						// User was logged out due to inactivity.
+						window.location = '/login/?redirect=%2Fusers%2F#{profile.id}';
+					}.bind(this));
 				}
-			}, 10000);
+			}, 20000);
 
 			$cursor.hide();
 			$('#avatarContainer').hide();
