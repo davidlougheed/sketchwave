@@ -136,10 +136,12 @@ SWConversationUI.prototype.initialize = function () {
 		onMouseUp(event);
 	});
 	this.$canvas.on('mouseleave', function () {
-		this.drawCanvas.stopPainting();
 		hover = false;
-		this.drawCanvas.imageToBg(false);
 		if (this.useCursor) this.$cursor.hide();
+		if (this.drawCanvas.paint) {
+			this.drawCanvas.stopPainting();
+			this.drawCanvas.imageToBg(false);
+		}
 	}.bind(this));
 
 	this.$canvas.on('mouseenter', function (event) {
