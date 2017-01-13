@@ -40,8 +40,13 @@ block scripts
 					$avatar.hide();
 
 					var drawCanvas = new SWCanvas('avatarCanvas');
-					drawCanvas.background = $avatar.attr('src');
+					drawCanvas.frames[0].background.getContext('2d').drawImage($avatar[0], 0, 0);
 					drawCanvas.drawBackground();
+					window.requestAnimationFrame(drawCanvas.redraw.bind(drawCanvas));
+
+					$('#main').scroll(function () {
+						drawCanvas.updateCanvasOffset();
+					});
 
 					var drawCursor = function (x, y) {
 						$cursor.css({
@@ -51,32 +56,17 @@ block scripts
 					};
 
 					$avatarCanvas.on('mousedown', function (event) {
-						var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
-
 						drawCanvas.startPainting();
-
-						drawCanvas.addPoint(mCoords.x, mCoords.y, false);
-						drawCanvas.redraw();
+						drawCanvas.addPoint(drawCanvas.calculateMouse(event.pageX, event.pageY), false);
 					});
 					$avatarCanvas.on('touchstart', function (event) {
 						var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-						var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
-
 						drawCanvas.startPainting();
-
-						drawCanvas.addPoint(mCoords.x, mCoords.y, false);
-						drawCanvas.redraw();
+						drawCanvas.addPoint(drawCanvas.calculateMouse(touch.pageX, touch.pageY), false);
 					});
 					$avatarCanvas.on('mousemove', function (event) {
 						if (drawCanvas.paint) {
-							var mCoords = drawCanvas.calculateMouse(event.pageX, event.pageY);
-
-							drawCanvas.addPoint(mCoords.x, mCoords.y, true);
-							drawCanvas.redraw();
-						}
-
-						if (hover) {
-							// drawCursor(event.pageX, event.pageY + $(this).scrollTop());
+							drawCanvas.addPoint(drawCanvas.calculateMouse(event.pageX, event.pageY), true);
 						}
 					});
 					$avatarCanvas.on('touchmove', function (event) {
@@ -84,18 +74,15 @@ block scripts
 
 						if (drawCanvas.paint) {
 							var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-							var mCoords = drawCanvas.calculateMouse(touch.pageX, touch.pageY);
 
 							drawCanvas.startPainting();
-
-							drawCanvas.addPoint(mCoords.x, mCoords.y, true);
-							drawCanvas.redraw();
+							drawCanvas.addPoint(drawCanvas.calculateMouse(touch.pageX, touch.pageY), true);
 						}
 					});
 
-					var onMouseUp = function (event) {
+					var onMouseUp = function () {
 						drawCanvas.stopPainting();
-						drawCanvas.imageToBg();
+						drawCanvas.imageToBg(false);
 					};
 
 					$avatarCanvas.on('mouseup', onMouseUp);
@@ -103,16 +90,14 @@ block scripts
 						event.preventDefault();
 						onMouseUp(event);
 					});
-					$avatarCanvas.on('mouseleave', function (event) {
+					$avatarCanvas.on('mouseleave', function () {
 						drawCanvas.stopPainting();
 						hover = false;
 						$cursor.hide();
 					});
 
-					$avatarCanvas.on('mouseenter', function (event) {
-						// hover = true;
-						// $cursor.show();
-						// drawCursor(event.pageX, event.pageY);
+					$avatarCanvas.on('mouseenter', function () {
+						hover = true;
 					});
 
 					$('.colorTool').click(function () {
@@ -147,7 +132,7 @@ block scripts
 					});
 
 					$('#clear').click(function () {
-						drawCanvas.clearAllCanvasData(true);
+						drawCanvas.clearAllCanvasData(true, false);
 					});
 
 					$brushSizeRange.on('input change', function () {
