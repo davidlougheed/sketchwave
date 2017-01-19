@@ -80,7 +80,7 @@ module.exports.controller = function (objects) {
 				});
 			} else {
 				// TODO: Handle reCAPTCHA failure
-				return res.send({ error: 'captcha_failure' });
+				return res.send({ success: false, error: 'captcha_failure' });
 			}
 		});
 	});

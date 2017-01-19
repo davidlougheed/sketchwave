@@ -54,11 +54,11 @@ module.exports.controller = function (objects) {
 
 	// Get conversations data.
 	objects.router.get('/conversations_data/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
 		if (!req.isAuthenticated()) {
 			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: Handle non authentication
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		objects.models.User.findOne({
 			where: {
@@ -96,8 +96,8 @@ module.exports.controller = function (objects) {
 					});
 				}, function (err) {
 					if (err) {
-						throw err;
-						// TODO: Send internal server error
+						console.error(err);
+						return appError.generate(req, res, appError.ERROR_INTERNAL_SERVER, {});
 					}
 
 					return res.send({ conversations: conversations, users: usersList });
@@ -130,11 +130,11 @@ module.exports.controller = function (objects) {
 							conversation: conversation
 						});
 					} else {
-						appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
+						return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 					}
 				});
 			} else {
-				appError.generate(req, res, appError.ERROR_NOT_FOUND, {});
+				return appError.generate(req, res, appError.ERROR_NOT_FOUND, {});
 			}
 		});
     });
@@ -156,7 +156,7 @@ module.exports.controller = function (objects) {
 			}
 		}).then(function (conversation) {
 			if (conversation == null) {
-				return res.send({ success: false }); // TODO: appError format
+				return appError.generate(req, res, appError.ERROR_NOT_FOUND, {});
 			}
 			conversation.getOwner().then(function (owner) {
 				if (owner == null || owner.id == req.user.id) {
@@ -182,24 +182,22 @@ module.exports.controller = function (objects) {
 							return res.send({ success: true });
 						} else {
 							// If the user is not part of the conversation, block the action.
-							appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
+							return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 						}
 					});
 				} else {
 					// If there is an owner and the current user is not the owner, block the action.
-					appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
+					return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 				}
 			});
 
 			// If nothing works, send an internal server error.
-			return res.send({ success: false, error: 'serverError' }); // TODO: appError format
+			return appError.generate(req, res, appError.ERROR_INTERNAL_SERVER, {});
 		});
 	});
 
 	// Get all users in a conversation.
 	objects.router.get('/conversations/:id/users/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
 		if (!req.isAuthenticated()) {
 			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
 		}
@@ -240,7 +238,7 @@ module.exports.controller = function (objects) {
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ success: false, error: 'not_allowed' }); // TODO: appError format
+					return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: message field in meta
 				}
 			});
 		});
@@ -254,6 +252,8 @@ module.exports.controller = function (objects) {
 		if (!parseInt(req.params.id)) {
 			return res.send({ error: 'invalid id' });
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		//TODO: Fetch conversations from database
 		objects.models.Conversation.findOne({
@@ -294,7 +294,7 @@ module.exports.controller = function (objects) {
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return res.send({ success: false, error: 'not_allowed' }); // TODO: appError format
+					return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: message field in meta
 				}
 			});
 		});
