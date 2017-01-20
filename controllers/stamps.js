@@ -2,16 +2,18 @@
 
 var sanitizeHtml = require('sanitize-html');
 
+var appError = require('../modules/app-error');
+
 module.exports.controller = function (objects) {
 	objects.router.get('/conversations/:id/stamps/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
 		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 		if (!req.params.id) {
-			return res.send({ success: false, error: 'no_params' });
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}, appError.MESSAGE_PARAMETERS_REQUIRED);
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		objects.models.Stamp.findAll({
 			where: {

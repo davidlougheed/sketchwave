@@ -3,17 +3,19 @@
 var sanitizeHtml = require('sanitize-html');
 var sharp = require('sharp');
 
+var appError = require('../modules/app-error');
+
 var HtmlEntities = require('html-entities').AllHtmlEntities;
 var entities = new HtmlEntities();
 
 module.exports.controller = function (objects) {
 	// Get a list of users
 	objects.router.get('/users/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		objects.models.User.findAll({
 			attributes: { exclude: ['avatar', 'avatarThumb', 'password'] }
@@ -21,8 +23,8 @@ module.exports.controller = function (objects) {
             //TODO: THIS HECKING SUCKS... BUT HOW???
             var usersData = {};
 
-            for(var u in users) {
-				if(users.hasOwnProperty(u)) {
+            for (var u in users) {
+				if (users.hasOwnProperty(u)) {
 					var userData = users[u].toJSON();
 
 					// Prevent XSS from username
@@ -38,11 +40,11 @@ module.exports.controller = function (objects) {
 
 	// Search for certain users.
 	objects.router.get('/users_search/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
-		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+		if (!req.isAuthenticated()) {
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		var searchTerm = req.query.q;
 		var exclude = req.query.exclude;
@@ -129,7 +131,7 @@ module.exports.controller = function (objects) {
 
 	objects.router.get('/users/:id/avatar/', function (req, res) {
 		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 
 		res.header('Content-Type', 'image/png');
@@ -160,7 +162,7 @@ module.exports.controller = function (objects) {
 
 	objects.router.get('/users/:id/avatar/thumb/', function (req, res) {
 		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 
 		res.header('Content-Type', 'image/png');
@@ -214,7 +216,7 @@ module.exports.controller = function (objects) {
 
 	objects.router.post('/users/:id/avatar/', function (req, res) {
 		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 
 		objects.models.User.findOne({
@@ -239,11 +241,11 @@ module.exports.controller = function (objects) {
 
 	// Get a JSON object containing a boolean indicating if a user is online or not.
 	objects.router.get('/users/:id/status/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
 		if(!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		objects.redis.sismember(['swUsersOnline', parseInt(req.params.id)], function (err, reply) {
 			if (reply === 1) {

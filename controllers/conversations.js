@@ -112,7 +112,7 @@ module.exports.controller = function (objects) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/' + req.params.id));
 		}
 		if (!parseInt(req.params.id)) {
-			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}, appError.MESSAGE_INVALID_ID);
 		}
 
 		objects.models.Conversation.findOne({
@@ -147,7 +147,7 @@ module.exports.controller = function (objects) {
 			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 		}
 		if (!parseInt(req.params.id)) {
-			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}, appError.MESSAGE_INVALID_ID);
 		}
 
 		objects.models.Conversation.findOne({
@@ -199,11 +199,13 @@ module.exports.controller = function (objects) {
 	// Get all users in a conversation.
 	objects.router.get('/conversations/:id/users/', function (req, res) {
 		if (!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: Handle non authentication
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 		if (!parseInt(req.params.id)) {
-			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}); // TODO: meta info 'invalid id'
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}, appError.MESSAGE_INVALID_ID);
 		}
+
+		res.setHeader('Content-Type', 'application/json');
 
 		objects.models.Conversation.findOne({
 			where: {
@@ -244,13 +246,11 @@ module.exports.controller = function (objects) {
 		});
 	});
 	objects.router.get('/conversations/:id/data/from/:from/count/:count/', function (req, res) {
-		res.setHeader('Content-Type', 'application/json');
-
 		if (!req.isAuthenticated()) {
-			return res.send({ success: false, error: 'not_authenticated' }); // TODO: appError format
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_NOT_AUTHENTICATED);
 		}
 		if (!parseInt(req.params.id)) {
-			return res.send({ error: 'invalid id' });
+			return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}, appError.MESSAGE_INVALID_ID);
 		}
 
 		res.setHeader('Content-Type', 'application/json');
