@@ -791,7 +791,7 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
  * @param immediate - A flag for scrolling the page with animation or immediately.
  */
 SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate) {
-	this.$messagesContainer.append('<div class="meta-message">' + message + '</div>');
+	this.$messagesContainer.append('<div class="message meta-message">' + message + '</div>');
 	if (immediate) {
 		this.$messagesContainer.scrollTop(this.$messagesContainer[0].scrollHeight);
 	} else {
