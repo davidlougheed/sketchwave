@@ -15,7 +15,7 @@ module.exports.TYPE_ANIMATION = 'animation';
 module.exports.TYPE_TEXT = 'text';
 module.exports.TYPE_META = 'meta';
 
-module.exports.create = function (objects, socket, conversationID, data, type, metaData) {
+module.exports.create = function (objects, socket, conversationID, data, type, metaData, toAll) {
 	metaData = metaData || {};
 
 	objects.models.Conversation.findOne({
@@ -96,8 +96,13 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 						}
 					}
 
-					socket.broadcast.to('conversation' + conversationID.toString())
-						.emit('newMessage', expandedMessage);
+					if (toAll) {
+						objects.io.to('conversation' + conversationID.toString())
+							.emit('newMessage', expandedMessage);
+					} else {
+						socket.broadcast.to('conversation' + conversationID.toString())
+							.emit('newMessage', expandedMessage);
+					}
 				});
 			}
 		});
