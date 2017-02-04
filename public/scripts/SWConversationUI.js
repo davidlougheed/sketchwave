@@ -678,7 +678,7 @@ SWConversationUI.prototype.initialize = function () {
 		this.ownerId = claimerId;
 	}.bind(this));
 
-	this.socket.on('newMessage', this.receiveMessage);
+	this.socket.on('newMessage', this.receiveMessage.bind(this));
 
 	this.socket.on('stampAdd', function (stamp) {
 		this.stamps[stamp['id']] = stamp;
@@ -927,7 +927,7 @@ SWConversationUI.prototype.receiveMessage = function (data) {
 				this.displayMessage(data['UserId'], data['id'], data['textData'], data['type'], formattedDate, false);
 				break;
 			case 'meta':
-				this.displayMetaMessage(data['textData'], false);
+				this.displayMetaMessage(data, false);
 		}
 
 		if ('Notification' in window && notificationToCreate != '') {
