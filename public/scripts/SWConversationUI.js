@@ -489,8 +489,6 @@ SWConversationUI.prototype.initialize = function () {
 				var userToAdd = $('#addMemberBox').val();
 				if (userToAdd) {
 					self.socket.emit('userAdd', {userID: userToAdd, conversationID: self.convID});
-					self.displayRawMetaMessage(self.authors[userToAdd]['username'] + ' was added to the conversation by '
-						+ self.CURRENT_USER.username + '.', false);
 
 					$members.append('<div class="member" data-username="'
 						+ self.authors[userToAdd]['username'] + '"><div class="avatar"><img src="/users/'
@@ -516,8 +514,6 @@ SWConversationUI.prototype.initialize = function () {
 		// TODO: We should probably only use one method of IDing users rather than DB ID + username
 		var usernameToRemove = $(this).parent().data('username');
 		self.socket.emit('userRemove', {username: usernameToRemove, conversationID: self.convID});
-		self.displayRawMetaMessage(usernameToRemove + ' was removed from the conversation by '
-			+ self.CURRENT_USER.username + '.', false);
 		$(this).parent().remove();
 
 		if (self.CURRENT_USER.username == usernameToRemove) {

@@ -322,10 +322,10 @@ module.exports.controller = function (objects) {
 						objects.io.to('conversation' + conversation.id.toString())
 							.emit('changeName', conversation.name);
 
-						appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
+						appMessage.create(objects, socket, conversation.id, null, appMessage.TYPE_META, {
 							action: appMessage.ACTION_NAME_CHANGED,
 							name: conversation.name
-						});
+						}, true);
 					} else {
 						// TODO: Throw a forbidden-esque error
 					}
@@ -368,7 +368,7 @@ module.exports.controller = function (objects) {
 								appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
 									action: appMessage.ACTION_USER_ADDED,
 									subject: user.id
-								});
+								}, true);
 							}
 						});
 					} else {
@@ -413,7 +413,7 @@ module.exports.controller = function (objects) {
 									appMessage.create(objects, socket, data.conversationID, null, appMessage.TYPE_META, {
 										action: appMessage.ACTION_USER_REMOVED,
 										subject: userId
-									});
+									}, true);
 								} else {
 									// TODO: Throw a forbidden-esque error
 								}
@@ -494,11 +494,11 @@ module.exports.controller = function (objects) {
 							if (owner == null) {
 								// Conversation is OK to claim, since there is no set owner.
 								conversation.setOwner(users[0]).then(function () {
-									socket.broadcast.to('conversation' + conversationID.toString())
+									objects.io.in('conversation' + conversation.id.toString())
 										.emit('claimConversation', users[0].id);
 									appMessage.create(objects, socket, conversationID, null, appMessage.TYPE_META, {
 										action: appMessage.ACTION_CLAIMED
-									});
+									}, true);
 								});
 							} else {
 								// TODO: Send bad request error.
