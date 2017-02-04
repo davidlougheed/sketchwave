@@ -15,6 +15,16 @@ module.exports.TYPE_ANIMATION = 'animation';
 module.exports.TYPE_TEXT = 'text';
 module.exports.TYPE_META = 'meta';
 
+/**
+ * Creates a SketchWave message.
+ * @param objects {object} - A collection of shared objects to be used for server tasks.
+ * @param socket {object} - A socket.io socket object.
+ * @param conversationID {number} - The ID of the conversation to send the message to.
+ * @param data {object} - Message data.
+ * @param type {string} - Message type.
+ * @param metaData {object} - Message metadata.
+ * @param toAll {boolean} - Whether to send the message to everyone (including the sender) or not.
+ */
 module.exports.create = function (objects, socket, conversationID, data, type, metaData, toAll) {
 	metaData = metaData || {};
 
