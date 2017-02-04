@@ -98,13 +98,13 @@ module.exports.create = function (objects, socket, conversationID, data, type, m
 
 					var expandedMessage = message.toJSON();
 					expandedMessage.imageData = [];
-					delete expandedMessage.imageData2;
-					for (var i in message.imageData2) {
-						if (message.imageData2.hasOwnProperty(i)) {
+					for (var i in expandedMessage.imageData2) {
+						if (expandedMessage.imageData2.hasOwnProperty(i)) {
 							expandedMessage.imageData.push('data:image/png;base64,' +
-								message.imageData2[i].toString('base64'));
+								expandedMessage.imageData2[i].toString('base64'));
 						}
 					}
+					delete expandedMessage.imageData2;
 
 					if (toAll) {
 						objects.io.to('conversation' + conversationID.toString())
