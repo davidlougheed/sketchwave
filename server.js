@@ -52,8 +52,8 @@ var app = express();
 var appServer = http.createServer(app);
 var appRouter = express.Router();
 
-var dbConfig = require('./config/config.json')[process.env.NODE_ENV];
-var siteConfig = require('./config/site.json');
+var dbConfig = require(path.join(APP_BASE_PATH, 'config/config.json'))[process.env.NODE_ENV];
+var siteConfig = require(path.join(APP_BASE_PATH, 'config/site.json'));
 
 // Set up the session middleware with a Redis store (to allow for multiple app instances).
 // NOTE: maxAge is in milliseconds!
@@ -81,8 +81,8 @@ app.set('view engine', 'jade');
 app.set('views', APP_BASE_PATH + '/views');
 
 // Keep these above passport and session initialization to prevent reload of user data
-app.use('/bower_components', express.static(APP_BASE_PATH + '/bower_components'));
-app.use(express.static(APP_BASE_PATH + '/public'));
+app.use('/bower_components', express.static(path.join(APP_BASE_PATH, 'bower_components')));
+app.use(express.static(path.join(APP_BASE_PATH, 'public')));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
