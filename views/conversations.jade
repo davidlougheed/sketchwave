@@ -204,7 +204,7 @@ block content
 				i.material-icons add
 				span Create
 
-	form#formCreateConversation(method='post')
+	form#formCreateConversation(method='post', style='display: none;')
 		input(type='hidden', name='_csrf', value='#{csrfToken}')
 
 		label(for='names') Members
