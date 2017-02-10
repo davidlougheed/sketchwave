@@ -2,6 +2,7 @@
 
 var http = require('http');
 var fs = require('fs');
+var path = require('path');
 
 // Web-related resources
 var express = require('express');
@@ -22,8 +23,10 @@ var csurf = require('csurf');
 var bcrypt = require('bcrypt');
 
 const APP_BASE_PATH = __dirname;
+const MODEL_DIR = path.join(APP_BASE_PATH, 'models');
+const CONTROLLER_DIR = path.join(APP_BASE_PATH, 'controllers');
 
-var models = require('./models');
+var models = require(MODEL_DIR);
 
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({ usernameField: 'username' }, function (username, password, done) {
@@ -110,13 +113,11 @@ passport.deserializeUser(function (id, done) {
 	});
 });
 
-var controllerDir = './controllers';
-
 // Load all JavaScript files in the controller directory as controller objects.
-fs.readdirSync(controllerDir).filter(function (file) {
+fs.readdirSync(CONTROLLER_DIR).filter(function (file) {
 	return (file.indexOf('.') !== 0) && (file.substr(-3) === '.js');
 }).forEach(function (file) {
-	var route = require(controllerDir + '/' + file);
+	var route = require(path.join(CONTROLLER_DIR, file));
 	// Pass an object containing shared instances needed for site function to each controller.
 	route.controller({
 		router: appRouter,
