@@ -788,13 +788,20 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
  * Display a non-template-based meta message.
  * @param message - The raw HTML contents of the message.
  * @param immediate - A flag for scrolling the page with animation or immediately.
+ * @param top - Add the message to the top rather than at the bottom.
  */
-SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate) {
-	this.$messagesContainer.append('<div class="message meta-message">' + message + '</div>');
-	if (immediate) {
-		this.$messagesContainer.scrollTop(this.$messagesContainer[0].scrollHeight);
+SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate, top) {
+	var messageHTML = '<div class="message meta-message">' + message + '</div>';
+	if (top) {
+		this.$messagesContainer.children('#loadMore').first().after(messageHTML);
 	} else {
-		this.$messagesContainer.animate({scrollTop: this.$messagesContainer[0].scrollHeight.toString() + 'px'});
+		this.$messagesContainer.append(messageHTML);
+
+		if (immediate) {
+			this.$messagesContainer.scrollTop(this.$messagesContainer[0].scrollHeight);
+		} else {
+			this.$messagesContainer.animate({scrollTop: this.$messagesContainer[0].scrollHeight.toString() + 'px'});
+		}
 	}
 };
 
@@ -802,8 +809,9 @@ SWConversationUI.prototype.displayRawMetaMessage = function (message, immediate)
  * Display a template-based meta message.
  * @param message - The message data.
  * @param immediate A flag for scrolling the page with animation or immediately.
+ * @param top - Add the message to the top rather than at the bottom.
  */
-SWConversationUI.prototype.displayMetaMessage = function (message, immediate) {
+SWConversationUI.prototype.displayMetaMessage = function (message, immediate, top) {
 	// TODO: The authors array is garbage and has to be fixed.
 	var processedString = this.META_MESSAGES[message['metaData']['action']];
 	if (message['metaData']['action'] == 'nameChanged') {
@@ -814,7 +822,7 @@ SWConversationUI.prototype.displayMetaMessage = function (message, immediate) {
 		processedString = processedString.replace('%subject%',
 			this.authors[message['metaData']['subject']]['username']);
 	}
-	this.displayRawMetaMessage(processedString, immediate);
+	this.displayRawMetaMessage(processedString, immediate, top);
 };
 
 /**
@@ -869,7 +877,7 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 						data['messages'][m]['type'], formattedDate, immediate, top);
 					break;
 				case 'meta':
-					this.displayMetaMessage(data['messages'][m], immediate);
+					this.displayMetaMessage(data['messages'][m], immediate, top);
 					break;
 			}
 		}
@@ -882,7 +890,7 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 		this.messagesLoaded += data['messages'].length;
 
 		if (top) {
-			this.$messagesContainer.scrollTop(currentScrollTop.offset().top - 240);
+			this.$messagesContainer.scrollTop(currentScrollTop.offset().top - 236);
 		} else {
 			// TODO: This is a temporary hack for images being done loading
 
@@ -926,7 +934,7 @@ SWConversationUI.prototype.receiveMessage = function (data) {
 				this.displayMessage(data['UserId'], data['id'], data['textData'], data['type'], formattedDate, false);
 				break;
 			case 'meta':
-				this.displayMetaMessage(data, false);
+				this.displayMetaMessage(data, false, false);
 		}
 
 		if ('Notification' in window && notificationToCreate != '') {
