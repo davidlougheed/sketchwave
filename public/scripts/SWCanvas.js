@@ -200,10 +200,9 @@ SWCanvas.prototype.drawPoints = function () {
 	}
 
 	if (!this.playing && this.currentFrame > 0) {
+		this.clearOnionSkin();
 		if (this.frames[this.currentFrame - 1].background) {
-			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.toDataURL());
-		} else {
-			$('#onionSkin').attr('src', this.BLANK_PNG);
+			$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0, this.cw, this.ch);
 		}
 	}
 };
@@ -212,15 +211,15 @@ SWCanvas.prototype.drawPoints = function () {
  * Clears the onion skin image.
  */
 SWCanvas.prototype.redrawOnionSkin = function () {
-	if (!this.playing && this.currentFrame > 0) {
-		if (this.frames[this.currentFrame - 1].background) {
-			$('#onionSkin').attr('src', this.frames[this.currentFrame - 1].background.toDataURL());
-		} else {
-			$('#onionSkin').attr('src', this.BLANK_PNG);
-		}
-	} else {
-		$('#onionSkin').attr('src', this.BLANK_PNG);
+	this.clearOnionSkin();
+
+	if (!this.playing && this.currentFrame > 0 && this.frames[this.currentFrame - 1].background) {
+		$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0, this.cw, this.ch);
 	}
+};
+
+SWCanvas.prototype.clearOnionSkin = function () {
+	$('#onionSkin')[0].getContext('2d').clearRect(0, 0, this.cw, this.ch);
 };
 
 /**
@@ -323,7 +322,7 @@ SWCanvas.prototype.setFrame = function (frame) {
 		this.allowGabeSave = true;
 		this.currentFrame = frame;
 		if (frame == 0 || (this.currentFrame > 0 && !this.frames[this.currentFrame].background)) {
-			$('#onionSkin').attr('src', this.BLANK_PNG);
+			this.clearOnionSkin();
 		}
 	}
 };
@@ -355,7 +354,7 @@ SWCanvas.prototype.playStep = function () {
 SWCanvas.prototype.startPlaying = function () {
 	this.playing = true;
 	this.animationInterval = setInterval(this.playStep.bind(this), 100);
-	$('#onionSkin').attr('src', this.BLANK_PNG);
+	this.clearOnionSkin();
 };
 
 /**

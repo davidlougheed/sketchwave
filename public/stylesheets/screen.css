@@ -709,7 +709,7 @@ div#avatarContainer canvas#avatarCanvas {
 	width: 100%;
 }
 
-div#conversation section#drawPanel img#onionSkin {
+div#conversation section#drawPanel canvas#onionSkin {
 	position: absolute;
 	z-index: 48;
 	left: 50%;

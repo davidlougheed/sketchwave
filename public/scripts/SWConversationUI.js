@@ -213,8 +213,7 @@ SWConversationUI.prototype.initialize = function () {
 		this.drawCanvas.clearAllCanvasData(true, false);
 		this.drawCanvas.clearFrames();
 		this.drawCanvas.stopPlaying();
-
-		this.$onionSkin.attr('src', '/images/blank.png');
+		this.drawCanvas.clearOnionSkin();
 
 		$('#toggleAnimation').children('i').first().text('play_arrow');
 
