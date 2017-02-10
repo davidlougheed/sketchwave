@@ -260,7 +260,7 @@ module.exports.controller = function (objects) {
 	objects.io.on('connection', function (socket) {
 		socket.on('userOnline', function () {
 			if (socket.request.session.passport.user) {
-				objects.redis.sadd(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+				objects.redis.sadd(['swUsersOnline', socket.request.session.passport.user], function (err) {
 					if (err) {
 						throw err;
 					}
@@ -269,7 +269,7 @@ module.exports.controller = function (objects) {
 		});
 		socket.on('disconnect', function () {
 			if (socket.request.session.passport.user) {
-				objects.redis.srem(['swUsersOnline', socket.request.session.passport.user], function (err, reply) {
+				objects.redis.srem(['swUsersOnline', socket.request.session.passport.user], function (err) {
 					if (err) {
 						throw err;
 					}
