@@ -108,7 +108,10 @@ passport.serializeUser(function (user, done) {
 });
 // Convert a user's serialized form to an object.
 passport.deserializeUser(function (id, done) {
-	models.User.findOne({ where: { id: id }, attributes: { exclude: ['avatar'] } }).then(function (user) {
+	models.User.findOne({
+		where: { id: id },
+		attributes: { exclude: ['password', 'avatar', 'avatarThumb'] }
+	}).then(function (user) {
 		done(null, user);
 	});
 });
