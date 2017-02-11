@@ -45,7 +45,7 @@ module.exports.controller = function (objects) {
 			}).then(function (users) {
 				conversation.setUsers(users).then(function () {
 					conversation.setOwner(req.user).then(function () {
-						return res.render('conversations', { user: req.user });
+						return res.render('conversations', {user: req.user, csrfToken: req.csrfToken()});
 					});
 				});
 			});
