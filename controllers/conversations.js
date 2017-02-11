@@ -26,7 +26,11 @@ module.exports.controller = function (objects) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/'));
 		}
+
 		if (!req.body) {
+			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {});
+		}
+		if (req.body.name.trim().length == 0) {
 			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {});
 		}
 
@@ -34,7 +38,7 @@ module.exports.controller = function (objects) {
 		names.push(req.user.username);
 
 		objects.models.Conversation.create({
-			name: req.body.name
+			name: req.body.name.trim()
 		}).then(function (conversation) {
 			objects.models.User.findAll({
 				where: {

@@ -348,8 +348,9 @@ SWConversationUI.prototype.initialize = function () {
 		self.editingName = true;
 
 		var $conversationName = $('#conversationName');
+		var currentName = $conversationName.text();
 
-		$conversationName.replaceWith('<input type="text" id="changeNameText" value="' + $conversationName.text() + '">');
+		$conversationName.replaceWith('<input type="text" id="changeNameText" value="' + currentName + '">');
 
 		var $changeNameText = $('#changeNameText');
 
@@ -358,19 +359,23 @@ SWConversationUI.prototype.initialize = function () {
 			+ '<button id="cancelChange" class="transparent"><i class="material-icons">clear</i>'
 			+ '<span>Cancel</span></button></div>');
 		$('#saveName').click(function () {
-			// TODO: Socket send a message that name has changed
+			var newName = $('#changeNameText').val().trim();
+			if (newName.length > 0 && newName != currentName) {
+				self.socket.emit('changeName', {
+					newName: newName,
+					conversationID: self.convID
+				});
 
-			self.socket.emit('changeName', {
-				newName: $('#changeNameText').val(),
-				conversationID: self.convID
-			});
+				$changeNameText.replaceWith('<span id="conversationName">' + $changeNameText.val() + '</span>');
+			} else {
+				$changeNameText.replaceWith('<span id="conversationName">' + currentName + '</span>');
+			}
 
 			self.editingName = false;
 
 			$('#saveName').remove();
 			$('#cancelChange').remove();
 
-			$changeNameText.replaceWith('<span id="conversationName">' + $changeNameText.val() + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
@@ -843,7 +848,7 @@ SWConversationUI.prototype.refreshMessages = function (immediate, from, count, t
 		var $conversationName = $('#conversationName');
 
 		// TODO: If not editing
-		$conversationName.text(data['conversation']['name']);
+		$conversationName.html(data['conversation']['name']);
 		this.ownerId = data['conversation']['OwnerId'];
 
 		if (this.ownerId == null) {
