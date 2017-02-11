@@ -162,7 +162,7 @@ block scripts
 
 				$('#confirmDelete').click(function () {
 					$.ajax({
-						url: '/conversation/' + $(this).parent().children('#toDelete').first().val() + '/',
+						url: '/conversations/' + $(this).parent().children('#toDelete').first().val() + '/',
 						method: 'DELETE'
 					}).done(function (data) {
 						// TODO: Check if delete was successful.
