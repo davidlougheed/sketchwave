@@ -3,6 +3,8 @@
 var bcrypt = require('bcrypt');
 var request = require('request');
 
+var sanitizeHtml = require('sanitize-html');
+
 module.exports.controller = function (objects) {
 	objects.router.get('/', function (req, res) {
 		if (req.isAuthenticated()) {
@@ -60,23 +62,31 @@ module.exports.controller = function (objects) {
 				var salt = bcrypt.genSaltSync(10);
 				var hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
-				var userAvatar = Buffer.from(sanitizeHtml(req.body.imageData.replace('data:image/png;base64,', ''), {
+				var userAvatar = Buffer.from(sanitizeHtml(req.body.avatar.replace('data:image/png;base64,', ''), {
 					allowedTags: [],
 					allowedAttributes: []
 				}).toString(), 'base64');
 
-				// TODO: Fix XSS vulnerability with direct avatar database pass
-				objects.models.User.create({
-					username: req.body.username,
-					password: hashedPassword,
-					avatar: userAvatar
+				// TODO: Fix XSS vulnerability with direct avatar database pass. 2017-02-10: does this still exist?
+				objects.models.User.findOne({
+					where: { username: req.body.username }
 				}).then(function (user) {
-					req.login(user, function (err) {
-						if (err) {
-							return next(err);
-						}
-						return res.redirect('/conversations/');
-					});
+					if (user) {
+						return res.send({ success: false, error: 'same_username' });
+					} else {
+						objects.models.User.create({
+							username: req.body.username,
+							password: hashedPassword,
+							avatar: userAvatar
+						}).then(function (user) {
+							req.login(user, function (err) {
+								if (err) {
+									return next(err);
+								}
+								return res.redirect('/conversations/');
+							});
+						});
+					}
 				});
 			} else {
 				// TODO: Handle reCAPTCHA failure
