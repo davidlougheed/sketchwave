@@ -202,7 +202,8 @@ SWCanvas.prototype.drawPoints = function () {
 	if (!this.playing && this.currentFrame > 0) {
 		this.clearOnionSkin();
 		if (this.frames[this.currentFrame - 1].background) {
-			$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0, this.cw, this.ch);
+			$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0,
+				this.cw, this.ch);
 		}
 	}
 };
@@ -214,7 +215,8 @@ SWCanvas.prototype.redrawOnionSkin = function () {
 	this.clearOnionSkin();
 
 	if (!this.playing && this.currentFrame > 0 && this.frames[this.currentFrame - 1].background) {
-		$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0, this.cw, this.ch);
+		$('#onionSkin')[0].getContext('2d').drawImage(this.frames[this.currentFrame - 1].background, 0, 0,
+			this.cw, this.ch);
 	}
 };
 
@@ -411,6 +413,7 @@ SWCanvas.prototype.setBrushSize = function (value) {
  */
 SWCanvas.prototype.moveImageDataToBackground = function (checkPoints, dragging, callback) {
 	this.pointsSinceSave = 0;
+	this.frames[this.currentFrame].background.getContext('2d').clearRect(0, 0, this.cw, this.ch);
 	this.frames[this.currentFrame].background.getContext('2d').drawImage(this.canvas, 0, 0, this.cw, this.ch);
 	if (!dragging) {
 		this.frames[this.currentFrame].points = this.frames[this.currentFrame].points
