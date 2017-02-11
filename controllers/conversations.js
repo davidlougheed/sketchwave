@@ -194,9 +194,6 @@ module.exports.controller = function (objects) {
 					return appError.generate(req, res, appError.ERROR_FORBIDDEN, {});
 				}
 			});
-
-			// If nothing works, send an internal server error.
-			return appError.generate(req, res, appError.ERROR_INTERNAL_SERVER, {});
 		});
 	});
 
@@ -271,35 +268,40 @@ module.exports.controller = function (objects) {
 				}
 			}).then(function (users) {
 				if (users != null && users.length > 0) {
-					objects.models.Message.findAll({
+					return objects.models.Message.findAll({
 						where: {
 							ConversationId: conversation.id
 						},
 						order: '"createdAt" DESC',
 						offset: parseInt(req.params.from),
 						limit: parseInt(req.params.count)
-					}).then(function (messages) {
-						var expandedMessages = [];
-						for (var m in messages) {
-							if (messages.hasOwnProperty(m)) {
-								var expandedMessage = messages[m];
-								expandedMessage.imageData = [];
-								delete expandedMessage.imageData2;
-								for (var i in messages[m].imageData2) {
-									if (messages[m].imageData2.hasOwnProperty(i)) {
-										expandedMessage.imageData.push('data:image/png;base64,' +
-											messages[m].imageData2[i].toString('base64'));
-									}
-								}
-								expandedMessages.push(expandedMessage);
-							}
-						}
-						return res.send({ success: true, conversation: conversation, messages: expandedMessages });
 					});
 				} else {
 					// User is not part of the conversation and should not be able to access data
-					return appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: message field in meta
+					appError.generate(req, res, appError.ERROR_FORBIDDEN, {}); // TODO: message field in meta
 				}
+			}).then(function (messages) {
+				var expandedMessages = [];
+				for (var m in messages) {
+					if (messages.hasOwnProperty(m)) {
+						var expandedMessage = messages[m].toJSON();
+						if (messages[m].type != 'image') {
+							expandedMessage.imageData = [];
+							for (var i in messages[m].imageData2) {
+								if (messages[m].imageData2.hasOwnProperty(i)) {
+									expandedMessage.imageData.push('data:image/png;base64,' +
+										messages[m].imageData2[i].toString('base64'));
+								}
+							}
+						} else {
+							// Fetched via URL. Don't need to send; this will speed display up a bit.
+							delete expandedMessage.imageData;
+						}
+						delete expandedMessage.imageData2;
+						expandedMessages.push(expandedMessage);
+					}
+				}
+				res.send({ success: true, conversation: conversation, messages: expandedMessages });
 			});
 		});
 	});
@@ -309,27 +311,30 @@ module.exports.controller = function (objects) {
 	objects.io.on('connection', function (socket) {
 		// Change the name of a conversation.
 		socket.on('changeName', function (data) {
-			objects.models.Conversation.findOne({where: {
-				id: parseInt(data.conversationID)
-			}
+			objects.models.Conversation.findOne({
+				where: {
+					id: parseInt(data.conversationID)
+				}
 			}).then(function (conversation) {
-				conversation.getUsers({
+				return conversation.getUsers({
 					where: {
 						id: socket.request.session.passport.user
 					},
 					attributes: ['id']
 				}).then(function (users) {
 					if (users != null && users.length > 0) {
-						conversation.name = entities.encode(data.newName);
-						conversation.save();
+						if (data.newName.trim().length > 0) {
+							conversation.name = entities.encode(data.newName.trim());
+							conversation.save();
 
-						objects.io.to('conversation' + conversation.id.toString())
-							.emit('changeName', conversation.name);
+							objects.io.to('conversation' + conversation.id.toString())
+								.emit('changeName', conversation.name);
 
-						appMessage.create(objects, socket, conversation.id, null, appMessage.TYPE_META, {
-							action: appMessage.ACTION_NAME_CHANGED,
-							name: conversation.name
-						}, true);
+							appMessage.create(objects, socket, conversation.id, null, appMessage.TYPE_META, {
+								action: appMessage.ACTION_NAME_CHANGED,
+								name: conversation.name
+							}, true);
+						}
 					} else {
 						// TODO: Throw a forbidden-esque error
 					}
