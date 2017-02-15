@@ -110,7 +110,7 @@ module.exports.controller = function (objects) {
 			where: {
 				id: req.params.id
 			},
-			attributes: { exclude: ['password'] }
+			attributes: { exclude: ['password', 'avatarThumb'] }
 		}).then(function (user) {
 			var userData = user.toJSON();
 
