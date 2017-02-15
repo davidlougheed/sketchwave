@@ -1,6 +1,8 @@
 doctype html
 html
 	block vars
+		- var footer = false
+		- var page = 'base'
 	head
 		title SketchWave
 
@@ -21,12 +23,14 @@ html
 		script(src='/bower_components/jquery/dist/jquery.min.js')
 		script(src='/socket.io/socket.io.js')
 		script(src='/bower_components/select2/dist/js/select2.full.min.js')
-		script(src='https://www.google.com/recaptcha/api.js')
+		script(src='/bower_components/object-hash/dist/object_hash.js')
+		if page == 'signup'
+			script(src='https://www.google.com/recaptcha/api.js' async defer)
 
 		script(src='/scripts/SWCanvas.js')
 
 		block scripts
-	body
+	body(class='page-#{page}')
 		header#siteHeader
 			img(src='/images/sketchwave.png' height='62')
 			nav
