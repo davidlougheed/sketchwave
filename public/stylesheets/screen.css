@@ -1405,6 +1405,13 @@ form#formSignUp h2 {
 	text-align: center;
 	color: #444;
 }
+.col {
+	display: inline-block;
+	box-sizing: border-box;
+}
+.col50 {
+	width: 50%;
+}
 
 /*** SELECT2 OVERRIDES ***/
 
