@@ -114,7 +114,7 @@ module.exports.controller = function (objects) {
 		if (!req.isAuthenticated()) {
 			return res.redirect('/login/?redirect=' + encodeURIComponent('/conversations/' + req.params.id));
 		}
-		if (!parseInt(req.params.id)) {
+		if (isNaN(parseInt(req.params.id))) {
 			return appError.generate(req, res, appError.ERROR_BAD_REQUEST, {}, appError.MESSAGE_INVALID_ID);
 		}
 
