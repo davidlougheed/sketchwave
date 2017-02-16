@@ -308,8 +308,8 @@ SWConversationUI.prototype.initialize = function () {
 				console.error('No background canvas element found.');
 			}
 			self.drawCanvas.clearAllCanvasData(true, false);
-			self.drawCanvas.frames[self.drawCanvas.currentFrame].background.getContext('2d').drawImage($(this).parent().parent()
-				.children('div.image').first().children('img').first()[0], 0, 0);
+			self.drawCanvas.frames[self.drawCanvas.currentFrame].background.getContext('2d')
+				.drawImage($(this).parent().parent().children('div.image').first().children('img').first()[0], 0, 0);
 			// self.drawCanvas.clearAllCanvasData(false, false);
 		} else if ($messageDataContainer.hasClass('animation')) {
 			var $animationFrames = $messageDataContainer.children('.animation-frame');
