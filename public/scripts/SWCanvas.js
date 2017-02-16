@@ -52,7 +52,6 @@ var SWCanvas = function (canvas) {
 	this.animationInterval = null;
 	this.playing = false;
 
-	this.BLANK_PNG = "/images/blank.png";
 	this.GABESAVE_QUOTA = 50;
 
 	this.stamps = {
