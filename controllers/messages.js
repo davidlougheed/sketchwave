@@ -8,7 +8,7 @@ module.exports.controller = function (objects) {
 			// If user is properly signed in
 
 			if (socket.request.session.passport.user) {
-                appMessage.create(objects, socket, data.conversationID, data.messageData, data.type);
+                appMessage.create(objects, socket, data.conversationID, data.messageData, data.type, {}, false);
 			} else {
 				// TODO: Handle socket non-auth error
 			}
