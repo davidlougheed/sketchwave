@@ -205,19 +205,19 @@ block content
 				i.material-icons add
 				span Create
 
-	form#formCreateConversation(method='post', style='display: none;')
-		input(type='hidden', name='_csrf', value='#{csrfToken}')
+	form#formCreateConversation(method='post' style='display: none;')
+		input(type='hidden' name='_csrf' value='#{csrfToken}')
 
 		label(for='names') Members
-		select(name='names[]', id='names', class='js-basic-multiple', multiple='multiple', style='width: 400px')
+		select(name='names[]' id='names' class='js-basic-multiple' multiple='multiple' style='width: 400px')
 		label(for='name') Conversation Name
-		input(type='text', name='name', id='name')
+		input(type='text' name='name' id='name')
 		br
 		br
-		button(type='submit', style='margin-right: 0.2rem')
+		button(type='submit' style='margin-right: 0.2rem')
 			i.material-icons add
 			span Create
-		button(type='button', id='cancelConversation').transparent Cancel
+		button(type='button' id='cancelConversation').transparent Cancel
 
 	ul#conversations
 	div#conversationsMessage

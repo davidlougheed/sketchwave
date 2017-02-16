@@ -121,10 +121,10 @@ block content
 			button#btnLogIn.transparent
 				i.material-icons exit_to_app
 				span Log In
-	form#formSignUp(method='post', action='/signup')
+	form#formSignUp(method='post' action='/signup')
 		// TODO: Proper errors such as "already taken", etc...
 
-		input(type='hidden', name='_csrf', value='#{csrfToken}')
+		input(type='hidden' name='_csrf' value='#{csrfToken}')
 
 		label(for='username')
 			span Username
@@ -184,5 +184,5 @@ block content
 
 		div.g-recaptcha(data-sitekey='6LcU6hkTAAAAAIAlMCEAA6gEMzYWbcyY3M2l2opa')
 
-		button(type='submit', name='submit').big
+		button(type='submit' name='submit').big
 			span Sign Up

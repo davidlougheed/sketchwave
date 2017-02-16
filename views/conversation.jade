@@ -5,7 +5,7 @@ block vars
 	- var page = "conversation"
 
 block scripts
-	script(type='text/javascript', src='/scripts/SWConversationUI.js')
+	script(type='text/javascript' src='/scripts/SWConversationUI.js')
 
 	if conversation.OwnerId
 		script(type='text/javascript') var ownerId = #{conversation.OwnerId};
@@ -47,8 +47,8 @@ block content
 		section#drawPanel
 			div#scrollIt
 				div#canvasContainer
-					canvas#onionSkin(height='640', width='960', style='width: 480px; height: 320px;')
-					canvas#drawCanvas(height='640', width='960', style='width: 480px; height: 320px;', tabindex='1')
+					canvas#onionSkin(height='640' width='960' style='width: 480px; height: 320px;')
+					canvas#drawCanvas(height='640' width='960' style='width: 480px; height: 320px;' tabindex='1')
 
 				div#frames
 					a#frame-1(data-frame='0').frame.selected 1
@@ -90,7 +90,7 @@ block content
 
 					div#brushSize
 						h3 Brush Size
-						input#brushSizeRange(type='range', min='1', max='100', value='10')
+						input#brushSizeRange(type='range' min='1' max='100' value='10')
 
 			div#commands
 				div(style='float: left;')
