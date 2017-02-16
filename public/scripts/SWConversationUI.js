@@ -747,8 +747,10 @@ SWConversationUI.prototype.displayMessage = function (userID, mId, messageData, 
 
 	switch (messageType) {
 		case 'image':
+			var imageURL = messageData;
+			if (mId) imageURL = '/messages/' + mId.toString() + '/image/';
 			messageHTML += '<div class="message-data image">'
-				+ '<img src="' + messageData + '" width="480" height="320"></div>'
+				+ '<img src="' + imageURL + '" width="480" height="320"></div>'
 				+ '<div class="controls"><button class="importToCanvas transparent noMargin">'
 				+ '<i class="material-icons">gesture</i><span>Bastardize</span></button></div>';
 			break;
