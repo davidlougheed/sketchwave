@@ -7,11 +7,140 @@ block vars
 block scripts
 	script(type='text/javascript').
 		$(function () {
+			var $body = $('body');
 			var $gabeFace = $('#gabeFace');
+			var $brushSizeRange = $('#brushSizeRange');
+			var $demoCanvas = $('#demoCanvas');
+			var $cursor = $('#cursor');
 
-			$('body').on('mousemove', function (event) {
-				$gabeFace.css('left', event.pageX - ($gabeFace.width() / 2));
+			var hover = false;
+
+			var drawCanvas = new SWCanvas('demoCanvas');
+			window.requestAnimationFrame(drawCanvas.redraw.bind(drawCanvas));
+
+			$demoCanvas.on('mousedown', function (event) {
+				drawCanvas.startPainting();
+				drawCanvas.addPoint(drawCanvas.calculateMouse(event.pageX, event.pageY), false);
 			});
+			$demoCanvas.on('touchstart', function (event) {
+				var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+
+				drawCanvas.startPainting();
+				drawCanvas.addPoint(drawCanvas.calculateMouse(touch.pageX, touch.pageY), false);
+			});
+			$demoCanvas.on('mousemove', function (event) {
+				if (drawCanvas.paint) {
+					drawCanvas.addPoint(drawCanvas.calculateMouse(event.pageX, event.pageY), true);
+				}
+				if (hover) {
+					$('#cursor').css({
+						'top': (event.pageY - 10).toString() + 'px',
+						'left': event.pageX.toString() + 'px'
+					});
+				}
+			});
+			$demoCanvas.on('touchmove', function (event) {
+				event.preventDefault();
+
+				if (drawCanvas.paint) {
+					var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+
+					drawCanvas.startPainting();
+					drawCanvas.addPoint(drawCanvas.calculateMouse(touch.pageX, touch.pageY), true);
+				}
+			});
+
+			var onMouseUp = function () {
+				drawCanvas.stopPainting();
+				drawCanvas.imageToBg(false);
+			};
+
+			$demoCanvas.on('mouseup', onMouseUp);
+			$demoCanvas.on('touchend', function (event) {
+				event.preventDefault();
+				onMouseUp(event);
+			});
+			$demoCanvas.on('mouseleave', function () {
+				drawCanvas.stopPainting();
+				hover = false;
+				$cursor.hide();
+			});
+
+			$demoCanvas.on('mouseenter', function () {
+				hover = true;
+				$cursor.show();
+			});
+
+			$('.colorTool').click(function () {
+				drawCanvas.updateBrush({
+					tool: 'brush',
+					color: $(this).css('backgroundColor')
+				});
+
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#images').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+			$('.stampTool').click(function () {
+				drawCanvas.updateBrush({
+					tool: 'stamp',
+					stamp: $(this).attr('id')
+				});
+
+				$brushSizeRange.change(); // Refresh size, make sure it's correct
+
+				$(this).parent().children('li').each(function () {
+					$(this).removeClass('active');
+				});
+				$(this).addClass('active');
+
+				$(this).parent().parent().children('#colors').children('li').each(function () {
+					$(this).removeClass('active');
+				});
+			});
+
+			$brushSizeRange.on('input change', function () {
+				drawCanvas.setBrushSize($(this).val());
+			});
+
+			$brushSizeRange.change();
+
+			$('#clear').click(function () {
+				drawCanvas.clearAllCanvasData(true, false);
+			});
+
+			$(window).on('beforeunload', function (event) {
+				onMouseUp(event);
+			});
+
+			$(window).resize(function () {
+				$demoCanvas.css('height', ($demoCanvas.width() / 1.5).toString() + 'px');
+				drawCanvas.updateCanvasOffset();
+			}.bind(this));
+			$(window).resize();
+
+			$('#main').scroll(function () {
+				drawCanvas.updateCanvasOffset();
+			});
+
+			// --------
+
+			//$body.on('mousemove', function (event) {
+			//	var newPosition = event.pageX - ($gabeFace.width() / 2);
+			//	if (newPosition > $('#home-text').offset().left + $('#home-text').width() - $gabeFace.width()) {
+			//		newPosition = $('#home-text').offset().left + $('#home-text').width() - $gabeFace.width() + 120;
+			//	}
+			//	$gabeFace.css('left', newPosition);
+			//});
+
+			$body.mousemove();
 
 			$('#btnLogIn').on('click touchstart', function () {
 				window.location.replace('/login');
@@ -21,27 +150,67 @@ block scripts
 			});
 		});
 
-block content
-	h1.full-width
-		span Home
-		div#controls
-			button#btnLogIn.transparent
-				i.material-icons exit_to_app
-				span Log In
-			button#btnSignUp Sign Up
+block global
+	img#cursor(width='100' height='57' src='/images/cursor.png' style='display: none;')
 
-	blockquote
-		p.
-			In a world of increasing data-overload, who wants to be stuck with grandpa's writing system?
-			Throw away those letters, but on SketchWave you can keep the stamps!
-		footer Gabe, SketchWave Spiritual Adviser
-	blockquote
-		p.
-			Your conversation is the canvas, and the world is yours to bastardize.
-		footer Gabe, Chair of SketchWave's Department of Arcane Arts
-	blockquote
-		p.
-			Let fun replace functionality and join us in communicating in the sketchiest way possible.
-		footer Gabe, Head of Combustion
+block content
+	div#home-text
+		h1.full-width
+			span Home
+			div#controls
+				button#btnLogIn.transparent
+					i.material-icons exit_to_app
+					span Log In
+				button#btnSignUp Sign Up
+
+		blockquote
+			p.
+				In a world of increasing data-overload, who wants to be stuck with grandpa's writing system?
+				Throw away those letters, but on SketchWave you can keep the stamps!
+			footer Gabe, SketchWave Spiritual Adviser
+		blockquote
+			p.
+				Your conversation is the canvas, and the world is yours to bastardize.
+			footer Gabe, Head of Combustion
+		//blockquote
+		//	p.
+		//		Let fun replace functionality and join us in communicating in the sketchiest way possible.
+		//	footer Gabe, Chair of SketchWave's Department of Arcane Arts
+
+	div#home-canvas
+		canvas#demoCanvas(height='640' width='960' style='width: 480px; height: 320px;')
+
+		div#tools
+			ul#colors
+				li#white.colorTool
+				li#grey.colorTool
+				li#black.colorTool
+				li#hotPink.colorTool
+				li#red.colorTool.active
+				li#orange.colorTool
+				li#yellow.colorTool
+				li#blue.colorTool
+				li#green.colorTool
+
+			ul#images
+				li#dolphin.big.stampTool
+					img(src='/images/dolphin.png')
+				li#hand.big.stampTool
+					img(src='/images/hand.png')
+				li#pizza.big.stampTool
+					img(src='/images/pizza.png')
+				li#gabe.big.stampTool
+					img(src='/images/gabe.png')
+				li#hotswap.big.stampTool
+					img(src='/images/speech_bubble.png')
+
+			div#brushSize
+				h3 Brush Size
+				input#brushSizeRange(type='range', min='1', max='100', value='10')
+
+			div#canvasControls
+				button#clear(type='button').transparent.big
+					i.material-icons clear
+					span Clear
 
 	img#gabeFace(style='position: fixed; bottom: 0; left: 100px;', src='/images/gabed.png')

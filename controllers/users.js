@@ -112,20 +112,29 @@ module.exports.controller = function (objects) {
 			},
 			attributes: { exclude: ['password', 'avatarThumb'] }
 		}).then(function (user) {
-			var userData = user.toJSON();
+			if (user) {
+				var userData = user.toJSON();
 
-			if (userData.avatar.toString().indexOf('data:image/png;base64,') == -1) {
-				// New Avatar Storage System
-				userData.avatar = 'data:image/png;base64,' + userData.avatar.toString('base64');
+				if (userData.avatar.toString().indexOf('data:image/png;base64,') == -1) {
+					// New Avatar Storage System
+					var avatarString = userData.avatar.toString('base64');
+					if (avatarString.length == 0) {
+						userData.avatar = '';
+					} else {
+						userData.avatar = 'data:image/png;base64,' + avatarString;
+					}
+				} else {
+					// Old Avatar Storage System
+					userData.avatar = userData.avatar.toString();
+				}
+
+				res.render('user', {
+					user: req.user, // The currently signed-in user
+					profile: userData // User who's profile someone is viewing
+				});
 			} else {
-				// Old Avatar Storage System
-				userData.avatar = userData.avatar.toString();
+				return appError.generate(req, res, appError.ERROR_NOT_FOUND, {});
 			}
-
-			res.render('user', {
-				user: req.user, // The currently signed-in user
-				profile: userData // User who's profile someone is viewing
-			});
 		});
 	});
 
@@ -256,7 +265,7 @@ module.exports.controller = function (objects) {
 		});
 	});
 
-	// TODO: This online system doesn't really work... replace with a keep-alive type of deal?
+	// TODO: Handle redis errors better...
 	objects.io.on('connection', function (socket) {
 		socket.on('userOnline', function () {
 			if (socket.request.session.passport.user) {
