@@ -153,6 +153,11 @@ block scripts
 				$('#avatar').show();
 				$('#avatarContainer').hide();
 			});
+
+			$(window).resize(function () {
+				$('#emptyAvatar').height($('#emptyAvatar').width());
+			});
+			$(window).resize();
 		});
 
 block content
@@ -160,7 +165,7 @@ block content
 		if profile.avatar
 			img#avatar(src='#{profile.avatar}')
 		else
-			img#avatar
+			div#emptyAvatar
 
 		div#avatarContainer
 			form#formAvatar(style='display: none;')

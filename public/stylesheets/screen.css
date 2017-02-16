@@ -925,6 +925,20 @@ div#profile img#avatar {
 	border-radius: 100%;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
+div#profile div#emptyAvatar {
+	display: block;
+	margin: auto;
+	box-sizing: border-box;
+	max-height: 384px; max-width: 384px;
+	height: 384px;
+
+	width: 100%;
+
+	background-color: white;
+	border: 1px solid #bdbdbd;
+	border-radius: 100%;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
 div#profile h1 {
 	border: none;
 	font-size: 3rem;
