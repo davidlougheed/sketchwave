@@ -109,6 +109,8 @@ block scripts
 				onMouseUp(event);
 			});
 
+			$('#avatar').val($avatarCanvas[0].toDataURL());
+
 			$('#main').scroll(function () {
 				drawCanvas.updateCanvasOffset();
 			});
@@ -146,10 +148,10 @@ block content
 		h2 Draw Your Avatar
 
 		// TODO: FIX XSS VULNERABILITY WITH AVATAR (ELSEWHERE TOO!!!)
-		input(type='hidden', id='avatar', name='avatar')
+		input(type='hidden' id='avatar' name='avatar')
 
 		div#avatarContainer
-			canvas#avatarCanvas(height='768', width='768')
+			canvas#avatarCanvas(height='768' width='768')
 
 			div#tools
 				ul#colors
