@@ -35,16 +35,15 @@ module.exports.controller = function (objects) {
 		}
 
 		var names = req.body.names || [];
-		names.push(req.user.username);
+		names.push(req.user.id);
+		names.map(parseInt);
 
 		objects.models.Conversation.create({
 			name: req.body.name.trim()
 		}).then(function (conversation) {
 			objects.models.User.findAll({
 				where: {
-					username: {
-						$in: names
-					}
+					id: { $in: names }
 				}
 			}).then(function (users) {
 				conversation.setUsers(users).then(function () {
