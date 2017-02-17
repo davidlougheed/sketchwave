@@ -14,10 +14,10 @@ module.exports.controller = function (objects) {
 		res.render('index');
 	});
 	objects.router.get('/about/', function (req, res) {
-		res.render('about');
+		res.render('about', { user: req.user });
 	});
 	objects.router.get('/contact/', function (req, res) {
-		res.render('contact');
+		res.render('contact', { user: req.user });
 	});
 
 	objects.router.get('/signup/', objects.csrfProtection, function (req, res) {
