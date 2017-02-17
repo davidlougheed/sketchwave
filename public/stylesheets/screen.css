@@ -201,6 +201,12 @@ footer#pageFooter {
 	-webkit-backdrop-filter: blur(5px);
 	backdrop-filter: blur(5px);
 }
+footer#pageFooter.inline {
+	position: static;
+	width: 100%;
+	margin-top: 40px;
+	margin-bottom: -25px;
+}
 footer#pageFooter nav {
 	float: left
 }

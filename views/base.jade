@@ -64,7 +64,23 @@ html
 		section#main
 			block content
 
-		if footer
+			if footer === 'inline'
+				footer#pageFooter.inline
+					nav
+						ul
+							li
+								a(href='/') Home
+							li
+								a(href='/about/') About
+							//li
+							//	a(href='/blog/') Blog
+							//li
+							//	a(href='/privacy/') Privacy Policy
+							li
+								a(href='/contact/') Contact
+					img#footerLogo(src='/images/dolphin_transparent.png' height='40')
+
+		if footer === true
 			footer#pageFooter
 				nav
 					ul
