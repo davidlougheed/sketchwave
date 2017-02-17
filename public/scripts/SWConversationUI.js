@@ -385,7 +385,7 @@ SWConversationUI.prototype.initialize = function () {
 			$('#saveName').remove();
 			$(this).remove();
 
-			$changeNameText.replaceWith('<span id="conversationName">' + $changeNameText.val() + '</span>');
+			$changeNameText.replaceWith('<span id="conversationName">' + currentName + '</span>');
 			self.$changeNameButton.removeAttr('disabled');
 			self.$changeNameButton.show();
 		});
@@ -460,7 +460,9 @@ SWConversationUI.prototype.initialize = function () {
 			var $members = $('#members');
 			for (var u in data['users']) {
 				if (data['users'].hasOwnProperty(u)) {
-					var memberHTML = '<div class="member" data-username="'
+					var isMe = self.CURRENT_USER.id === data['users'][u]['id'] ? ' me' : '';
+
+					var memberHTML = '<div class="member' + isMe + '" data-username="'
 						+ data['users'][u]['username'] + '" data-id="' + data['users'][u]['id']
 						+ '"><div class="avatar">'
 						+ '<img src="/users/' + data['users'][u]['id'] + '/avatar/thumb/">'
@@ -471,7 +473,8 @@ SWConversationUI.prototype.initialize = function () {
 					if (self.ownerId == data['users'][u]['id']) {
 						memberHTML += '<div class="ownerBadge">Owner</div>';
 					}
-					if (self.ownerId == self.CURRENT_USER.id) {
+					if (self.ownerId == self.CURRENT_USER.id &&
+						(self.CURRENT_USER.id != data['users'][u]['id'] || data['users'].length > 1)) {
 						memberHTML += ' <button class="deleteMember iconOnly transparent">'
 							+ '<i class="material-icons">clear</i></button>';
 					}
@@ -494,12 +497,14 @@ SWConversationUI.prototype.initialize = function () {
 				if (userToAdd) {
 					self.socket.emit('userAdd', {userID: userToAdd, conversationID: self.convID});
 
+					var deleteButton = (self.ownerId === self.CURRENT_USER.id ? ' <button class="deleteMember ' +
+						'iconOnly transparent"><i class="material-icons">clear</i></button></div>' : '');
+
 					$members.append('<div class="member" data-username="'
 						+ self.authors[userToAdd]['username'] + '"><div class="avatar"><img src="/users/'
 						+ self.authors[userToAdd]['id'] + '/avatar/thumb/"></div><a class="name">'
 						+ self.authors[userToAdd]['username']
-						+ '</a> <button class="deleteMember iconOnly transparent">'
-						+ '<i class="material-icons">clear</i></button></div>');
+						+ '</a>' + deleteButton);
 				}
 			});
 
@@ -519,6 +524,10 @@ SWConversationUI.prototype.initialize = function () {
 		var usernameToRemove = $(this).parent().data('username');
 		self.socket.emit('userRemove', {username: usernameToRemove, conversationID: self.convID});
 		$(this).parent().remove();
+
+		if ($('.member').length == 1) {
+			$('.member.me').children('.deleteMember').remove();
+		}
 
 		if (self.CURRENT_USER.username == usernameToRemove) {
 			// User has removed themselves; send them to the conversation list page.
